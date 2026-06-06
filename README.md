@@ -2,7 +2,7 @@
 ⚡️ Subtitle Translator
 </h1>
 <p align="center">
-    English | <a href="./README-zh.md">中文</a>
+    English | <a href="./README-zh.md">中文</a> | <a href="./README-km.md">ភាសាខ្មែរ</a>
 </p>
 <p align="center">
     <em>Customized subtitle translation tool with Khmer language support and curated tools list</em>
