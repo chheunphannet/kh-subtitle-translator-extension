@@ -18,9 +18,7 @@ This is a customized version of the excellent [Subtitle Translator](https://gith
 2. **Khmer Language Support (`km`)**: 
    - Added full UI localization for the Khmer language.
    - Integrated the **[Kantumruy Pro](https://fonts.google.com/specimen/Kantumruy+Pro)** Google Font specifically optimized for Khmer rendering across both global styles and Ant Design's component theme.
-3. **Custom Community Links**:
-   - Replaced default community chat options with a dedicated Telegram link: [t.me/ifitworkitwork](https://t.me/ifitworkitwork).
-   - Removed Discord options.
+3. **Qwen-MT Translation Support**: Improved translation capability with optimized Qwen-MT models for higher translation accuracy and flow.
 
 ### 💖 Credits
 All credit for the core engine, UI layout, translation API integrations, and local caching architecture goes to the original creator, **[rockbenben](https://github.com/rockbenben)**. You can find the original repository here: [rockbenben/subtitle-translator](https://github.com/rockbenben/subtitle-translator).
