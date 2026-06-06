@@ -42,3 +42,7 @@ next-env.d.ts
 
 # tauri
 src-tauri
+
+# agents and workspace local configuration
+.agents/
+skills-lock.json

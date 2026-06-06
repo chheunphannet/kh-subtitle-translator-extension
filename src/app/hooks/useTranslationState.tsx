@@ -773,23 +773,147 @@ const useTranslationState = () => {
         return translatedLines;
       }
 
-      // Chunk-based translation
+      // Chunk-based concurrent translation.
+      //
+      // WHY NOT join→translate→split:
+      // Joining lines with "\n" then splitting the translated result by "\n"
+      // breaks when any line is empty — an empty line becomes an extra "\n"
+      // in the joined text, so the split result has MORE elements than the
+      // original, shifting every subsequent line's index. This silently maps
+      // the wrong translation to the wrong subtitle line.
+      //
+      // SOLUTION: track which contentLines indices each chunk covers, then
+      // map translated lines back by per-chunk position — no global index
+      // arithmetic that can drift.
       const delimiter = translationMethodArg === "deeplx" ? "<>" : "\n";
-      const nonEmptyLines = contentLines.map((line) => (line.trim() ? line : delimiter));
-      const text = nonEmptyLines.join(delimiter);
-      const chunkSize = config?.chunkSize || 5000;
-      const chunks = splitTextIntoChunks(text, chunkSize, delimiter);
-      const translatedChunks: string[] = [];
+      const chunkSizeVal = config?.chunkSize || 5000;
 
-      for (let i = 0; i < chunks.length; i++) {
-        const translatedContent = await translateSingle(chunks[i], cacheSuffix, runtimeConfig, fullText);
-        translatedChunks.push(translationMethodArg === "deeplx" ? (translatedContent || "").replace(/<>/g, "\n") : translatedContent || "");
-        updateProgress(i + 1, chunks.length);
-        if (i < chunks.length - 1) await delay(config?.delayTime || 200);
+      // Build chunks directly from contentLines, recording start index for each.
+      interface ChunkInfo { text: string; lines: string[]; startIdx: number }
+      const chunkInfos: ChunkInfo[] = [];
+      {
+        const parts: string[] = [];
+        let currentChars = 0;
+        let chunkStart = 0;
+
+        const flushChunk = () => {
+          if (parts.length === 0) return;
+          chunkInfos.push({
+            text: parts.join(delimiter),
+            lines: [...parts],
+            startIdx: chunkStart,
+          });
+          chunkStart += parts.length;
+          parts.length = 0;
+          currentChars = 0;
+        };
+
+        for (const line of contentLines) {
+          const addedLen = parts.length > 0 ? delimiter.length + line.length : line.length;
+          if (currentChars + addedLen > chunkSizeVal && parts.length > 0) flushChunk();
+          parts.push(line);
+          currentChars += parts.length === 1 ? line.length : delimiter.length + line.length;
+        }
+        flushChunk();
       }
 
-      const result = translatedChunks.join("\n").split("\n");
-      return result.map((line, index) => (contentLines[index]?.trim() ? line : contentLines[index] || line));
+      const translatedLines = new Array<string>(contentLines.length);
+      const chunkFailedLines: string[] = [];
+
+      const chunkTasks = chunkInfos.map(({ text, lines, startIdx }, i) =>
+        limit(async () => {
+          try {
+            const translatedContent = await translateSingle(text, cacheSuffix, runtimeConfig, fullText);
+            const decoded =
+              translationMethodArg === "deeplx"
+                ? (translatedContent || "").replace(/<>/g, "\n")
+                : translatedContent || "";
+            // Split translated result by the same delimiter used to build the chunk.
+            // Map each position back to the exact contentLines index — immune to
+            // index drift regardless of how many empty lines are in the file.
+            const resultLines = decoded.split(delimiter);
+            // First pass: map translated lines back by index.
+            // Collect lines the API skipped (line-count mismatch) for
+            // individual retry — their cache key differs from the chunk key,
+            // so individual calls bypass the cached partial result entirely.
+            const missingJs: number[] = [];
+            for (let j = 0; j < lines.length; j++) {
+              const contentIdx = startIdx + j;
+              if (contentIdx >= contentLines.length) break;
+              const original = contentLines[contentIdx];
+              const translated = resultLines[j];
+              if (!original?.trim()) {
+                translatedLines[contentIdx] = original || "";
+              } else if (translated?.trim()) {
+                translatedLines[contentIdx] = translated;
+              } else {
+                missingJs.push(j);
+                translatedLines[contentIdx] = original; // placeholder
+              }
+            }
+            // Second pass: retry each missing line individually.
+            // WHY: the chunk result was cached (HTTP 200 but wrong line count).
+            // Retrying the whole chunk would hit that same cache and return the
+            // same partial result forever. A single-line request has a different
+            // cache key, forces a fresh API call, and caches the correct result.
+            for (const j of missingJs) {
+              const contentIdx = startIdx + j;
+              if (contentIdx >= contentLines.length) break;
+              if (abortControllerRef.current?.signal.aborted) break;
+              const original = contentLines[contentIdx];
+              try {
+                const retried = await translateSingle(original, cacheSuffix, runtimeConfig, fullText);
+                if (retried?.trim()) {
+                  translatedLines[contentIdx] = retried;
+                } else {
+                  // Individual retry also returned empty — genuinely failed.
+                  chunkFailedLines.push(original);
+                }
+              } catch (lineErr) {
+                if (isAuthError(lineErr) || abortControllerRef.current?.signal.aborted) throw lineErr;
+                chunkFailedLines.push(original);
+              }
+            }
+          } catch (error) {
+            // Auth errors and cascaded aborts must propagate — same contract
+            // as line-by-line mode so Promise.all stops all peers correctly.
+            if (isAuthError(error) || abortControllerRef.current?.signal.aborted) throw error;
+            // Any other failure (network, 5xx, rate-limit after retries):
+            // soft-fail every line in this chunk so the rest keep translating.
+            for (let j = 0; j < lines.length; j++) {
+              const contentIdx = startIdx + j;
+              if (contentIdx >= contentLines.length) break;
+              translatedLines[contentIdx] = contentLines[contentIdx];
+              if (contentLines[contentIdx]?.trim()) chunkFailedLines.push(contentLines[contentIdx]);
+            }
+          }
+
+          // Progress based on lines translated so far (more accurate than chunk count).
+          updateProgress(translatedLines.filter((l) => l !== undefined).length, contentLines.length);
+          if (baseDelay > 0 && i < chunkInfos.length - 1) await delay(baseDelay);
+        }),
+      );
+
+      await Promise.all(chunkTasks);
+
+      // Safety net: any slot still undefined (shouldn't happen, but guards
+      // against future code paths missing an assignment).
+      for (let i = 0; i < contentLines.length; i++) {
+        if (translatedLines[i] === undefined) {
+          translatedLines[i] = contentLines[i];
+          if (contentLines[i]?.trim()) chunkFailedLines.push(contentLines[i]);
+        }
+      }
+
+      // Surface all failures through the retry panel — same channel as
+      // line-by-line mode so "Retry" works and cache skips successful lines.
+      if (chunkFailedLines.length > 0) {
+        setFailedCount((prev) => prev + chunkFailedLines.length);
+        setFailedLines((prev) => [...prev, ...chunkFailedLines]);
+      }
+
+      return translatedLines;
+
     } catch (error) {
       console.error("Error translating content:", error);
       throw error;

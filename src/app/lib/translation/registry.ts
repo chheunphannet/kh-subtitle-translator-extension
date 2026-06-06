@@ -1,6 +1,7 @@
 // Single source of truth for every translation provider.
 //
 // PROVIDERS below is the ONE place you edit to add / change a service.
+
 // TRANSLATION_PROVIDERS (UI list), LLM_MODELS, defaultConfigs, categorizedOptions,
 // OPENAI_COMPAT_PROVIDERS (factory input), findMethodLabel, getDefaultConfig,
 // and the TranslationMethod union type are all derived views over PROVIDERS.
@@ -112,7 +113,7 @@ export const PROVIDERS = {
     label: "Qwen-MT",
     docs: "https://help.aliyun.com/zh/model-studio/machine-translation",
     apiKeyUrl: "https://bailian.console.aliyun.com/?tab=model#/api-key",
-    defaults: { url: "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions", apiKey: "", domains: "", model: "qwen-mt-flash", batchSize: 20 },
+    defaults: { url: "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions", apiKey: "", domains: "", model: "qwen-mt-flash", chunkSize: 2000, batchSize: 3, delayTime: 300 },
     endpoints: [
       { label: "Mainland (CN)", url: "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions" },
       { label: "International", url: "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions" },

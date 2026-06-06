@@ -117,6 +117,7 @@ export const languages: LanguageOption[] = [
   { value: "th", name: "Thai", nativelabel: "ไทย" },
   { value: "lo", name: "Lao", nativelabel: "ລາວ" },
   { value: "my", name: "Burmese", nativelabel: "မြန်မာ" },
+  { value: "km", name: "Khmer", nativelabel: "ភាសាខ្មែរ" },
   { value: "ms", name: "Malay", nativelabel: "Bahasa Melayu" },
   { value: "fil", name: "Filipino(Tagalog)", nativelabel: "Tagalog" },
   { value: "jv", name: "Javanese", nativelabel: "Basa Jawa" },
@@ -203,8 +204,8 @@ export const languages: LanguageOption[] = [
 const UNSUPPORTED_LANGS: Record<string, Set<string>> = {
   // DeepL & DeepLX — same coverage (DeepLX is a community proxy in front of DeepL).
   // Verified 2026-05-26 — denylist is complete, no other master codes missing.
-  deepl: new Set(["kn", "am", "ug", "si", "lo"]),
-  deeplx: new Set(["kn", "am", "ug", "si", "lo"]),
+  deepl: new Set(["kn", "am", "ug", "si", "lo", "km"]),
+  deeplx: new Set(["kn", "am", "ug", "si", "lo", "km"]),
 
   // Google Cloud Translation / GTX (Free). Both go through Google's NMT backend.
   // Only 2 codes from our master aren't on Google's official supported list:
@@ -249,7 +250,7 @@ const UNSUPPORTED_LANGS: Record<string, Set<string>> = {
     "yue", "bho",
     // 2026-05 backfill — our existing master list entries not in WMT24++:
     "af", "bs", "mk", "be", "sq", "mt", "hy", "ka", "uz", "kk", "ky", "tk",
-    "az", "tg", "mn", "si", "ne", "lo", "my", "ms", "jv", "ha", "am", "ug",
+    "az", "tg", "mn", "si", "ne", "lo", "my", "km", "ms", "jv", "ha", "am", "ug",
     // 2026-05 additions (43 - 1 since zu IS in WMT24++):
     "ace", "an", "as", "ay", "ba", "br", "ceb", "ckb", "cy", "eo", "eu",
     "ga", "gl", "gn", "gom", "ht", "ig", "kmr", "la", "lb", "lmo", "ln",
@@ -329,7 +330,7 @@ export const LANGUAGE_GROUPS: ReadonlyArray<{ key: string; labelKey: string; cod
   {
     key: "seAsia",
     labelKey: "langGroupSeAsia",
-    codes: ["th", "lo", "my", "ms", "fil", "jv", "su", "ace", "pag", "pam", "ceb"],
+    codes: ["th", "lo", "my", "km", "ms", "fil", "jv", "su", "ace", "pag", "pam", "ceb"],
   },
   {
     key: "africa",

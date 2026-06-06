@@ -5,17 +5,29 @@
     English | <a href="./README-zh.md">中文</a>
 </p>
 <p align="center">
-    <em>Blazing-fast batch subtitle translation for 120+ languages — powered by AI</em>
+    <em>Customized subtitle translation tool with Khmer language support and curated tools list</em>
 </p>
 
-<p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
-  <a href="https://tools.newzone.top/en/subtitle-translator"><img src="https://img.shields.io/badge/Live%20Demo-subtitle--translator-blue" alt="Live Demo"></a>
-</p>
+---
 
-**Subtitle Translator** is a free, browser-based batch subtitle translation tool for `.srt`, `.ass`, `.vtt`, and `.lrc` files. With chunked compression and parallel processing it hits ~1 second per episode. Batch-upload a whole season at once, connect to 7 traditional translation APIs (DeepL, Google, Azure, DeepLX, Qwen-MT, TranslateGemma, GTX) or 17+ LLM providers, and translate into 120+ languages — or into several target languages in a single pass, each exported as its own file. Everything runs locally in your browser; subtitle content and API keys never touch a server.
+## 📌 About This Fork
+This is a customized version of the excellent [Subtitle Translator](https://github.com/rockbenben/subtitle-translator) created by [rockbenben](https://github.com/rockbenben). 
 
-👉 **Try it online**: <https://tools.newzone.top/en/subtitle-translator>
+### 🔧 Key Customizations & Updates:
+1. **Simplified Toolset**: Removed unrelated tools (parsers, text utilities) to keep the focus strictly on translation (Subtitle Translator, Markdown Translator, and Multi JSON Translator).
+2. **Khmer Language Support (`km`)**: 
+   - Added full UI localization for the Khmer language.
+   - Integrated the **[Kantumruy Pro](https://fonts.google.com/specimen/Kantumruy+Pro)** Google Font specifically optimized for Khmer rendering across both global styles and Ant Design's component theme.
+3. **Custom Community Links**:
+   - Replaced default community chat options with a dedicated Telegram link: [t.me/ifitworkitwork](https://t.me/ifitworkitwork).
+   - Removed Discord options.
+
+### 💖 Credits
+All credit for the core engine, UI layout, translation API integrations, and local caching architecture goes to the original creator, **[rockbenben](https://github.com/rockbenben)**. You can find the original repository here: [rockbenben/subtitle-translator](https://github.com/rockbenben/subtitle-translator).
+
+---
+
+👈 **Original Live Demo**: <https://tools.newzone.top/en/subtitle-translator>
 
 ![Batch Translation Demo](./public/img/subtitle-translator-en.webp)
 

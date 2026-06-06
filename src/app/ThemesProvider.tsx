@@ -6,6 +6,15 @@ import { ReactNode, useSyncExternalStore } from "react";
 import { useLocale } from "next-intl";
 import { getLangDir } from "rtl-detect";
 
+// Suppress the React 19 false-positive script tag warning in next-themes
+if (typeof window !== "undefined" && process.env.NODE_ENV === "development") {
+  const orig = console.error;
+  console.error = (...args: unknown[]) => {
+    if (typeof args[0] === "string" && args[0].includes("Encountered a script tag")) return;
+    orig.apply(console, args);
+  };
+}
+
 export default function ThemesProvider({ children }: { children: ReactNode }) {
   return (
     <NextThemesProvider attribute="class" defaultTheme="dark" enableSystem={false}>
@@ -30,7 +39,7 @@ const sharedTokens = {
   colorWarning: GOLD,
   colorError: BRICK,
 
-  fontFamily: 'var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif',
+  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif',
   fontFamilyCode: 'var(--font-mono), ui-monospace, "SF Mono", Menlo, Consolas, monospace',
 
   borderRadius: 4,
@@ -77,6 +86,7 @@ function AntdConfigProvider({ children }: { children: ReactNode }) {
   const { resolvedTheme } = useTheme();
   const locale = useLocale();
   const direction = getLangDir(locale);
+  const isKhmer = locale === "km";
 
   // next-themes 的 resolvedTheme 在 SSR + 首次 client render 都是 undefined,
   // 等 mount 后才确定。SSR 直接 isDark=true 跟 defaultTheme="dark" 对齐 (避
@@ -91,7 +101,15 @@ function AntdConfigProvider({ children }: { children: ReactNode }) {
   );
   const isDark = mounted ? resolvedTheme !== "light" : true;
   const algorithms = isDark ? [theme.darkAlgorithm] : [theme.defaultAlgorithm];
-  const tokens = isDark ? darkTokens : lightTokens;
+
+  // Build tokens with locale-aware font family
+  const fontFamily = isKhmer
+    ? '"Kantumruy Pro", var(--font-kantumruy), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+    : sharedTokens.fontFamily;
+
+  const tokens = isDark
+    ? { ...darkTokens, fontFamily }
+    : { ...lightTokens, fontFamily };
 
   return (
     <ConfigProvider

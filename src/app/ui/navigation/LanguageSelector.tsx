@@ -35,6 +35,7 @@ const LANGUAGES: readonly Language[] = [
   { key: "bn", label: "বাংলা" },
   { key: "id", label: "Indonesia" },
   { key: "it", label: "Italiano" },
+  { key: "km", label: "ភាសាខ្មែរ" },
 ] as const;
 
 // ============ 组件 ============

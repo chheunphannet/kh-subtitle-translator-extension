@@ -70,8 +70,8 @@ export type ApplicationCategory =
  * same group share a category tab. Order of values defines the default tab
  * order in the UI.
  */
-export type ToolGroup = "translate" | "textParser" | "jsonParser" | "dataParser";
-export const TOOL_GROUPS = ["translate", "textParser", "jsonParser", "dataParser"] as const satisfies readonly ToolGroup[];
+export type ToolGroup = "translate";
+export const TOOL_GROUPS = ["translate"] as const satisfies readonly ToolGroup[];
 
 type ToolEntry = {
   /** URL slug under /{locale}/ */
@@ -95,20 +95,6 @@ export const TOOL_REGISTRY = {
   subtitleTranslator:   { path: "subtitle-translator",    category: "MultimediaApplication", group: "translate",  namespaces: ["SubtitleTranslator", "TranslationSettings"] },
   mdTranslator:         { path: "md-translator",          category: "BusinessApplication",   group: "translate",  namespaces: ["MDTranslator", "TranslationSettings"] },
   jsonTranslate:        { path: "json-translate",         category: "DeveloperApplication",  group: "translate",  namespaces: ["JSON", "TranslationSettings"] },
-  textSplitter:         { path: "text-splitter",          category: "UtilitiesApplication",  group: "textParser", namespaces: ["TextSplitter"] },
-  chineseConversion:    { path: "chinese-conversion",     category: "UtilitiesApplication",  group: "textParser", namespaces: ["ChineseConversion", "ProtectedRuleManager"] },
-  novelProcessor:       { path: "novel-processor",        category: "UtilitiesApplication",  group: "textParser", namespaces: ["NovelProcessor", "ProtectedRuleManager"] },
-  textToolbox:          { path: "text-toolbox",           category: "DeveloperApplication",  group: "textParser", namespaces: ["TextToolbox"] },
-  dataBatch:            { path: "data-batch",             category: "UtilitiesApplication",  group: "textParser", namespaces: ["DataBatch"] },
-  jsonValueExtractor:   { path: "json-value-extractor",   category: "DeveloperApplication",  group: "jsonParser", namespaces: ["JSON", "JSONValueExtractor"] },
-  jsonNodeEdit:         { path: "json-node-edit",         category: "DeveloperApplication",  group: "jsonParser", namespaces: ["JSON", "JSONNodeEdit"] },
-  jsonValueTransformer: { path: "json-value-transformer", category: "DeveloperApplication",  group: "jsonParser", namespaces: ["JSON", "JSONValueTransformer"] },
-  jsonValueSwapper:     { path: "json-value-swapper",     category: "DeveloperApplication",  group: "jsonParser", namespaces: ["JSON", "JSONValueSwapper"] },
-  jsonNodeInserter:     { path: "json-node-inserter",     category: "DeveloperApplication",  group: "jsonParser", namespaces: ["JSON", "JSONNodeInserter"] },
-  jsonSortClassify:     { path: "json-sort-classify",     category: "DeveloperApplication",  group: "jsonParser", namespaces: ["JSON", "JSONSortClassify"] },
-  jsonMatchUpdate:      { path: "json-match-update",      category: "DeveloperApplication",  group: "jsonParser", namespaces: ["JSON", "JSONMatchUpdate"] },
-  dataParserFlare:      { path: "data-parser/flare",      category: "DeveloperApplication",  group: "dataParser", namespaces: ["JSON", "Flare"] },
-  dataParserImgPrompt:  { path: "data-parser/img-prompt", category: "DesignApplication",     group: "dataParser", namespaces: ["JSON", "ImgPrompt"] },
 } as const satisfies Record<string, ToolEntry>;
 
 export type ToolKey = keyof typeof TOOL_REGISTRY;
@@ -123,31 +109,14 @@ export const TOOL_KEYS = Object.keys(TOOL_REGISTRY) as ToolKey[];
  *
  * Semantic clusters used:
  *   • Translation trio (subtitle / md / json-translate) cross-link each other
- *   • Text-family tools (splitter / toolbox / novel / chinese-conversion) form a square
- *   • JSON tools route to nearest-utility siblings + the JSON i18n translator
- *   • Data-parser tools cluster with each other + jsonValueExtractor / dataBatch
  *
  * Goal: 2-3 outbound links per page so AI engines see an entity graph and
  * users discover adjacent tools.
  */
 export const RELATED_TOOLS: Record<ToolKey, ToolKey[]> = {
-  subtitleTranslator:   ["mdTranslator", "jsonTranslate", "textSplitter"],
-  mdTranslator:         ["subtitleTranslator", "jsonTranslate", "textSplitter"],
-  jsonTranslate:        ["mdTranslator", "subtitleTranslator", "jsonValueExtractor"],
-  textSplitter:         ["textToolbox", "novelProcessor", "mdTranslator"],
-  chineseConversion:    ["novelProcessor", "textToolbox", "textSplitter"],
-  novelProcessor:       ["textSplitter", "textToolbox", "chineseConversion"],
-  textToolbox:          ["textSplitter", "novelProcessor", "chineseConversion"],
-  dataBatch:            ["textToolbox", "jsonValueExtractor", "jsonTranslate"],
-  jsonValueExtractor:   ["jsonValueTransformer", "jsonNodeEdit", "jsonSortClassify"],
-  jsonNodeEdit:         ["jsonNodeInserter", "jsonValueTransformer", "jsonValueSwapper"],
-  jsonValueTransformer: ["jsonValueExtractor", "jsonValueSwapper", "jsonMatchUpdate"],
-  jsonValueSwapper:     ["jsonValueTransformer", "jsonNodeEdit", "jsonMatchUpdate"],
-  jsonNodeInserter:     ["jsonNodeEdit", "jsonValueSwapper", "jsonSortClassify"],
-  jsonSortClassify:     ["jsonValueExtractor", "jsonMatchUpdate", "jsonNodeEdit"],
-  jsonMatchUpdate:      ["jsonValueTransformer", "jsonValueSwapper", "jsonValueExtractor"],
-  dataParserFlare:      ["dataParserImgPrompt", "jsonValueExtractor", "dataBatch"],
-  dataParserImgPrompt:  ["dataParserFlare", "jsonTranslate", "dataBatch"],
+  subtitleTranslator:   ["mdTranslator", "jsonTranslate"],
+  mdTranslator:         ["subtitleTranslator", "jsonTranslate"],
+  jsonTranslate:        ["mdTranslator", "subtitleTranslator"],
 };
 
 /** Return the curated related-tool keys for a tool. Order is meaningful (declaration order = display order). */

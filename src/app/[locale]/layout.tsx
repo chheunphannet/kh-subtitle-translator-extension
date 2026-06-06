@@ -8,6 +8,14 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import ThemesProvider from "@/app/ThemesProvider";
+import { Kantumruy_Pro } from "next/font/google";
+
+const kantumruyPro = Kantumruy_Pro({
+  subsets: ["khmer", "latin"],
+  display: "swap",
+  variable: "--font-kantumruy",
+  weight: ["100", "200", "300", "400", "500", "600", "700"],
+});
 
 type Props = {
   children: React.ReactNode;
@@ -45,9 +53,13 @@ export default async function LocaleLayout({ children, params }: Props) {
   const direction = getLangDir(locale);
   const messages = await getMessages();
 
+  // Apply Kantumruy Pro font class when locale is Khmer
+  const isKhmer = locale === "km";
+  const htmlClassName = isKhmer ? kantumruyPro.variable : "";
+
   return (
-    <html lang={locale} dir={direction} suppressHydrationWarning>
-      <body>
+    <html lang={locale} dir={direction} className={htmlClassName} suppressHydrationWarning>
+      <body className={isKhmer ? kantumruyPro.className : ""}>
         <AntdRegistry>
           <NextIntlClientProvider messages={messages}>
             <ThemesProvider>

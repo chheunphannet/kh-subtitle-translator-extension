@@ -11,6 +11,6 @@
  */
 export const SOCIAL_LINKS = {
   discord: "https://discord.gg/PZTQfJ4GjX",
-  telegram: "https://t.me/aishort_top",
+  telegram: "https://t.me/ifitworkitwork",
   qq: "https://qm.qq.com/q/uWsUSnyivm",
 } as const;
