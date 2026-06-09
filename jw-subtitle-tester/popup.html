@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+  <meta charset="UTF-8">
+  <title>JW Subtitle Tester & Translator</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body class="dark-theme">
+  <!-- Container Header -->
+  <header class="app-header">
+    <div class="header-logo">
+      <span class="logo-icon">⚡</span>
+      <span class="logo-text font-display">Subtitle Tester</span>
+    </div>
+    <div class="header-controls">
+      <!-- Language Picker -->
+      <select id="ui-lang-select" class="lang-select">
+        <option value="km">ភាសាខ្មែរ</option>
+        <option value="en">English</option>
+        <option value="zh">简体中文</option>
+      </select>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="app-nav">
+    <button class="nav-tab active" data-tab="inject" id="tab-btn-inject">បញ្ចូល Subtitle</button>
+    <button class="nav-tab" data-tab="settings" id="tab-btn-settings">ការកំណត់ AI</button>
+    <button class="nav-tab" data-tab="prompts" id="tab-btn-prompts">Prompts</button>
+    <button class="nav-tab" data-tab="advanced" id="tab-btn-advanced">កម្រិតខ្ពស់</button>
+  </nav>
+
+  <!-- Content Sections -->
+  <main class="app-content">
+    
+    <!-- Tab 1: Inject Subtitles -->
+    <section id="tab-inject" class="tab-panel active">
+      <!-- Auto detect segment -->
+      <div id="auto-detect-box" class="card detect-box">
+        <div class="detect-header">
+          <span class="pulse-dot"></span>
+          <span class="detect-title" id="auto-detect-title">កំពុងស្វែងរក Player...</span>
+        </div>
+        <p class="detect-desc" id="auto-detect-desc">បើកទំព័រវីដេអូដែលមាន JW Player ដើម្បីបកប្រែស្វ័យប្រវត្ត។</p>
+        <button id="btn-auto-translate" class="btn btn-primary btn-block disabled" disabled>បកប្រែ & បញ្ចូលដោយស្វ័យប្រវត្ត</button>
+      </div>
+
+      <div class="divider">
+        <span id="divider-text">ឬ បញ្ចូលដោយខ្លួនឯង (Manual)</span>
+      </div>
+
+      <!-- File Dropzone -->
+      <div id="dropzone" class="dropzone-card">
+        <div class="dropzone-content">
+          <div class="dropzone-icon">📤</div>
+          <p id="drag-drop-text" class="dropzone-title">អូស & ទម្លាក់ file Subtitle ទីនេះ</p>
+          <p id="or-select-text" class="dropzone-subtitle">ឬ ចុចដើម្បីជ្រើសរើស file</p>
+        </div>
+        <input type="file" id="file-input" accept=".vtt,.srt,.ass,.lrc" style="display: none;">
+      </div>
+
+      <!-- File Details -->
+      <div id="file-info" class="card file-info-box" style="display: none;">
+        <span class="file-icon">📄</span>
+        <div class="file-details">
+          <span id="file-name" class="file-name">filename.srt</span>
+          <span id="file-size" class="file-size">0 KB</span>
+        </div>
+      </div>
+
+      <!-- Language Mappings -->
+      <div class="form-row">
+        <div class="form-group flex-1">
+          <label for="source-lang-select" id="source-lang-label">ភាសាដើម៖</label>
+          <select id="source-lang-select" class="form-control">
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+        <div class="form-group flex-1">
+          <label for="target-lang-select" id="target-lang-label">ភាសាបកប្រែ៖</label>
+          <select id="target-lang-select" class="form-control">
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+      </div>
+
+      <button id="btn-manual-inject" class="btn btn-primary btn-block disabled" disabled>បកប្រែ & បញ្ចូល</button>
+      
+      <!-- Progress Bar & Download Area -->
+      <div id="progress-container" class="card progress-card" style="display: none;">
+        <div class="progress-info">
+          <span id="progress-status">កំពុងបកប្រែ...</span>
+          <span id="progress-percent">0%</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div id="progress-bar" class="progress-bar-fill" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <button id="btn-download-translated" class="btn btn-success btn-block" style="display: none;">ទាញយក Subtitle បកប្រែរួច</button>
+    </section>
+
+    <!-- Tab 2: AI Settings -->
+    <section id="tab-settings" class="tab-panel">
+      <div class="form-group">
+        <label for="input-api-key" id="api-key-label">Gemini API Key</label>
+        <input type="password" id="input-api-key" class="form-control" placeholder="Enter Gemini API key">
+      </div>
+
+      <div class="form-group">
+        <label for="select-model" id="model-label">ជ្រើសរើស Model</label>
+        <select id="select-model" class="form-control">
+          <option value="gemini-3.5-flash">Gemini 3.5 Flash</option>
+          <option value="gemini-3.1-pro-preview">Gemini 3.1 Pro (Preview)</option>
+          <option value="gemini-3.1-flash-lite">Gemini 3.1 Flash Lite</option>
+        </select>
+      </div>
+
+      <div class="form-row" style="margin-top: 16px;">
+        <button id="btn-test-connection" class="btn btn-secondary flex-1">តេស្តការតភ្ជាប់</button>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Context Configs -->
+      <div class="form-group checkbox-group">
+        <input type="checkbox" id="check-context-aware">
+        <label for="check-context-aware" id="context-toggle-label">បកប្រែតាមបរិបទ (Context-Aware)</label>
+      </div>
+
+      <div id="context-settings-panel">
+        <div class="form-group">
+          <label for="input-context-window" id="context-window-label">ចំនួនបន្ទាត់បរិបទ (Context Lines)</label>
+          <input type="number" id="input-context-window" class="form-control" min="5" max="200" value="100">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="input-concurrency" id="concurrency-label">Concurrency</label>
+            <input type="number" id="input-concurrency" class="form-control" min="1" max="10" value="3">
+          </div>
+          <div class="form-group flex-1">
+            <label for="input-delay" id="delay-label">Delay (ms)</label>
+            <input type="number" id="input-delay" class="form-control" min="0" max="5000" value="200">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 3: Prompts -->
+    <section id="tab-prompts" class="tab-panel">
+      <div class="form-group">
+        <label for="input-system-prompt" id="system-prompt-label">Global System Prompt</label>
+        <textarea id="input-system-prompt" class="form-control text-area" rows="5"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="input-user-prompt" id="user-prompt-label">User Prompt</label>
+        <textarea id="input-user-prompt" class="form-control text-area" rows="5"></textarea>
+      </div>
+    </section>
+
+    <!-- Tab 4: Advanced -->
+    <section id="tab-advanced" class="tab-panel">
+      <div class="form-group checkbox-group">
+        <input type="checkbox" id="check-use-cache" checked>
+        <label for="check-use-cache" id="cache-toggle-label">ប្រើប្រាស់ការចងចាំ (Enable Cache)</label>
+      </div>
+
+      <div class="form-group">
+        <label for="select-format-pref" id="format-pref-label">ទម្រង់ Subtitle</label>
+        <select id="select-format-pref" class="form-control">
+          <option value="srt">SRT</option>
+          <option value="vtt" selected>WebVTT</option>
+        </select>
+      </div>
+
+      <div style="margin-top: 24px;">
+        <button id="btn-clear-cache" class="btn btn-danger btn-block">សម្អាត Cache</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Global Alert Area -->
+  <div id="global-status" class="alert-box" style="display: none;"></div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
