@@ -1,67 +1,49 @@
-import { parseSrt, parseVtt, parseAss, parseLrc, buildVtt, SubtitleCue } from "./parsers";
+import { parseSrt, parseVtt, parseAss, parseLrc, buildVtt, SubtitleCue, formatSubtitleText, generateSubtitleExport, formatMsToVttTime } from "./parsers";
 import { GeminiConfig, DEFAULT_GEMINI_CONFIG } from "./services/gemini";
-
-// ------------------------------------
-// Web App Settings Syncing
-// ------------------------------------
-function syncSettingsFromPage() {
-  try {
-    const configs = localStorage.getItem("translation-configs");
-    if (configs) {
-      const systemPrompt = localStorage.getItem("translation-systemPrompt") || "";
-      const userPrompt = localStorage.getItem("translation-userPrompt") || "";
-      const method = localStorage.getItem("translation-method") || "gemini";
-      
-      const settings = {
-        configs: JSON.parse(configs),
-        systemPrompt,
-        userPrompt,
-        method
-      };
-      
-      chrome.runtime.sendMessage({
-        action: "syncSettings",
-        settings
-      });
-      console.log("[JW Subtitle Tester] Auto-synced settings from web application.");
-    }
-  } catch (e) {
-    console.error("[JW Subtitle Tester] Failed to sync settings:", e);
-  }
-}
-
-// Auto-run sync if on the translation web app
-const isLocalhost = window.location.hostname === "localhost";
-const isHostedTranslator = window.location.hostname.includes("kh-subtitle-translator") || window.location.pathname.includes("subtitle-translator");
-if (isLocalhost || isHostedTranslator) {
-  // Run immediately and listen for changes
-  syncSettingsFromPage();
-  window.addEventListener("storage", (e) => {
-    if (e.key && (e.key.startsWith("translation-") || e.key === "translation-configs")) {
-      syncSettingsFromPage();
-    }
-  });
-}
 
 // ------------------------------------
 // Iframe Auto-Scraping & Injection
 // ------------------------------------
-const isKhanimeIframe = window.location.hostname.includes("stream.khanime.co") && window.location.pathname.startsWith("/e/");
+interface SupportedSite {
+  name: string;
+  isMatch: (hostname: string, pathname: string) => boolean;
+}
 
-if (isKhanimeIframe) {
-  console.log("[JW Subtitle Tester] Khanime player iframe detected. Initializing auto-translator...");
+const SUPPORTED_SITES: SupportedSite[] = [
+  {
+    name: "Khanime",
+    isMatch: (host, path) => host.includes("stream.khanime.co") && path.startsWith("/e/")
+  },
+  {
+    name: "KHFullHD",
+    isMatch: (host, path) => host.includes("stream.khfullhd.co") && path.startsWith("/e/")
+  },
+  {
+    name: "Anistream",
+    isMatch: (host, _) => host.includes("anistream.one")
+  }
+];
+
+const matchedSite = SUPPORTED_SITES.find(site => site.isMatch(window.location.hostname, window.location.pathname));
+
+if (matchedSite) {
+  console.log(`[JW Subtitle Tester] ${matchedSite.name} player iframe detected. Initializing auto-translator...`);
   
   // Listen for the popup requests (or check if we should auto-trigger)
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    const info = scanForSubtitles();
+    if (!info.hasPlayer) {
+      return false; // Let other frames that contain the player respond
+    }
+
     if (request.action === "getDetectedSubtitles") {
-      const info = scanForSubtitles();
       sendResponse(info);
       return true;
     }
 
     if (request.action === "autoTranslateAndInject") {
-      runAutoTranslateFlow(request.targetLanguage, request.sourceLanguage)
-        .then((res) => sendResponse({ success: true, text: res.text, fileName: res.fileName }))
+      runAutoTranslateFlow(request.targetLanguage, request.sourceLanguage, request.displayFormat || 'translated', request.exportFormat || 'vtt')
+        .then((res) => sendResponse({ success: true, text: res.text, fileName: res.fileName, ext: res.ext }))
         .catch((err) => sendResponse({ success: false, error: err.message }));
       return true;
     }
@@ -83,9 +65,28 @@ interface DetectedSubInfo {
 }
 
 function scanForSubtitles(): DetectedSubInfo {
-  const hasPlayer = !!(document.querySelector('.jwplayer') || document.querySelector('#player') || document.querySelector('video'));
+  const video = document.querySelector('video');
+  const hasPlayer = !!(document.querySelector('.jwplayer') || document.querySelector('#player') || video);
   let englishSubUrl: string | null = null;
   let videoTitle = document.title || "Video";
+
+  if (matchedSite?.name === "Anistream") {
+    if (video) {
+      const tracks = video.textTracks;
+      let foundTrack = false;
+      for (let i = 0; i < tracks.length; i++) {
+        const t = tracks[i];
+        if (t.kind === 'captions' || t.kind === 'subtitles') {
+          foundTrack = true;
+          break;
+        }
+      }
+      if (foundTrack) {
+        englishSubUrl = "native-text-track";
+      }
+    }
+    return { hasPlayer, englishSubUrl, videoTitle };
+  }
 
   try {
     const html = document.documentElement.innerHTML;
@@ -120,38 +121,111 @@ function scanForSubtitles(): DetectedSubInfo {
   return { hasPlayer, englishSubUrl, videoTitle };
 }
 
+async function getSubtitleCuesFromVideoElement(): Promise<SubtitleCue[]> {
+  const video = document.querySelector('video');
+  if (!video) {
+    throw new Error("No video element found");
+  }
+
+  const tracks = video.textTracks;
+  let englishTrack: TextTrack | null = null;
+
+  // Find English track
+  for (let i = 0; i < tracks.length; i++) {
+    const t = tracks[i];
+    if (t.kind === 'captions' || t.kind === 'subtitles') {
+      if (
+        t.label?.toLowerCase().includes('english') ||
+        t.language?.toLowerCase().includes('en')
+      ) {
+        englishTrack = t;
+        break;
+      }
+    }
+  }
+
+  // Fallback: first caption track
+  if (!englishTrack) {
+    for (let i = 0; i < tracks.length; i++) {
+      if (tracks[i].kind === 'captions' || tracks[i].kind === 'subtitles') {
+        englishTrack = tracks[i];
+        break;
+      }
+    }
+  }
+
+  if (!englishTrack) {
+    throw new Error("No caption or subtitle track found on the video element.");
+  }
+
+  const oldMode = englishTrack.mode;
+  englishTrack.mode = 'showing';
+
+  let retries = 5;
+  while ((!englishTrack.cues || englishTrack.cues.length === 0) && retries > 0) {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    retries--;
+  }
+
+  const cues = englishTrack.cues;
+  if (!cues || cues.length === 0) {
+    englishTrack.mode = oldMode;
+    throw new Error("No cues loaded from the video text track.");
+  }
+
+  const cueArray: SubtitleCue[] = Array.from(cues).map((cue: any, idx) => ({
+    id: String(idx + 1),
+    startTime: formatMsToVttTime(cue.startTime * 1000),
+    endTime: formatMsToVttTime(cue.endTime * 1000),
+    text: cue.text,
+    originalText: cue.text
+  }));
+
+  englishTrack.mode = oldMode;
+  return cueArray;
+}
+
 async function runAutoTranslateFlow(
   targetLanguage: string,
-  sourceLanguage: string
-): Promise<{ success: boolean; text: string; fileName: string }> {
+  sourceLanguage: string,
+  displayFormat: string,
+  exportFormat: string
+): Promise<{ success: boolean; text: string; fileName: string; ext: string }> {
   const scan = scanForSubtitles();
   if (!scan.englishSubUrl) {
     throw new Error("No English subtitle track was detected in this video player.");
   }
 
-  // 1. Download English subtitle using background to bypass CORS
-  const fetchRes = await chrome.runtime.sendMessage({
-    action: "fetchSubtitle",
-    url: scan.englishSubUrl
-  });
-
-  if (!fetchRes.success) {
-    throw new Error(`Failed to download English subtitles: ${fetchRes.error}`);
-  }
-
-  // 2. Parse subtitle into cues
-  const ext = scan.englishSubUrl.split('.').pop()?.split('?')[0].toLowerCase() || 'srt';
-  const rawText = fetchRes.text;
   let cues: SubtitleCue[] = [];
+  let ext = 'vtt';
 
-  if (ext === 'vtt' || rawText.trim().startsWith('WEBVTT')) {
-    cues = parseVtt(rawText);
-  } else if (ext === 'ass') {
-    cues = parseAss(rawText).cues;
-  } else if (ext === 'lrc') {
-    cues = parseLrc(rawText);
+  if (scan.englishSubUrl === "native-text-track") {
+    // 1 & 2. Extract subtitle cues directly from video element
+    cues = await getSubtitleCuesFromVideoElement();
   } else {
-    cues = parseSrt(rawText); // Fallback to SRT
+    // 1. Download English subtitle using background to bypass CORS
+    const fetchRes = await chrome.runtime.sendMessage({
+      action: "fetchSubtitle",
+      url: scan.englishSubUrl
+    });
+
+    if (!fetchRes.success) {
+      throw new Error(`Failed to download English subtitles: ${fetchRes.error}`);
+    }
+
+    // 2. Parse subtitle into cues
+    ext = scan.englishSubUrl.split('.').pop()?.split('?')[0].toLowerCase() || 'srt';
+    const rawText = fetchRes.text;
+
+    if (ext === 'vtt' || rawText.trim().startsWith('WEBVTT')) {
+      cues = parseVtt(rawText);
+    } else if (ext === 'ass') {
+      cues = parseAss(rawText).cues;
+    } else if (ext === 'lrc') {
+      cues = parseLrc(rawText);
+    } else {
+      cues = parseSrt(rawText); // Fallback to SRT
+    }
   }
 
   if (cues.length === 0) {
@@ -159,10 +233,8 @@ async function runAutoTranslateFlow(
   }
 
   // 3. Get configurations from extension local storage
-  const storage = await chrome.storage.local.get(["syncedConfig", "userConfig"]);
-  
-  // Merge configurations
-  const config = getGeminiConfig(storage.syncedConfig, storage.userConfig);
+  const storage = await chrome.storage.local.get(["userConfig"]);
+  const config = getGeminiConfig(storage.userConfig);
 
   // 4. Translate cues in background (so IndexedDB and API requests work seamlessly)
   const transRes = await chrome.runtime.sendMessage({
@@ -180,42 +252,48 @@ async function runAutoTranslateFlow(
   // 5. Build translated VTT
   const translatedCues = cues.map((cue, idx) => ({
     ...cue,
-    text: transRes.translatedTexts[idx] || cue.text
+    text: formatSubtitleText(cue.originalText || cue.text, transRes.translatedTexts[idx], displayFormat)
   }));
 
   const translatedVttText = buildVtt(translatedCues);
-  const cleanFileName = `${scan.videoTitle.replace(/[^a-zA-Z0-9]/g, "_")}_${targetLanguage}.vtt`;
+  const baseName = scan.videoTitle.replace(/[^a-zA-Z0-9]/g, "_");
+  const vttFileName = `${baseName}_${targetLanguage}.vtt`;
 
   // 6. Inject VTT into JW Player
-  await injectVttToPlayer(translatedVttText, cleanFileName);
+  await injectVttToPlayer(translatedVttText, vttFileName);
 
-  return { success: true, text: translatedVttText, fileName: cleanFileName };
+  // 7. Generate export file using user's preferred format
+  // For Auto Translate, we only have VTT/SRT source, so AssFile is not preserved. generateBasicAss will be used.
+  const exportData = generateSubtitleExport(translatedCues, exportFormat);
+  const cleanFileName = `${baseName}_${targetLanguage}.${exportData.ext}`;
+
+  return { success: true, text: exportData.text, fileName: cleanFileName, ext: exportData.ext };
 }
 
-function getGeminiConfig(synced: any, user: any): GeminiConfig {
+function getGeminiConfig(user: any): GeminiConfig {
   const activeConfig = { ...DEFAULT_GEMINI_CONFIG };
 
-  // Prioritize synced configuration from web app, fallback to user config inside popup settings
-  const webConfigs = synced?.configs || user?.configs;
-  const geminiWeb = webConfigs?.gemini || {};
-
-  activeConfig.apiKey = geminiWeb.apiKey || activeConfig.apiKey;
-  activeConfig.model = geminiWeb.model || activeConfig.model;
-  activeConfig.temperature = geminiWeb.temperature !== undefined ? geminiWeb.temperature : activeConfig.temperature;
-  activeConfig.systemPrompt = synced?.systemPrompt || user?.systemPrompt || activeConfig.systemPrompt;
-  activeConfig.userPrompt = synced?.userPrompt || user?.userPrompt || activeConfig.userPrompt;
-  
-  // Other settings
-  activeConfig.contextWindow = geminiWeb.contextWindow || activeConfig.contextWindow;
-  activeConfig.contextBatchSize = geminiWeb.contextBatchSize || activeConfig.contextBatchSize;
-  activeConfig.delayTime = geminiWeb.delayTime !== undefined ? geminiWeb.delayTime : activeConfig.delayTime;
-  activeConfig.useCache = user?.useCache !== undefined ? user.useCache : activeConfig.useCache;
+  activeConfig.apiKey = user?.apiKey || activeConfig.apiKey;
+  activeConfig.model = user?.model || activeConfig.model;
+  activeConfig.temperature = user?.temperature ?? activeConfig.temperature;
+  activeConfig.systemPrompt = user?.systemPrompt || activeConfig.systemPrompt;
+  activeConfig.userPrompt = user?.userPrompt || activeConfig.userPrompt;
+  activeConfig.contextWindow = user?.contextWindow ?? activeConfig.contextWindow;
+  activeConfig.contextBatchSize = user?.contextBatchSize ?? activeConfig.contextBatchSize;
+  activeConfig.delayTime = user?.delayTime ?? activeConfig.delayTime;
+  activeConfig.useCache = user?.useCache ?? activeConfig.useCache;
+  activeConfig.isMature = user?.isMature ?? activeConfig.isMature;
 
   return activeConfig;
 }
 
 // Create blob URL and inject via inject.js script injection
 async function injectVttToPlayer(vttText: string, fileName: string): Promise<void> {
+  if (matchedSite?.name === "Anistream") {
+    setupKhmerSubtitle(vttText);
+    return;
+  }
+
   const blob = new Blob([vttText], { type: "text/vtt" });
   const blobUrl = URL.createObjectURL(blob);
   const eventId = "jw-subtitle-injection-" + Math.random().toString(36).substring(2, 9);
@@ -241,4 +319,177 @@ async function injectVttToPlayer(vttText: string, fileName: string): Promise<voi
     (document.head || document.documentElement).appendChild(script);
     script.remove();
   });
+}
+
+function setupKhmerSubtitle(khmerVTT: string) {
+  const video     = document.querySelector('video');
+  const videoSkin = document.querySelector('video-skin');
+  const shadow    = videoSkin?.shadowRoot;
+
+  if (!shadow || !video) {
+    console.error('❌ No shadow root or video found');
+    return;
+  }
+
+  let currentActiveLabel = 'English';
+  let isUpdating = false;
+
+  function injectStyle() {
+    const styleId = 'khmer-cue-style';
+    if (document.getElementById(styleId)) return;
+    
+    const fontUrlKhmer = chrome.runtime.getURL("fonts/kantumruypro-khmer.woff2");
+    const fontUrlLatin = chrome.runtime.getURL("fonts/kantumruypro-latin.woff2");
+
+    const style = document.createElement('style');
+    style.id = styleId;
+    style.textContent = `
+      @font-face {
+        font-family: 'Kantumruy Pro';
+        src: url('${fontUrlKhmer}') format('woff2');
+        unicode-range: U+1780-17FF, U+19E0-19FF, U+200C-200D;
+        font-weight: 100 900;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'Kantumruy Pro';
+        src: url('${fontUrlLatin}') format('woff2');
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        font-weight: 100 900;
+        font-style: normal;
+      }
+      
+      video::cue {
+        font-family: 'Kantumruy Pro', sans-serif !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function injectTrack() {
+    if (!video) return;
+    const existing = document.querySelector('track[data-anistream-caption-key="captions-khmer"]');
+    if (existing) return;
+
+    const blob    = new Blob([khmerVTT], { type: 'text/vtt' });
+    const blobUrl = URL.createObjectURL(blob);
+    const tracks  = document.querySelectorAll('track[data-anistream-managed-caption-track]');
+
+    const track = document.createElement('track');
+    track.setAttribute('data-anistream-managed-caption-track', '');
+    track.setAttribute('data-anistream-caption-key', 'captions-khmer');
+    track.kind    = 'captions';
+    track.label   = 'Khmer';
+    track.srclang = `und-x-${tracks.length + 1}`;
+    track.src     = blobUrl;
+    video.appendChild(track);
+    console.log('✅ Track injected');
+  }
+
+  function activateTrack(label: string) {
+    if (!video) return;
+    Array.from(video.textTracks).forEach(t => {
+      t.mode = t.label === label ? 'showing' : 'disabled';
+    });
+    currentActiveLabel = label;
+  }
+
+  function updateMainMeta() {
+    if (!shadow || isUpdating) return;
+    isUpdating = true;
+    const allButtons = shadow.querySelectorAll('.anistream-vjs-settings-menu-item');
+    allButtons.forEach(btn => {
+      const firstSpan = btn.querySelector('span');
+      if (firstSpan && firstSpan.textContent?.trim() === 'Captions') {
+        const meta = btn.querySelector('.anistream-vjs-settings-menu-item__meta');
+        if (meta && meta.textContent !== currentActiveLabel) {
+          meta.textContent = currentActiveLabel;
+        }
+      }
+    });
+    isUpdating = false;
+  }
+
+  function injectMenuButton() {
+    if (!shadow || !video) return;
+    const menuList = shadow.querySelector('.anistream-vjs-settings-menu-list[aria-label="Captions"]');
+    if (!menuList) return;
+    if (menuList.querySelector('[data-khmer-btn]')) return;
+
+    const englishBtn = Array.from(
+      menuList.querySelectorAll('button.anistream-vjs-settings-menu-option')
+    ).find(b => b.textContent?.trim() === 'English');
+    if (!englishBtn) return;
+
+    const khmerBtn = englishBtn.cloneNode(true) as HTMLButtonElement;
+    khmerBtn.setAttribute('data-khmer-btn', 'true');
+    khmerBtn.setAttribute('aria-checked', 'false');
+    khmerBtn.classList.remove('is-active');
+    const labelSpan = khmerBtn.querySelector('span');
+    if (labelSpan) labelSpan.textContent = 'Khmer';
+
+    khmerBtn.addEventListener('click', () => {
+      menuList.querySelectorAll('button.anistream-vjs-settings-menu-option').forEach(b => {
+        b.classList.remove('is-active');
+        b.setAttribute('aria-checked', 'false');
+      });
+      khmerBtn.classList.add('is-active');
+      khmerBtn.setAttribute('aria-checked', 'true');
+      activateTrack('Khmer');
+      updateMainMeta();
+    });
+
+    menuList.querySelectorAll('button.anistream-vjs-settings-menu-option').forEach(btn => {
+      btn.addEventListener('click', () => {
+        menuList.querySelectorAll('button.anistream-vjs-settings-menu-option').forEach(b => {
+          b.classList.remove('is-active');
+          b.setAttribute('aria-checked', 'false');
+        });
+        btn.classList.add('is-active');
+        btn.setAttribute('aria-checked', 'true');
+        khmerBtn.classList.remove('is-active');
+        khmerBtn.setAttribute('aria-checked', 'false');
+        activateTrack(btn.textContent?.trim() || '');
+        updateMainMeta();
+      });
+    });
+
+    // Insert Khmer button below the "Off" button if found, otherwise prepend
+    const offBtn = Array.from(
+      menuList.querySelectorAll('button.anistream-vjs-settings-menu-option')
+    ).find(b => {
+      const txt = b.textContent?.trim().toLowerCase();
+      return txt === 'off' || txt === 'disable' || txt === 'none';
+    });
+
+    if (offBtn) {
+      offBtn.after(khmerBtn);
+    } else {
+      menuList.prepend(khmerBtn);
+    }
+
+    const khmerTrack = Array.from(video.textTracks).find(t => t.label === 'Khmer');
+    if (khmerTrack?.mode === 'showing') {
+      menuList.querySelectorAll('button.anistream-vjs-settings-menu-option').forEach(b => {
+        b.classList.remove('is-active');
+        b.setAttribute('aria-checked', 'false');
+      });
+      khmerBtn.classList.add('is-active');
+      khmerBtn.setAttribute('aria-checked', 'true');
+    }
+  }
+
+  const observer = new MutationObserver(() => {
+    if (isUpdating) return;
+    injectTrack();
+    injectMenuButton();
+    updateMainMeta();
+  });
+
+  observer.observe(shadow, { childList: true, subtree: true });
+  injectStyle();
+  injectTrack();
+  injectMenuButton();
+
+  console.log('✅ Khmer subtitle setup complete!');
 }

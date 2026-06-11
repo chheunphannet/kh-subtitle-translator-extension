@@ -96,14 +96,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   if (message.action === "translateSubtitles") {
-    const { cues, targetLanguage, sourceLanguage, config } = message as {
+    const { cues, targetLanguage, sourceLanguage, config, isTestConnection } = message as {
       cues: SubtitleCue[];
       targetLanguage: string;
       sourceLanguage: string;
       config: GeminiConfig;
+      isTestConnection?: boolean;
     };
 
-    performTranslation(cues, targetLanguage, sourceLanguage, config, sender.tab?.id)
+    performTranslation(cues, targetLanguage, sourceLanguage, config, sender.tab?.id, isTestConnection)
       .then((translatedTexts) => sendResponse({ success: true, translatedTexts }))
       .catch((err) => sendResponse({ success: false, error: err.message }));
     return true; // Keep channel open
@@ -116,13 +117,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 
-  if (message.action === "syncSettings") {
-    // Save settings from webapp tab
-    chrome.storage.local.set({ syncedConfig: message.settings }, () => {
-      sendResponse({ success: true });
-    });
-    return true;
-  }
 });
 
 // Coordinate subtitle translation, checking cache line by line
@@ -131,7 +125,8 @@ async function performTranslation(
   targetLanguage: string,
   sourceLanguage: string,
   config: GeminiConfig,
-  tabId?: number
+  tabId?: number,
+  isTestConnection?: boolean
 ): Promise<string[]> {
   const result: string[] = new Array(cues.length).fill("");
   const promptHash = getPromptHash(config.systemPrompt + config.userPrompt);
@@ -156,23 +151,19 @@ async function performTranslation(
   }
 
   // Report initial progress
-  if (tabId) {
-    chrome.tabs.sendMessage(tabId, {
-      action: "translationProgress",
-      percent: Math.floor(((cues.length - cuesToTranslate.length) / cues.length) * 100)
-    }).catch(() => {}); // Ignore if extension popup is closed
-  }
+  chrome.runtime.sendMessage({
+    action: "translationProgress",
+    percent: Math.floor(((cues.length - cuesToTranslate.length) / cues.length) * 100)
+  }).catch(() => {}); // Ignore if extension popup is closed
 
   // 2. Call Gemini API for missing cues
   if (cuesToTranslate.length > 0) {
     const onProgress = (percent: number) => {
-      if (tabId) {
-        const totalCompleted = (cues.length - cuesToTranslate.length) + Math.floor((cuesToTranslate.length * percent) / 100);
-        chrome.tabs.sendMessage(tabId, {
-          action: "translationProgress",
-          percent: Math.floor((totalCompleted / cues.length) * 100)
-        }).catch(() => {});
-      }
+      const totalCompleted = (cues.length - cuesToTranslate.length) + Math.floor((cuesToTranslate.length * percent) / 100);
+      chrome.runtime.sendMessage({
+        action: "translationProgress",
+        percent: Math.floor((totalCompleted / cues.length) * 100)
+      }).catch(() => {});
     };
 
     const translatedBatch = await translateBatchWithContext(
@@ -180,7 +171,9 @@ async function performTranslation(
       targetLanguage,
       sourceLanguage,
       config,
-      onProgress
+      onProgress,
+      undefined,
+      isTestConnection
     );
 
     // 3. Write newly translated cues back to cache & result
@@ -199,9 +192,7 @@ async function performTranslation(
   }
 
   // Send final progress update
-  if (tabId) {
-    chrome.tabs.sendMessage(tabId, { action: "translationProgress", percent: 100 }).catch(() => {});
-  }
+  chrome.runtime.sendMessage({ action: "translationProgress", percent: 100 }).catch(() => {});
 
   return result;
 }

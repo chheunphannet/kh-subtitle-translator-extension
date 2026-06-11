@@ -300,7 +300,55 @@ export function buildAss(assFile: AssFile): string {
     }
   }
 
-  return output.join('\n') + '\n';
+  return output.join('\n');
+}
+
+export function generateBasicAss(cues: SubtitleCue[]): string {
+  const assHeader = `[Script Info]
+Title: Translated Subtitle
+ScriptType: v4.00+
+WrapStyle: 0
+ScaledBorderAndShadow: yes
+YCbCr Matrix: None
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,20,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text`;
+
+  const body = cues.map(cue => {
+    const start = vttTimeToAssTime(cue.startTime);
+    const end = vttTimeToAssTime(cue.endTime);
+    const text = cue.text.replace(/\n/g, '\\N');
+    return `Dialogue: 0,${start},${end},Default,,0,0,0,,${text}`;
+  }).join('\n');
+
+  return `${assHeader}\n${body}\n`;
+}
+
+export function generateSubtitleExport(cues: SubtitleCue[], format: string, originalAssFile?: AssFile): { text: string, ext: string } {
+  let text = "";
+  let ext = format;
+  
+  if (format === 'ass') {
+    if (originalAssFile) {
+      originalAssFile.cues = cues;
+      text = buildAss(originalAssFile);
+    } else {
+      text = generateBasicAss(cues);
+    }
+  } else if (format === 'lrc') {
+    text = buildLrc(cues);
+  } else if (format === 'srt') {
+    text = buildSrt(cues);
+  } else {
+    text = buildVtt(cues);
+    ext = 'vtt';
+  }
+  
+  return { text, ext };
 }
 
 function assTimeToVttTime(assTime: string): string {
@@ -416,3 +464,20 @@ export const languagesList = [
   { value: "es", name: "Spanish (អេស្ប៉ាញ)", nativelabel: "Español" },
   { value: "ru", name: "Russian (រុស្ស៊ី)", nativelabel: "Русский" }
 ];
+
+export function formatSubtitleText(originalText: string, translatedText: string, format: string): string {
+  if (!translatedText) return originalText;
+  if (!originalText || translatedText === originalText) return translatedText;
+  
+  switch (format) {
+    case 'bilingual':
+    case 'both':
+    case 'translation_above':
+      return `${translatedText}\n${originalText}`;
+    case 'translation_below':
+      return `${originalText}\n${translatedText}`;
+    case 'translated':
+    default:
+      return translatedText;
+  }
+}

@@ -84,8 +84,8 @@ const useTranslationState = () => {
   const [systemPrompt, setSystemPrompt] = useLocalStorage<string>("translation-systemPrompt", DEFAULT_SYSTEM_PROMPT);
   const [userPrompt, setUserPrompt] = useLocalStorage<string>("translation-userPrompt", DEFAULT_USER_PROMPT);
   const [sourceLanguage, setSourceLanguage] = useLocalStorage<string>("translation-sourceLanguage", "auto");
-  const [targetLanguage, setTargetLanguage] = useLocalStorage<string>("translation-targetLanguage", "zh");
-  const [targetLanguages, setTargetLanguages] = useLocalStorage<string[]>("translation-targetLanguages", ["zh"]);
+  const [targetLanguage, setTargetLanguage] = useLocalStorage<string>("translation-targetLanguage", "km");
+  const [targetLanguages, setTargetLanguages] = useLocalStorage<string[]>("translation-targetLanguages", ["km"]);
   const [removeChars, setRemoveChars] = useLocalStorage<string>("translation-removeChars", "");
   const [multiLanguageMode, setMultiLanguageMode] = useLocalStorage<boolean>("translation-multiLanguageMode", false);
   const [retryCount, setRetryCount] = useLocalStorage<number>("translation-retryCount", DEFAULT_RETRY_COUNT);
@@ -228,10 +228,10 @@ const useTranslationState = () => {
     const otherValue = type === "source" ? targetLanguage : sourceLanguage;
     if (value === otherValue) {
       if (type === "source") {
-        const newTargetValue = value === "zh" ? "en" : "zh";
+        const newTargetValue = value === "km" ? "en" : "km";
         setSourceLanguage(value);
         setTargetLanguage(newTargetValue);
-        message.error(`${t("sameLanguageTarget")} ${newTargetValue === "zh" ? tLanguages("zh") : tLanguages("en")}`);
+        message.error(`${t("sameLanguageTarget")} ${newTargetValue === "km" ? tLanguages("km") : tLanguages("en")}`);
       } else {
         setTargetLanguage(value);
         setSourceLanguage("auto");
