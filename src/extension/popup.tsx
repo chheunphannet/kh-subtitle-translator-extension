@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
-import { ConfigProvider, theme, Tabs, Select, Button, Upload, message, Progress, Switch, Input, InputNumber, Divider, Card, Typography, Space, AutoComplete, Segmented } from 'antd';
-import { InboxOutlined, GlobalOutlined, SettingOutlined, FileTextOutlined, ControlOutlined, ApiOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { ConfigProvider, theme, Tabs, Select, Button, Upload, message, Progress, Switch, Input, InputNumber, Divider, Card, Typography, Space, AutoComplete, Segmented, Tooltip } from 'antd';
+import { InboxOutlined, GlobalOutlined, SettingOutlined, FileTextOutlined, ControlOutlined, ApiOutlined, CheckCircleOutlined, InfoCircleOutlined, SendOutlined, MessageOutlined, GithubOutlined } from '@ant-design/icons';
 import { locales } from "./i18n/locales";
 import { languagesList, parseSrt, parseVtt, parseAss, parseLrc, buildSrt, buildVtt, buildAss, buildLrc, SubtitleCue, formatSubtitleText, generateSubtitleExport } from "./parsers";
 import { GeminiConfig, DEFAULT_GEMINI_CONFIG } from "./services/gemini";
@@ -359,6 +359,17 @@ const App = () => {
     });
   };
 
+  const handleResetConfig = () => {
+    setConfig(prev => ({
+      ...DEFAULT_GEMINI_CONFIG,
+      apiKey: prev.apiKey
+    }));
+    setExportMode('translatedOnly');
+    setBilingualOrder('translationFirst');
+    setFormatPref('vtt');
+    message.success(loc.settingsReset);
+  };
+
   const updateConfig = (key: keyof GeminiConfig, value: any) => {
     setConfig(prev => ({ ...prev, [key]: value }));
   };
@@ -404,10 +415,27 @@ const App = () => {
         
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-          <Title level={4} style={{ margin: 0, display: 'flex', alignItems: 'center' }}>
-            <img src="icons/icon32.png" alt="KH-Translator Logo" style={{ width: 24, height: 24, marginRight: 8, borderRadius: 4 }} />
-            KH-Translator
-          </Title>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+              <Title level={4} style={{ margin: 0, display: 'flex', alignItems: 'center' }}>
+                <img src="icons/icon32.png" alt="KH-Translator Logo" style={{ width: 20, height: 20, marginRight: 6, borderRadius: 4 }} />
+                KH-Translator
+              </Title>
+              <Text type="secondary" style={{ fontSize: 10 }}>v{chrome.runtime.getManifest().version}</Text>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 10 }}>
+              <span style={{ 
+                width: 6, 
+                height: 6, 
+                borderRadius: '50%', 
+                backgroundColor: config.apiKey ? '#52c41a' : '#ff4d4f', 
+                display: 'inline-block' 
+              }} />
+              <Text type="secondary" style={{ fontSize: 10 }}>
+                {config.apiKey ? loc.keyConfigured : loc.keyMissing}
+              </Text>
+            </div>
+          </div>
           <Select value={uiLanguage} onChange={(val) => {
             setUiLanguage(val);
             chrome.storage.local.set({ uiLanguage: val });
@@ -433,6 +461,24 @@ const App = () => {
                 {loc.btnAutoTranslate}
               </Button>
             </Card>
+
+            {/* Supported Sites */}
+            <div style={{ marginBottom: 16, padding: '10px 12px', borderRadius: 8, border: '1px solid rgba(245, 240, 230, 0.10)', backgroundColor: 'rgba(255, 255, 255, 0.02)' }}>
+              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', marginBottom: 6, fontWeight: 500 }}>
+                {loc.supportedSitesLabel}
+              </div>
+              <Space wrap size={12}>
+                <a href="https://anistream.one" target="_blank" rel="noopener noreferrer">
+                  <Button size="small" type="text" style={{ fontSize: 11, padding: '0 4px', height: 20, color: '#E54D2E' }}>Anistream</Button>
+                </a>
+                <a href="https://khanime.co" target="_blank" rel="noopener noreferrer">
+                  <Button size="small" type="text" style={{ fontSize: 11, padding: '0 4px', height: 20, color: '#E54D2E' }}>Khanime</Button>
+                </a>
+                <a href="https://khfullhd.com" target="_blank" rel="noopener noreferrer">
+                  <Button size="small" type="text" style={{ fontSize: 11, padding: '0 4px', height: 20, color: '#E54D2E' }}>KHFullHD</Button>
+                </a>
+              </Space>
+            </div>
 
             <Divider plain>{loc.orManualUpload}</Divider>
 
@@ -536,7 +582,12 @@ const App = () => {
               
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Switch checked={isContextAware} onChange={toggleContextAware} />
-                <Text>{loc.contextToggle}</Text>
+                <Text style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                  {loc.contextToggle}
+                  <Tooltip title={loc.contextTooltip}>
+                    <InfoCircleOutlined style={{ color: 'rgba(255,255,255,0.45)', cursor: 'help', fontSize: 13 }} />
+                  </Tooltip>
+                </Text>
               </div>
 
               {isContextAware && (
@@ -547,11 +598,21 @@ const App = () => {
                   </div>
                   <div style={{ display: 'flex', gap: 16 }}>
                     <div style={{ flex: 1 }}>
-                      <Text>{loc.concurrencyLabel}</Text>
+                      <Text style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                        {loc.concurrencyLabel}
+                        <Tooltip title={loc.concurrencyTooltip}>
+                          <InfoCircleOutlined style={{ color: 'rgba(255,255,255,0.45)', cursor: 'help', fontSize: 12 }} />
+                        </Tooltip>
+                      </Text>
                       <InputNumber value={config.contextBatchSize} onChange={val => updateConfig('contextBatchSize', val)} style={{ width: '100%' }} />
                     </div>
                     <div style={{ flex: 1 }}>
-                      <Text>{loc.delayLabel}</Text>
+                      <Text style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                        {loc.delayLabel}
+                        <Tooltip title={loc.delayTooltip}>
+                          <InfoCircleOutlined style={{ color: 'rgba(255,255,255,0.45)', cursor: 'help', fontSize: 12 }} />
+                        </Tooltip>
+                      </Text>
                       <InputNumber value={config.delayTime} onChange={val => updateConfig('delayTime', val)} style={{ width: '100%' }} />
                     </div>
                   </div>
@@ -565,7 +626,12 @@ const App = () => {
             <Space direction="vertical" style={{ width: '100%' }} size="middle">
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 0' }}>
                 <Switch checked={config.isMature} onChange={val => updateConfig('isMature', val)} />
-                <Text strong>{loc.isMatureLabel}</Text>
+                <Text strong style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                  {loc.isMatureLabel}
+                  <Tooltip title={loc.matureTooltip}>
+                    <InfoCircleOutlined style={{ color: 'rgba(255,255,255,0.45)', cursor: 'help', fontSize: 12 }} />
+                  </Tooltip>
+                </Text>
               </div>
               <div>
                 <Text>{loc.systemPromptLabel}</Text>
@@ -630,10 +696,29 @@ const App = () => {
               <Button danger block onClick={handleClearCache} loading={clearingCache} style={{ marginTop: 24 }}>
                 {loc.btnClearCache}
               </Button>
+              <Button block onClick={handleResetConfig} style={{ marginTop: 12 }}>
+                {loc.btnReset}
+              </Button>
             </Space>
           </Tabs.TabPane>
 
         </Tabs>
+
+        {/* Footer */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, paddingTop: 12, borderTop: '1px solid rgba(245, 240, 230, 0.10)' }}>
+          <Text type="secondary" style={{ fontSize: 11 }}>v{chrome.runtime.getManifest().version}</Text>
+          <Space size="middle">
+            <a href="https://github.com/chheunphannet/kh-subtitle-translator" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center' }}>
+              <GithubOutlined style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)' }} />
+            </a>
+            <a href="https://t.me/ifitworkitwork" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center' }}>
+              <SendOutlined style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)' }} />
+            </a>
+            <a href="https://discord.gg/PZTQfJ4GjX" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center' }}>
+              <MessageOutlined style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)' }} />
+            </a>
+          </Space>
+        </div>
       </div>
     </ConfigProvider>
   );

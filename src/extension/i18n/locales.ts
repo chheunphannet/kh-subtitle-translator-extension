@@ -54,6 +54,15 @@ export interface LocaleStrings {
   bilingualOrderLabel: string;
   translationAbove: string;
   translationBelow: string;
+  btnReset: string;
+  settingsReset: string;
+  contextTooltip: string;
+  concurrencyTooltip: string;
+  delayTooltip: string;
+  matureTooltip: string;
+  keyMissing: string;
+  keyConfigured: string;
+  supportedSitesLabel: string;
 
   languages: Record<string, string>;
 }
@@ -115,6 +124,15 @@ export const locales: Record<string, LocaleStrings> = {
     bilingualOrderLabel: "លំដាប់ទ្វេភាសា",
     translationAbove: "ការបកប្រែនៅខាងលើ",
     translationBelow: "ការបកប្រែនៅខាងក្រោម",
+    btnReset: "កំណត់ឡើងវិញ",
+    settingsReset: "បានកំណត់ការកំណត់ឡើងវិញជាលំនាំដើម!",
+    contextTooltip: "បកប្រែដោយប្រើបរិបទនៃបន្ទាត់ជុំវិញ ដើម្បីបង្កើនភាពត្រឹមត្រូវ។",
+    concurrencyTooltip: "ចំនួនសំណើដែលត្រូវផ្ញើទៅបកប្រែស្របគ្នា។ កាន់តែច្រើនកាន់តែលឿន ប៉ុន្តែអាចប៉ះពាល់ដល់ដែនកំណត់ល្បឿន API (Rate Limit)។",
+    delayTooltip: "រយៈពេលពន្យារពេលរវាងសំណើនីមួយៗ (គិតជាមីលីវិនាទី)។ បង្កើនវាប្រសិនបើអ្នកជួបបញ្ហា Rate Limit (កំហុស 429)។",
+    matureTooltip: "មិនបិទបាំងឬត្រងពាក្យពេចន៍ ដើម្បីបកប្រែពាក្យអសុរស ហិង្សា និងការសន្ទនាបែបមនុស្សពេញវ័យឱ្យចំន័យច្បាស់លាស់។",
+    keyMissing: "គ្មាន API Key",
+    keyConfigured: "មាន API Key",
+    supportedSitesLabel: "គេហទំព័រដែលគាំទ្រ៖",
 
     languages: {
       auto: "ស្វ័យប្រវត្ត",
@@ -188,6 +206,15 @@ export const locales: Record<string, LocaleStrings> = {
     bilingualOrderLabel: "Bilingual Order",
     translationAbove: "Translation Above",
     translationBelow: "Translation Below",
+    btnReset: "Reset to Defaults",
+    settingsReset: "Settings reset to defaults!",
+    contextTooltip: "Translate with context of surrounding lines for better accuracy.",
+    concurrencyTooltip: "Number of requests sent in parallel. Higher is faster, but might trigger API rate limits.",
+    delayTooltip: "Delay between requests in milliseconds. Increase this if you encounter rate limits (Error 429).",
+    matureTooltip: "Bypasses AI filters to translate slang, violence, and mature dialog accurately without censoring.",
+    keyMissing: "No API Key",
+    keyConfigured: "API Key Configured",
+    supportedSitesLabel: "Supported Streaming Sites:",
 
     languages: {
       auto: "Auto-Detect",
@@ -261,6 +288,15 @@ export const locales: Record<string, LocaleStrings> = {
     bilingualOrderLabel: "双语顺序",
     translationAbove: "译文在上",
     translationBelow: "译文在下",
+    btnReset: "重置为默认值",
+    settingsReset: "已重置为默认设置！",
+    contextTooltip: "使用周围行作为上下文进行翻译，以获得更好的连贯性和准确度。",
+    concurrencyTooltip: "并行发送的请求数量。数值越高速度越快，但可能会触发 API 频率限制。",
+    delayTooltip: "两次请求之间的延迟时间（毫秒）。如果遇到频率限制（429错误），请增大此数值。",
+    matureTooltip: "绕过 AI 内容审查，准确翻译脏话、暴力和成人对白，不进行任何审查或过滤。",
+    keyMissing: "未配置 Key",
+    keyConfigured: "已配置 Key",
+    supportedSitesLabel: "支持的流媒体网站：",
 
     languages: {
       auto: "自动检测",
