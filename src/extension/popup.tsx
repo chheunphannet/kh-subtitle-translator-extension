@@ -673,9 +673,9 @@ const App = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, paddingTop: 12, borderTop: '1px solid rgba(245, 240, 230, 0.10)' }}>
           <Text type="secondary" style={{ fontSize: 11 }}>v{chrome.runtime.getManifest().version}</Text>
           <Space size="middle">
-            <a href="https://github.com/chheunphannet/kh-subtitle-translator/blob/main/EXTENSION-GUIDE.md" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center' }}>
+            <span onClick={() => chrome.tabs.create({ url: 'guide.html' })} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
               <QuestionCircleOutlined style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)' }} />
-            </a>
+            </span>
             <a href="https://github.com/chheunphannet/kh-subtitle-translator" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center' }}>
               <GithubOutlined style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)' }} />
             </a>
