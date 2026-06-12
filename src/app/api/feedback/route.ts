@@ -38,14 +38,51 @@ export async function POST(req: NextRequest) {
     };
     const formattedType = typeEmoji[type] || type;
 
-    // Build Email HTML Content
+    // Determine Badge colors based on feedback type
+    let badgeBg = "#e8f0fe";
+    let badgeColor = "#1a73e8";
+    let typeName = "General Inquiry";
+    if (type === "bug") {
+      badgeBg = "#fce8e6";
+      badgeColor = "#c5221f";
+      typeName = "Bug Report";
+    } else if (type === "suggestion") {
+      badgeBg = "#fef7e0";
+      badgeColor = "#b06000";
+      typeName = "Feature Suggestion";
+    }
+
+    // Build System Info HTML Table
     const systemInfoHTML = debugInfo
-      ? `<div style="background-color: #1e1e2e; color: #cdd6f4; padding: 15px; border-radius: 6px; font-family: monospace; font-size: 13px; margin-top: 10px; border: 1px solid #313244;">
+      ? `<table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
           ${Object.entries(debugInfo)
-            .map(([key, val]) => `<strong>${key}:</strong> ${typeof val === "object" ? JSON.stringify(val) : val}`)
-            .join("<br/>")}
+            .map(([key, val]) => `
+              <tr>
+                <td style="padding: 8px 0; color: #5f6368; font-size: 13px; font-weight: 500; width: 140px; border-bottom: 1px solid #f1f3f4; vertical-align: top;">${key}</td>
+                <td style="padding: 8px 0; color: #202124; font-size: 13px; border-bottom: 1px solid #f1f3f4; font-family: monospace; word-break: break-all; vertical-align: top;">${typeof val === "object" ? JSON.stringify(val) : val}</td>
+              </tr>
+            `)
+            .join("")}
+         </table>`
+      : `<p style="color: #5f6368; font-style: italic; font-size: 13px; margin: 10px 0 0 0;">No system logs attached.</p>`;
+
+    // Format user contact info
+    const cleanContact = contact?.trim();
+    const isEmail = !!(cleanContact && cleanContact.includes("@"));
+    const contactFormatted = cleanContact
+      ? (isEmail 
+          ? `<a href="mailto:${cleanContact}" style="color: #1a73e8; text-decoration: none; font-weight: 500;">${cleanContact}</a>` 
+          : `<span style="color: #202124; font-weight: 500;">${cleanContact}</span>`)
+      : `<span style="color: #5f6368; font-style: italic;">Anonymous submission</span>`;
+
+    // Action button if email exists
+    const actionButtonHTML = isEmail && cleanContact
+      ? `<div style="margin-top: 25px; text-align: left;">
+          <a href="mailto:${cleanContact}" style="display: inline-block; background-color: #1a73e8; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 4px; font-weight: 500; font-size: 13px; font-family: Roboto, Arial, sans-serif; line-height: 1.5; text-align: center; vertical-align: middle;">
+            Reply to User
+          </a>
          </div>`
-      : `<p style="color: #a6adc8; font-style: italic;">No system logs attached.</p>`;
+      : "";
 
     const emailHtml = `
       <!DOCTYPE html>
@@ -54,42 +91,74 @@ export async function POST(req: NextRequest) {
         <meta charset="utf-8">
         <title>New Feedback Received</title>
       </head>
-      <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #11111b; color: #cdd6f4; padding: 20px; margin: 0;">
-        <div style="max-width: 600px; margin: 0 auto; background-color: #181825; border: 1px solid #313244; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);">
-          
-          <!-- Header -->
-          <div style="border-bottom: 1px solid #313244; padding-bottom: 20px; margin-bottom: 20px;">
-            <h2 style="color: #cba6f7; margin: 0 0 10px 0; font-size: 22px;">📬 New Feedback Received</h2>
-            <span style="background-color: #313244; color: #f5c2e7; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; text-transform: uppercase;">
-              ${formattedType}
-            </span>
-          </div>
+      <body style="font-family: Roboto, Arial, sans-serif; background-color: #f4f6f8; color: #202124; padding: 40px 20px; margin: 0; -webkit-font-smoothing: antialiased;">
+        <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border: 1px solid #dadce0; border-top: 4px solid #1a73e8; border-radius: 8px; box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15); border-collapse: separate; overflow: hidden;">
+          <tr>
+            <td style="padding: 30px 40px;">
+              
+              <!-- Header Brand -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 25px;">
+                <tr>
+                  <td>
+                    <span style="font-size: 16px; font-weight: bold; color: #202124; letter-spacing: 0.5px;">Subtitle Translator</span>
+                    <span style="color: #5f6368; font-size: 14px; margin-left: 10px; font-weight: normal;">Console</span>
+                  </td>
+                </tr>
+              </table>
 
-          <!-- Description / Message -->
-          <div style="margin-bottom: 25px;">
-            <h3 style="color: #89b4fa; font-size: 16px; margin: 0 0 10px 0;">Feedback Detail:</h3>
-            <div style="background-color: #1e1e2e; border-left: 4px solid #cba6f7; padding: 15px; border-radius: 0 8px 8px 0; color: #cdd6f4; font-size: 15px; line-height: 1.6; white-space: pre-wrap;">${message.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
-          </div>
+              <hr style="border: none; border-top: 1px solid #dadce0; margin: 0 0 25px 0;">
 
-          <!-- Contact info -->
-          <div style="margin-bottom: 25px; border-top: 1px solid #313244; padding-top: 20px;">
-            <h3 style="color: #89b4fa; font-size: 16px; margin: 0 0 10px 0;">User Contact Info:</h3>
-            <p style="font-size: 14px; margin: 0; color: #a6adc8;">
-              ${contact?.trim() ? `<strong>Contact:</strong> ${contact}` : `<span style="font-style: italic;">Not provided (Anonymous submission)</span>`}
-            </p>
-          </div>
+              <!-- Title -->
+              <h1 style="color: #202124; font-size: 20px; font-weight: normal; margin: 0 0 15px 0; line-height: 1.4;">
+                New feedback message received
+              </h1>
 
-          <!-- System Logs / Debug Info -->
-          <div style="border-top: 1px solid #313244; padding-top: 20px; margin-bottom: 10px;">
-            <h3 style="color: #89b4fa; font-size: 16px; margin: 0 0 10px 0;">Technical Context:</h3>
-            ${systemInfoHTML}
-          </div>
+              <!-- Badge -->
+              <div style="margin-bottom: 25px;">
+                <span style="background-color: ${badgeBg}; color: ${badgeColor}; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; text-transform: uppercase; font-family: Roboto, Arial, sans-serif; display: inline-block;">
+                  ${typeName}
+                </span>
+              </div>
 
-          <!-- Footer -->
-          <div style="border-top: 1px solid #313244; padding-top: 20px; margin-top: 30px; text-align: center; font-size: 11px; color: #6c7086;">
-            Sent from Subtitle Translator Web Application
-          </div>
-        </div>
+              <!-- Message details -->
+              <div style="margin-bottom: 30px;">
+                <h3 style="color: #202124; font-size: 14px; font-weight: bold; margin: 0 0 10px 0;">Feedback details:</h3>
+                <div style="background-color: #f8f9fa; border: 1px solid #e8eaed; padding: 20px; border-radius: 8px; color: #202124; font-size: 14px; line-height: 1.6; white-space: pre-wrap; font-family: Roboto, Arial, sans-serif;">${message.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
+              </div>
+
+              <!-- Contact & System details -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-top: 1px solid #dadce0; padding-top: 20px; margin-bottom: 25px;">
+                <tr>
+                  <td>
+                    <h3 style="color: #202124; font-size: 14px; font-weight: bold; margin: 0 0 10px 0;">User contact:</h3>
+                    <p style="font-size: 13px; margin: 0; color: #202124;">
+                      ${contactFormatted}
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Environment details -->
+              <div style="border-top: 1px solid #dadce0; padding-top: 20px;">
+                <h3 style="color: #202124; font-size: 14px; font-weight: bold; margin: 0 0 10px 0;">Technical environment:</h3>
+                ${systemInfoHTML}
+              </div>
+
+              <!-- Action button -->
+              ${actionButtonHTML}
+
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color: #f8f9fa; border-top: 1px solid #dadce0; padding: 20px 40px; text-align: center;">
+              <p style="font-size: 11px; color: #5f6368; line-height: 1.6; margin: 0;">
+                This notification has been sent because you are the administrator of the Subtitle Translator application.
+                <br>
+                Please do not reply directly to this notification email unless clicking the "Reply to User" action button.
+              </p>
+            </td>
+          </tr>
+        </table>
       </body>
       </html>
     `;
