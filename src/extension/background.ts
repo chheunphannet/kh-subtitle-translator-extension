@@ -214,6 +214,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       activeAbortController = null;
     }
     activeTranslationState = {
+      ...activeTranslationState,
       translating: false,
       percent: 0,
       status: "Cancelled",
