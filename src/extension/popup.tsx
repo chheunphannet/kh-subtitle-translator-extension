@@ -415,27 +415,10 @@ const App = () => {
         
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-              <Title level={4} style={{ margin: 0, display: 'flex', alignItems: 'center' }}>
-                <img src="icons/icon32.png" alt="KH-Translator Logo" style={{ width: 20, height: 20, marginRight: 6, borderRadius: 4 }} />
-                KH-Translator
-              </Title>
-              <Text type="secondary" style={{ fontSize: 10 }}>v{chrome.runtime.getManifest().version}</Text>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 10 }}>
-              <span style={{ 
-                width: 6, 
-                height: 6, 
-                borderRadius: '50%', 
-                backgroundColor: config.apiKey ? '#52c41a' : '#ff4d4f', 
-                display: 'inline-block' 
-              }} />
-              <Text type="secondary" style={{ fontSize: 10 }}>
-                {config.apiKey ? loc.keyConfigured : loc.keyMissing}
-              </Text>
-            </div>
-          </div>
+          <Title level={4} style={{ margin: 0, display: 'flex', alignItems: 'center' }}>
+            <img src="icons/icon32.png" alt="KH-Translator Logo" style={{ width: 20, height: 20, marginRight: 6, borderRadius: 4 }} />
+            KH-Translator
+          </Title>
           <Select value={uiLanguage} onChange={(val) => {
             setUiLanguage(val);
             chrome.storage.local.set({ uiLanguage: val });
@@ -449,7 +432,7 @@ const App = () => {
         <Tabs defaultActiveKey="1" style={{ flex: 1, overflow: 'hidden' }}>
           
           {/* Inject Tab */}
-          <Tabs.TabPane tab={loc.tabInject} key="1" style={{ overflowY: 'auto', height: 450, paddingRight: 8 }}>
+          <Tabs.TabPane tab={loc.tabInject} key="1" style={{ overflowY: 'auto', height: 380, paddingRight: 8 }}>
             
             <Card size="small" style={{ marginBottom: 16, backgroundColor: detectedSubUrl ? 'rgba(107, 142, 90, 0.1)' : undefined, borderColor: detectedSubUrl ? '#6B8E5A' : undefined }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -461,24 +444,6 @@ const App = () => {
                 {loc.btnAutoTranslate}
               </Button>
             </Card>
-
-            {/* Supported Sites */}
-            <div style={{ marginBottom: 16, padding: '10px 12px', borderRadius: 8, border: '1px solid rgba(245, 240, 230, 0.10)', backgroundColor: 'rgba(255, 255, 255, 0.02)' }}>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', marginBottom: 6, fontWeight: 500 }}>
-                {loc.supportedSitesLabel}
-              </div>
-              <Space wrap size={12}>
-                <a href="https://anistream.one" target="_blank" rel="noopener noreferrer">
-                  <Button size="small" type="text" style={{ fontSize: 11, padding: '0 4px', height: 20, color: '#E54D2E' }}>Anistream</Button>
-                </a>
-                <a href="https://khanime.co" target="_blank" rel="noopener noreferrer">
-                  <Button size="small" type="text" style={{ fontSize: 11, padding: '0 4px', height: 20, color: '#E54D2E' }}>Khanime</Button>
-                </a>
-                <a href="https://khfullhd.com" target="_blank" rel="noopener noreferrer">
-                  <Button size="small" type="text" style={{ fontSize: 11, padding: '0 4px', height: 20, color: '#E54D2E' }}>KHFullHD</Button>
-                </a>
-              </Space>
-            </div>
 
             <Divider plain>{loc.orManualUpload}</Divider>
 
@@ -553,7 +518,7 @@ const App = () => {
           </Tabs.TabPane>
 
           {/* Settings Tab */}
-          <Tabs.TabPane tab={loc.tabSettings} key="2" style={{ overflowY: 'auto', height: 450, paddingRight: 8 }}>
+          <Tabs.TabPane tab={loc.tabSettings} key="2" style={{ overflowY: 'auto', height: 380, paddingRight: 8 }}>
             <Space direction="vertical" style={{ width: '100%' }} size="middle">
               <div>
                 <Text><SettingOutlined /> Translation API</Text>
@@ -622,7 +587,7 @@ const App = () => {
           </Tabs.TabPane>
 
           {/* Prompts Tab */}
-          <Tabs.TabPane tab={loc.tabPrompts} key="3" style={{ overflowY: 'auto', height: 450, paddingRight: 8 }}>
+          <Tabs.TabPane tab={loc.tabPrompts} key="3" style={{ overflowY: 'auto', height: 380, paddingRight: 8 }}>
             <Space direction="vertical" style={{ width: '100%' }} size="middle">
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 0' }}>
                 <Switch checked={config.isMature} onChange={val => updateConfig('isMature', val)} />
@@ -645,7 +610,7 @@ const App = () => {
           </Tabs.TabPane>
 
           {/* Advanced Tab */}
-          <Tabs.TabPane tab={loc.tabAdvanced} key="4" style={{ overflowY: 'auto', height: 450, paddingRight: 8 }}>
+          <Tabs.TabPane tab={loc.tabAdvanced} key="4" style={{ overflowY: 'auto', height: 380, paddingRight: 8 }}>
             <Space direction="vertical" style={{ width: '100%' }} size="middle">
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Switch checked={config.useCache} onChange={val => updateConfig('useCache', val)} />
