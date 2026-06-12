@@ -1,0 +1,799 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KHTranslator - User Guide</title>
+    <style>
+      @font-face {
+        font-family: "Kantumruy Pro";
+        font-style: normal;
+        font-weight: 100 700;
+        font-display: swap;
+        src: url("fonts/kantumruypro-khmer.woff2") format("woff2");
+        unicode-range: U+1780-17FF, U+19E0-19FF, U+200C-200D, U+25CC;
+      }
+      @font-face {
+        font-family: "Kantumruy Pro";
+        font-style: normal;
+        font-weight: 100 700;
+        font-display: swap;
+        src: url("fonts/kantumruypro-latin.woff2") format("woff2");
+        unicode-range:
+          U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+          U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+          U+2212, U+2215, U+FEFF, U+FFFD;
+      }
+
+      :root {
+        --bg-color: #0e0f12;
+        --card-bg: #16181d;
+        --accent-color: #e54d2e;
+        --accent-hover: #f7684a;
+        --text-main: #f2eee6;
+        --text-muted: rgba(242, 238, 230, 0.65);
+        --border-color: rgba(245, 240, 230, 0.1);
+      }
+
+      body {
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        font-family:
+          "Kantumruy Pro",
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      header {
+        width: 100%;
+        max-width: 800px;
+        padding: 32px 24px 16px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border-color);
+        box-sizing: border-box;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .brand img {
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+      }
+
+      .brand h1 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--text-main);
+      }
+
+      .lang-switcher {
+        display: flex;
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 4px;
+        gap: 4px;
+      }
+
+      .lang-btn {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        padding: 6px 12px;
+        font-size: 13px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-family: inherit;
+        transition: all 0.2s ease;
+      }
+
+      .lang-btn.active {
+        background-color: var(--accent-color);
+        color: #fff;
+        font-weight: 600;
+      }
+
+      .lang-btn:hover:not(.active) {
+        color: var(--text-main);
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+
+      main {
+        width: 100%;
+        max-width: 800px;
+        padding: 24px;
+        box-sizing: border-box;
+        flex: 1;
+      }
+
+      .guide-section {
+        display: none;
+      }
+
+      .guide-section.active {
+        display: block;
+        animation: fadeIn 0.3s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      h2 {
+        color: var(--accent-color);
+        font-size: 20px;
+        margin-top: 32px;
+        margin-bottom: 16px;
+        border-left: 3px solid var(--accent-color);
+        padding-left: 10px;
+      }
+
+      h2:first-of-type {
+        margin-top: 8px;
+      }
+
+      p {
+        line-height: 1.6;
+        color: var(--text-muted);
+        font-size: 15px;
+      }
+
+      .card {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      .card h3 {
+        margin-top: 0;
+        margin-bottom: 12px;
+        font-size: 16px;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .card h3 span {
+        background-color: rgba(229, 77, 46, 0.1);
+        color: var(--accent-color);
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+      }
+
+      ul,
+      ol {
+        padding-left: 20px;
+        color: var(--text-muted);
+        margin: 0 0 16px 0;
+      }
+
+      li {
+        margin-bottom: 8px;
+        line-height: 1.6;
+        font-size: 15px;
+      }
+
+      .setting-item {
+        margin-bottom: 16px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid rgba(245, 240, 230, 0.05);
+      }
+
+      .setting-item:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+      }
+
+      .setting-name {
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .setting-desc {
+        font-size: 14px;
+        color: var(--text-muted);
+        margin: 0;
+      }
+
+      .tag-badge {
+        display: inline-block;
+        padding: 1px 6px;
+        font-size: 11px;
+        border-radius: 4px;
+        font-weight: normal;
+      }
+
+      .tag-required {
+        background-color: rgba(247, 104, 74, 0.15);
+        color: #f7684a;
+        border: 1px solid rgba(247, 104, 74, 0.2);
+      }
+
+      .tag-optional {
+        background-color: rgba(255, 255, 255, 0.08);
+        color: var(--text-muted);
+      }
+
+      footer {
+        width: 100%;
+        max-width: 800px;
+        padding: 24px;
+        text-align: center;
+        border-top: 1px solid var(--border-color);
+        box-sizing: border-box;
+        margin-top: 40px;
+        color: rgba(242, 238, 230, 0.3);
+        font-size: 12px;
+      }
+
+      footer a {
+        color: var(--accent-color);
+        text-decoration: none;
+      }
+
+      footer a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="brand">
+        <img src="icons/icon32.png" alt="Logo" />
+        <h1>khtranslator</h1>
+      </div>
+      <div class="lang-switcher">
+        <button class="lang-btn active" data-lang="en">English</button>
+        <button class="lang-btn" data-lang="km">ភាសាខ្មែរ</button>
+        <button class="lang-btn" data-lang="zh">中文</button>
+      </div>
+    </header>
+
+    <main>
+      <!-- ENGLISH GUIDE -->
+      <div id="guide-en" class="guide-section active">
+        <h2>1. How to Use the Extension</h2>
+        <div class="card">
+          <h3>Auto-Translate & Inject</h3>
+          <p>
+            If you are watching video streams with English subtitles, the
+            extension can translate and overlay them instantly:
+          </p>
+          <ol>
+            <li>
+              Open the stream page (e.g., Anistream) and start playing the
+              video.
+            </li>
+            <li>
+              Open the extension popup. If supported player subtitles are found,
+              you will see a green
+              <strong>"English Subtitles Detected!"</strong> notice.
+            </li>
+            <li>
+              Click the <strong>"Auto Translate & Inject"</strong> button. The
+              translation will execute, and the target subtitles will be
+              overlayed onto the video player.
+            </li>
+          </ol>
+        </div>
+
+        <div class="card">
+          <h3>Manual Subtitle Injection</h3>
+          <p>
+            You can also translate and inject your own local subtitle files:
+          </p>
+          <ol>
+            <li>
+              Drag & drop a subtitle file (<code>.srt</code>, <code>.vtt</code>,
+              <code>.ass</code>, or <code>.lrc</code>) into the upload zone.
+            </li>
+            <li>
+              Select the <strong>Source Lang</strong> and
+              <strong>Target Lang</strong> (e.g. Khmer).
+            </li>
+            <li>
+              Click <strong>"Translate & Inject"</strong> to translate the
+              subtitles using Gemini AI and inject them into the player.
+            </li>
+            <li>
+              Or, click <strong>"Inject Only"</strong> to overlay the subtitle
+              file onto the video immediately without translating.
+            </li>
+            <li>
+              After translation completes, you can click
+              <strong>"Download Translated"</strong> to save the file to your
+              disk.
+            </li>
+          </ol>
+        </div>
+
+        <h2>2. Supported Streaming Sites</h2>
+        <p>
+          The extension contains built-in injectors that auto-detect and sync
+          subtitles on these platforms:
+        </p>
+        <ul style="list-style-type: none; padding-left: 0;">
+          <li>
+            <strong
+              ><a
+                href="https://anistream.one"
+                target="_blank"
+                rel="noopener noreferrer"
+                style="color: var(--accent-color); text-decoration: underline"
+                >Anistream</a
+              ></strong
+            >
+          </li>
+          <li>
+            <strong
+              ><a
+                href="https://khanime.co"
+                target="_blank"
+                rel="noopener noreferrer"
+                style="color: var(--accent-color); text-decoration: underline"
+                >Khanime</a
+              ></strong
+            >
+          </li>
+          <li>
+            <strong
+              ><a
+                href="https://khfullhd.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                style="color: var(--accent-color); text-decoration: underline"
+                >KHFullHD</a
+              ></strong
+            >
+          </li>
+        </ul>
+
+        <h2>3. AI Settings & Configurations Explained</h2>
+        <div class="card">
+          <div class="setting-item">
+            <div class="setting-name">
+              Gemini API Key
+              <span class="tag-badge tag-required">Required for AI</span>
+            </div>
+            <p class="setting-desc">
+              Your personal API key from Google AI Studio. Translations run
+              locally and securely directly from your browser to Google Gemini.
+            </p>
+          </div>
+          <div class="setting-item">
+            <div class="setting-name">
+              Select Model
+              <span class="tag-badge tag-optional">Configurable</span>
+            </div>
+            <p class="setting-desc">
+              Choose which Gemini model to use. <code>gemini-3.5-flash</code> is
+              recommended for general translation as it is extremely fast and
+              cost-efficient.
+            </p>
+          </div>
+          <div class="setting-item">
+            <div class="setting-name">
+              Context-Aware Translation
+              <span class="tag-badge tag-optional">Toggle</span>
+            </div>
+            <p class="setting-desc">
+              When enabled, the translator will send surrounding subtitle lines
+              (before and after the current block) as context to the LLM. This
+              yields much more natural dialogue, correct pronouns, and
+              consistent narrative flow.
+            </p>
+          </div>
+          <div class="setting-item">
+            <div class="setting-name">
+              Concurrency <span class="tag-badge tag-optional">Slider</span>
+            </div>
+            <p class="setting-desc">
+              Determines how many lines are sent in parallel. Higher values
+              accelerate translation but increase the risk of hitting Gemini API
+              limits (Error 429).
+            </p>
+          </div>
+          <div class="setting-item">
+            <div class="setting-name">
+              Delay (ms) <span class="tag-badge tag-optional">Slider</span>
+            </div>
+            <p class="setting-desc">
+              The delay between requests. If your translations are failing due
+              to rate limit errors, increase this delay to space out API
+              requests.
+            </p>
+          </div>
+          <div class="setting-item">
+            <div class="setting-name">
+              18+ / Mature Content
+              <span class="tag-badge tag-optional">Toggle</span>
+            </div>
+            <p class="setting-desc">
+              Allows the LLM to translate slang, swearing, and adult/violent
+              dialogue accurately without censoring or triggering standard
+              safety blocks.
+            </p>
+          </div>
+          <div class="setting-item">
+            <div class="setting-name">
+              Enable Caching <span class="tag-badge tag-optional">Toggle</span>
+            </div>
+            <p class="setting-desc">
+              Saves all translated lines to a local cache (IndexedDB). If you
+              re-translate the same subtitle file or replay a video, the
+              translations load instantly without hitting the Gemini API again,
+              saving you cost and time.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- KHMER GUIDE -->
+      <div id="guide-km" class="guide-section">
+        <h2>១. របៀបប្រើប្រាស់ Extension</h2>
+        <div class="card">
+          <h3>បកប្រែ & បញ្ចូលដោយស្វ័យប្រវត្ត (Auto-Translate & Inject)</h3>
+          <p>
+            ប្រសិនបើអ្នកកំពុងទស្សនាខ្សែភាពយន្តដែលមាន Subtitle ភាសាអង់គ្លេស
+            Extension អាចបកប្រែនិងបញ្ចូលវាភ្លាមៗ៖
+          </p>
+          <ol>
+            <li>បើកគេហទំព័រខ្សែភាពយន្ត (ឧទាហរណ៍ Anistream) រួចចាក់វីដេអូ។</li>
+            <li>
+              បើកផ្ទាំង Extension popup។ ប្រសិនបើរកឃើញ Subtitle ភាសាអង់គ្លេស
+              វានឹងបង្ហាញប្រអប់ពណ៌បៃតង
+              <strong>"បានរកឃើញ Subtitle ភាសាអង់គ្លេស!"</strong>។
+            </li>
+            <li>
+              ចុចប៊ូតុង <strong>"បកប្រែ & បញ្ចូលដោយស្វ័យប្រវត្ត"</strong>។
+              Extension នឹងបកប្រែ Subtitle ហើយបញ្ចូលទៅក្នុង Player វីដេអូភ្លាមៗ។
+            </li>
+          </ol>
+        </div>
+
+        <div class="card">
+          <h3>បញ្ចូល Subtitle ដោយខ្លួនឯង (Manual Subtitle Injection)</h3>
+          <p>
+            អ្នកក៏អាចបកប្រែនិងបញ្ចូល file Subtitle ផ្ទាល់ខ្លួនរបស់អ្នកបានដែរ៖
+          </p>
+          <ol>
+            <li>
+              អូសនិងទម្លាក់ file Subtitle (<code>.srt</code>, <code>.vtt</code>,
+              <code>.ass</code>, ឬ <code>.lrc</code>) ចូលក្នុងប្រអប់បង្ហោះ។
+            </li>
+            <li>
+              ជ្រើសរើស <strong>ភាសាដើម</strong> និង
+              <strong>ភាសាបកប្រែ</strong> (ឧទាហរណ៍៖ ខ្មែរ)។
+            </li>
+            <li>
+              ចុច <strong>"បកប្រែ & បញ្ចូល"</strong> ដើម្បីបកប្រែ Subtitle
+              តាមរយៈ Gemini AI រួចបញ្ចូលទៅក្នុង Player។
+            </li>
+            <li>
+              ឬ ចុច <strong>"បញ្ចូលតែប៉ុណ្ណោះ"</strong> ដើម្បីបញ្ចូល Subtitle
+              ទៅក្នុង Player ភ្លាមៗដោយមិនបាច់បកប្រែ។
+            </li>
+            <li>
+              បន្ទាប់ពីបកប្រែរួចរាល់ អ្នកអាចចុច
+              <strong>"ទាញយក Subtitle បកប្រែរួច"</strong> ដើម្បីរក្សាទុក file
+              ចូលក្នុងកុំព្យូទ័រ។
+            </li>
+          </ol>
+        </div>
+
+        <h2>២. គេហទំព័រគាំទ្រការបញ្ចូល Subtitle</h2>
+        <p>
+          Extension នេះអាចស្វែងរក Player
+          វីដេអូដោយស្វ័យប្រវត្តនៅលើគេហទំព័រទាំងនេះ៖
+        </p>
+        <ul style="list-style-type: none; padding-left: 0;">
+          <li>
+            <strong
+              ><a
+                href="https://anistream.one"
+                target="_blank"
+                rel="noopener noreferrer"
+                style="color: var(--accent-color); text-decoration: underline"
+                >Anistream</a
+              ></strong
+            >
+          </li>
+          <li>
+            <strong
+              ><a
+                href="https://khanime.co"
+                target="_blank"
+                rel="noopener noreferrer"
+                style="color: var(--accent-color); text-decoration: underline"
+                >Khanime</a
+              ></strong
+            >
+          </li>
+          <li>
+            <strong
+              ><a
+                href="https://khfullhd.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                style="color: var(--accent-color); text-decoration: underline"
+                >KHFullHD</a
+              ></strong
+            >
+          </li>
+        </ul>
+
+        <h2>៣. ការពន្យល់អំពីការកំណត់ AI Settings</h2>
+        <div class="card">
+          <div class="setting-item">
+            <div class="setting-name">
+              Gemini API Key
+              <span class="tag-badge tag-required">តម្រូវឱ្យមាន</span>
+            </div>
+            <p class="setting-desc">
+              API Key ផ្ទាល់ខ្លួនរបស់អ្នកដែលបង្កើតពី Google AI Studio។
+              ការបកប្រែធ្វើឡើងនៅលើ browser របស់អ្នកផ្ទាល់ ធានាសុវត្ថិភាពទិន្នន័យ
+              100%។
+            </p>
+          </div>
+          <div class="setting-item">
+            <div class="setting-name">
+              ជ្រើសរើស Model
+              <span class="tag-badge tag-optional">អាចកំណត់បាន</span>
+            </div>
+            <p class="setting-desc">
+              ជ្រើសរើសម៉ូដែល Gemini សម្រាប់បកប្រែ។ ម៉ូដែល
+              <code>gemini-3.1-flash-lite</code> ត្រូវបានណែនាំ ព្រោះវាលឿនបំផុត
+              និងមានតម្លៃទាបបំផុ ត។
+            </p>
+          </div>
+          <div class="setting-item">
+            <div class="setting-name">
+              បកប្រែតាមបរិបទ (Context-Aware)
+              <span class="tag-badge tag-optional">បើក/បិទ</span>
+            </div>
+            <p class="setting-desc">
+              នៅពេលបើក Extension ផ្ញើបន្ទាត់ Subtitle ជុំវិញទៅកាន់ AI។
+              វានឹងជួយឱ្យ AI បកប្រែអត្ថន័យស្របគ្នាល្អ យល់ពីសាច់រឿង
+              និងប្រើប្រាស់សព្វនាមត្រឹមត្រូវទៅតាមបរិបទ。
+            </p>
+          </div>
+          <div class="setting-item">
+            <div class="setting-name">
+              ចំនួនបកប្រែទន្ទឹមគ្នា (Concurrency)
+              <span class="tag-badge tag-optional">កំណត់តម្លៃ</span>
+            </div>
+            <p class="setting-desc">
+              ចំនួនសំណើដែលផ្ញើបកប្រែស្របគ្នា។ កាន់តែខ្ពស់បកប្រែកាន់តែលឿន
+              ប៉ុន្តែអាចប៉ះពាល់ដល់ដែនកំណត់ល្បឿន API (Error 429)។
+            </p>
+          </div>
+          <div class="setting-item">
+            <div class="setting-name">
+              ពន្យារពេល (Delay)
+              <span class="tag-badge tag-optional">កំណត់តម្លៃ</span>
+            </div>
+            <p class="setting-desc">
+              រយៈពេលរង់ចាំរវាងសំណើនីមួយៗ。 ប្រសិនបើជួបបញ្ហាកំហុសបកប្រែ Rate
+              Limit (Error 429) សូមបង្កើនតម្លៃពន្យារពេលនេះ។
+            </p>
+          </div>
+          <div class="setting-item">
+            <div class="setting-name">
+              មាតិកា 18+ / ហិង្សា (Mature Content)
+              <span class="tag-badge tag-optional">បើក/បិទ</span>
+            </div>
+            <p class="setting-desc">
+              អនុញ្ញាតឱ្យ AI បកប្រែពាក្យអសុរស ភាសាតំបន់ ហិង្សា
+              និងការសន្ទនាបែបមនុស្សពេញវ័យចំន័យល្អ ដោយមិនបិទបាំងឬត្រងឡើយ。
+            </p>
+          </div>
+          <div class="setting-item">
+            <div class="setting-name">
+              ប្រើប្រាស់ការចងចាំ (Enable Cache)
+              <span class="tag-badge tag-optional">បើក/បិទ</span>
+            </div>
+            <p class="setting-desc">
+              រក្សាទុកបន្ទាត់បកប្រែក្នុង Cache (IndexedDB)។
+              ប្រសិនបើបកប្រែឯកសារដដែល ឬចាក់វីដេអូឡើងវិញ
+              វានឹងទាញយកទិន្នន័យភ្លាមៗដោយមិនចាំបាច់ផ្ញើសំណើទៅកាន់ API ឡើយ。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHINESE GUIDE -->
+      <div id="guide-zh" class="guide-section">
+        <h2>1. 插件使用方法</h2>
+        <div class="card">
+          <h3>自动翻译并注入</h3>
+          <p>
+            如果您正在观看含有英文字幕的视频流媒体，插件可以实时翻译并显示：
+          </p>
+          <ol>
+            <li>打开播放网页（如 Anistream）并开始播放视频。</li>
+            <li>
+              打开插件弹出窗口。若成功检测到字幕，将显示绿色的
+              <strong>"检测到英文字幕！"</strong> 提示。
+            </li>
+            <li>
+              点击
+              <strong>"自动翻译并注入"</strong
+              >。翻译将启动，且译文字幕将实时注入并同步覆盖到视频播放器上。
+            </li>
+          </ol>
+        </div>
+
+        <div class="card">
+          <h3>手动字幕注入</h3>
+          <p>您也可以上传并注入本地字幕文件：</p>
+          <ol>
+            <li>
+              将字幕文件（支持 <code>.srt</code>, <code>.vtt</code>,
+              <code>.ass</code>, <code>.lrc</code>）拖拽到上传框中。
+            </li>
+            <li>
+              选择 <strong>源语言</strong> 和
+              <strong>目标语言</strong>（如高棉语或中文）。
+            </li>
+            <li>
+              点击 <strong>"翻译并注入"</strong> 使用 Gemini AI
+              进行翻译并插入到播放器中。
+            </li>
+            <li>
+              或者点击
+              <strong>"仅注入"</strong> 直接在当前视频中加载此字幕（无需翻译）。
+            </li>
+            <li>
+              翻译成功后，您可以点击
+              <strong>"下载已翻译字幕"</strong> 以将文件保存到电脑。
+            </li>
+          </ol>
+        </div>
+
+        <h2>2. 支持的流媒体网站</h2>
+        <p>插件内置专用的播放器探测器，支持自动检测并在以下网站注入字幕：</p>
+        <ul style="list-style-type: none; padding-left: 0;">
+          <li>
+            <strong
+              ><a
+                href="https://anistream.one"
+                target="_blank"
+                rel="noopener noreferrer"
+                style="color: var(--accent-color); text-decoration: underline"
+                >Anistream</a
+              ></strong
+            >
+          </li>
+          <li>
+            <strong
+              ><a
+                href="https://khanime.co"
+                target="_blank"
+                rel="noopener noreferrer"
+                style="color: var(--accent-color); text-decoration: underline"
+                >Khanime</a
+              ></strong
+            >
+          </li>
+          <li>
+            <strong
+              ><a
+                href="https://khfullhd.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                style="color: var(--accent-color); text-decoration: underline"
+                >KHFullHD</a
+              ></strong
+            >
+          </li>
+        </ul>
+
+        <h2>3. AI 设置说明</h2>
+        <div class="card">
+          <div class="setting-item">
+            <div class="setting-name">
+              Gemini API Key <span class="tag-badge tag-required">必填项</span>
+            </div>
+            <p class="setting-desc">
+              您的个人 Google AI Studio API
+              密钥。翻译工作完全在您本地浏览器发起并直达 Google，安全无风险。
+            </p>
+          </div>
+          <div class="setting-item">
+            <div class="setting-name">
+              选择模型 <span class="tag-badge tag-optional">可配置</span>
+            </div>
+            <p class="setting-desc">
+              选择要调用的 Gemini 模型。推荐使用
+              <code>gemini-3.5-flash</code>，翻译速度极快，性价比极高。
+            </p>
+          </div>
+          <div class="setting-item">
+            <div class="setting-name">
+              上下文关联翻译 <span class="tag-badge tag-optional">开关</span>
+            </div>
+            <p class="setting-desc">
+              启用后，翻译时会一并发送当前行前后的字幕作为上下文参考，使代词人称更准确，对白更流畅连贯。
+            </p>
+          </div>
+          <div class="setting-item">
+            <div class="setting-name">
+              并发数 (Concurrency)
+              <span class="tag-badge tag-optional">开关</span>
+            </div>
+            <p class="setting-desc">
+              设定并行发送的请求数量。并发越高速度越快，但更容易触发 API 429
+              报错限制。
+            </p>
+          </div>
+          <div class="setting-item">
+            <div class="setting-name">
+              延迟时间 (Delay) <span class="tag-badge tag-optional">开关</span>
+            </div>
+            <p class="setting-desc">
+              两次 API
+              请求之间的间隔时间（毫秒）。如果您的翻译频繁因频率限制报错，请调大此值以缓和请求频率。
+            </p>
+          </div>
+          <div class="setting-item">
+            <div class="setting-name">
+              18+ / 成人及暴力内容
+              <span class="tag-badge tag-optional">开关</span>
+            </div>
+            <p class="setting-desc">
+              允许 LLM
+              准确地翻译脏话、俚语以及暴力成人对话，不进行任何人工过滤或自我审查。
+            </p>
+          </div>
+          <div class="setting-item">
+            <div class="setting-name">
+              启用本地缓存 <span class="tag-badge tag-optional">开关</span>
+            </div>
+            <p class="setting-desc">
+              开启缓存（使用
+              IndexedDB）后，翻译结果会保存在您本地。如果再次翻译相同文件或重播视频，将秒速加载结果，且完全不再消耗任何
+              API 额度。
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>khtranslator &copy; 2026.</footer>
+
+    <script src="guide.js"></script>
+  </body>
+</html>
