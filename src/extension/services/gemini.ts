@@ -183,6 +183,9 @@ async function fetchWithRetry(
     }
     return response;
   } catch (error) {
+    if ((error as Error).name === "AbortError") {
+      throw error;
+    }
     if (retries > 0) {
       console.warn(`Fetch error: ${(error as Error).message}. Retrying in ${backoff}ms...`);
       await new Promise((resolve) => setTimeout(resolve, backoff));
@@ -260,6 +263,7 @@ export async function translateBatchWithContext(
   sourceLanguage: string,
   config: GeminiConfig,
   onProgress: (percent: number) => void,
+  onBatchTranslated?: (batchStart: number, batchCues: SubtitleCue[], translatedTexts: string[]) => Promise<void> | void,
   signal?: AbortSignal,
   isTestConnection?: boolean
 ): Promise<string[]> {
@@ -402,6 +406,16 @@ CRITICAL REQUIREMENTS:
         for (let j = 0; j < batch.expectedCount; j++) {
           const idx = batch.batchStart + j;
           translatedLines[idx] = translatedBatch[j] || contentLines[idx];
+        }
+
+        // Real-time caching callback
+        if (onBatchTranslated) {
+          const batchCues = cues.slice(batch.batchStart, batch.batchEnd);
+          try {
+            await onBatchTranslated(batch.batchStart, batchCues, translatedBatch);
+          } catch (cacheErr) {
+            console.error("Error writing batch to cache in real-time:", cacheErr);
+          }
         }
 
         completedCount += batch.expectedCount;

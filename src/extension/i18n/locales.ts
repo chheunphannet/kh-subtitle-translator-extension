@@ -10,6 +10,7 @@ export interface LocaleStrings {
   targetLang: string;
   btnInject: string;
   btnSave: string;
+  btnCancel: string;
   statusSelected: string;
   statusTranslating: string;
   statusInjected: string;
@@ -70,6 +71,7 @@ export const locales: Record<string, LocaleStrings> = {
     targetLang: "ភាសាបកប្រែ",
     btnInject: "បកប្រែ & បញ្ចូល",
     btnSave: "ទាញយក Subtitle បកប្រែរួច",
+    btnCancel: "បោះបង់",
     statusSelected: "បានជ្រើសរើស៖",
     statusTranslating: "កំពុងបកប្រែ... ",
     statusInjected: "បានបញ្ចូល Subtitle ដោយជោគជ័យ!",
@@ -142,6 +144,7 @@ export const locales: Record<string, LocaleStrings> = {
     targetLang: "Target Lang",
     btnInject: "Translate & Inject",
     btnSave: "Download Translated",
+    btnCancel: "Cancel",
     statusSelected: "Selected:",
     statusTranslating: "Translating... ",
     statusInjected: "Subtitles injected successfully!",
@@ -214,6 +217,7 @@ export const locales: Record<string, LocaleStrings> = {
     targetLang: "目标语言",
     btnInject: "翻译并注入",
     btnSave: "下载已翻译字幕",
+    btnCancel: "取消",
     statusSelected: "已选择：",
     statusTranslating: "正在翻译... ",
     statusInjected: "字幕注入成功！",

@@ -36,6 +36,40 @@ const App = () => {
 
   const loc = locales[uiLanguage as keyof typeof locales] || locales['en'];
 
+  const restoreCompletedTranslation = useCallback((status: any) => {
+    if (!status || !status.cues || !status.translatedTexts) return;
+
+    const translatedCues = status.cues.map((cue: any, idx: number) => {
+      let finalFormat = 'translated';
+      if (status.exportMode === 'bilingual') {
+        finalFormat = status.bilingualOrder === 'translationFirst' ? 'translation_above' : 'translation_below';
+      }
+      return {
+        ...cue,
+        text: formatSubtitleText(cue.originalText || cue.text, status.translatedTexts[idx], finalFormat)
+      };
+    });
+
+    // Rebuild export
+    const ext = status.fileName?.split('.').pop()?.toLowerCase() || 'srt';
+    const exportData = generateSubtitleExport(translatedCues, status.formatPref || 'vtt');
+
+    const baseName = status.fileName ? status.fileName.substring(0, status.fileName.lastIndexOf('.')) : 'subtitles';
+    setTranslatedFileName(`${baseName}_${status.targetLang}.${exportData.ext}`);
+    setTranslatedContent(exportData.text);
+    setProgress(100);
+    setProgressStatus(loc.statusInjected);
+  }, [loc.statusInjected]);
+
+  const handleCancel = () => {
+    chrome.runtime.sendMessage({ action: "cancelTranslation" }).then(() => {
+      setTranslating(false);
+      setProgress(0);
+      setProgressStatus('');
+      message.info("Translation cancelled.");
+    }).catch(() => {});
+  };
+
   useEffect(() => {
     chrome.storage.local.get(["userConfig", "uiLanguage", "exportMode", "bilingualOrder", "formatPref"]).then((storage: any) => {
       if (storage.uiLanguage) setUiLanguage(storage.uiLanguage);
@@ -59,6 +93,19 @@ const App = () => {
         isMature: userConfig.isMature ?? DEFAULT_GEMINI_CONFIG.isMature,
       });
       configLoaded.current = true;
+
+      // Query active translation status once local configurations are parsed
+      chrome.runtime.sendMessage({ action: "getTranslationStatus" }).then((status: any) => {
+        if (status) {
+          if (status.translating) {
+            setTranslating(true);
+            setProgress(status.percent);
+            setProgressStatus(loc.statusTranslating);
+          } else if (status.status === "Completed" && status.translatedTexts && status.cues) {
+            restoreCompletedTranslation(status);
+          }
+        }
+      }).catch(() => {});
     });
 
     checkActivePagePlayer();
@@ -66,11 +113,22 @@ const App = () => {
     const messageListener = (msg: any) => {
       if (msg.action === "translationProgress") {
         setProgress(msg.percent);
+        if (msg.percent === 100) {
+          setProgressStatus(loc.statusInjected);
+          chrome.runtime.sendMessage({ action: "getTranslationStatus" }).then((status: any) => {
+            if (status && status.status === "Completed") {
+              restoreCompletedTranslation(status);
+              setTranslating(false);
+            }
+          }).catch(() => {});
+        } else {
+          setProgressStatus(loc.statusTranslating);
+        }
       }
     };
     chrome.runtime.onMessage.addListener(messageListener);
     return () => chrome.runtime.onMessage.removeListener(messageListener);
-  }, []);
+  }, [restoreCompletedTranslation]);
 
   useEffect(() => {
     // Only save after initial load completes to avoid overwriting stored config with defaults
@@ -127,7 +185,11 @@ const App = () => {
         cues,
         targetLanguage: targetLang,
         sourceLanguage: sourceLang,
-        config
+        config,
+        fileName: selectedFile.name,
+        exportMode,
+        bilingualOrder,
+        formatPref
       }, (res) => {
         if (res && res.success) {
           setProgress(100);
@@ -425,7 +487,14 @@ const App = () => {
             {translating && (
               <div style={{ textAlign: 'center', marginBottom: 16 }}>
                 <Progress percent={progress} status={progress === 100 ? "success" : "active"} strokeColor="#E54D2E" />
-                <Text>{progressStatus}</Text>
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, marginTop: 8 }}>
+                  <Text>{progressStatus}</Text>
+                  {progress < 100 && (
+                    <Button size="small" danger onClick={handleCancel}>
+                      {loc.btnCancel}
+                    </Button>
+                  )}
+                </div>
               </div>
             )}
 

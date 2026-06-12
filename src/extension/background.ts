@@ -1,6 +1,36 @@
 import { translateBatchWithContext, translateSingleText, GeminiConfig, DEFAULT_GEMINI_CONFIG } from "./services/gemini";
 import { SubtitleCue } from "./parsers";
 
+let activeAbortController: AbortController | null = null;
+
+interface TranslationState {
+  translating: boolean;
+  percent: number;
+  status: string;
+  translatedTexts: string[] | null;
+  error: string | null;
+  cues: SubtitleCue[] | null;
+  fileName: string | null;
+  targetLang: string | null;
+  exportMode: string | null;
+  bilingualOrder: string | null;
+  formatPref: string | null;
+}
+
+let activeTranslationState: TranslationState = {
+  translating: false,
+  percent: 0,
+  status: "",
+  translatedTexts: null,
+  error: null,
+  cues: null,
+  fileName: null,
+  targetLang: null,
+  exportMode: null,
+  bilingualOrder: null,
+  formatPref: null
+};
+
 const DB_NAME = "SubtitlesCache";
 const DB_VERSION = 1;
 const STORE_NAME = "cues-cache";
@@ -96,18 +126,103 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   if (message.action === "translateSubtitles") {
-    const { cues, targetLanguage, sourceLanguage, config, isTestConnection } = message as {
+    const { cues, targetLanguage, sourceLanguage, config, isTestConnection, fileName, exportMode, bilingualOrder, formatPref } = message as {
       cues: SubtitleCue[];
       targetLanguage: string;
       sourceLanguage: string;
       config: GeminiConfig;
       isTestConnection?: boolean;
+      fileName?: string;
+      exportMode?: string;
+      bilingualOrder?: string;
+      formatPref?: string;
     };
 
-    performTranslation(cues, targetLanguage, sourceLanguage, config, sender.tab?.id, isTestConnection)
-      .then((translatedTexts) => sendResponse({ success: true, translatedTexts }))
-      .catch((err) => sendResponse({ success: false, error: err.message }));
+    if (isTestConnection) {
+      performTranslation(cues, targetLanguage, sourceLanguage, config, sender.tab?.id, isTestConnection)
+        .then((translatedTexts) => sendResponse({ success: true, translatedTexts }))
+        .catch((err) => sendResponse({ success: false, error: err.message }));
+      return true; // Keep channel open
+    }
+
+    // 1. Abort existing active translation first
+    if (activeAbortController) {
+      activeAbortController.abort();
+    }
+
+    // 2. Create new AbortController
+    const currentController = new AbortController();
+    activeAbortController = currentController;
+
+    // 3. Reset state
+    activeTranslationState = {
+      translating: true,
+      percent: 0,
+      status: "Starting...",
+      translatedTexts: null,
+      error: null,
+      cues,
+      fileName: fileName || null,
+      targetLang: targetLanguage,
+      exportMode: exportMode || null,
+      bilingualOrder: bilingualOrder || null,
+      formatPref: formatPref || null
+    };
+
+    performTranslation(cues, targetLanguage, sourceLanguage, config, sender.tab?.id, isTestConnection, currentController.signal)
+      .then((translatedTexts) => {
+        if (activeAbortController === currentController) {
+          activeTranslationState = {
+            ...activeTranslationState,
+            translating: false,
+            percent: 100,
+            status: "Completed",
+            translatedTexts,
+            error: null
+          };
+          activeAbortController = null;
+        }
+        sendResponse({ success: true, translatedTexts });
+      })
+      .catch((err) => {
+        if (activeAbortController === currentController) {
+          const isAbort = err.name === "AbortError" || err.message?.includes("aborted");
+          activeTranslationState = {
+            ...activeTranslationState,
+            translating: false,
+            percent: 0,
+            status: isAbort ? "Cancelled" : "Failed",
+            translatedTexts: null,
+            error: isAbort ? "Cancelled by user" : err.message
+          };
+          activeAbortController = null;
+        }
+        sendResponse({ success: false, error: err.message });
+      });
+
     return true; // Keep channel open
+  }
+
+  if (message.action === "getTranslationStatus") {
+    sendResponse(activeTranslationState);
+    return false;
+  }
+
+  if (message.action === "cancelTranslation") {
+    if (activeAbortController) {
+      activeAbortController.abort();
+      activeAbortController = null;
+    }
+    activeTranslationState = {
+      translating: false,
+      percent: 0,
+      status: "Cancelled",
+      translatedTexts: null,
+      error: "Cancelled by user"
+    };
+    chrome.runtime.sendMessage({ action: "translationProgress", percent: 0, status: "Cancelled", error: "Cancelled" }).catch(() => {});
+    sendResponse({ success: true });
+    return false;
   }
 
   if (message.action === "clearCache") {
@@ -116,7 +231,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       .catch((err) => sendResponse({ success: false, error: err.message }));
     return true;
   }
-
 });
 
 // Coordinate subtitle translation, checking cache line by line
@@ -126,7 +240,8 @@ async function performTranslation(
   sourceLanguage: string,
   config: GeminiConfig,
   tabId?: number,
-  isTestConnection?: boolean
+  isTestConnection?: boolean,
+  signal?: AbortSignal
 ): Promise<string[]> {
   const result: string[] = new Array(cues.length).fill("");
   const promptHash = getPromptHash(config.systemPrompt + config.userPrompt);
@@ -136,6 +251,7 @@ async function performTranslation(
   const cuesToTranslate: SubtitleCue[] = [];
 
   for (let i = 0; i < cues.length; i++) {
+    if (signal?.aborted) throw new DOMException("Aborted", "AbortError");
     const cue = cues[i];
     if (config.useCache) {
       // Key format: [model]_[source]_[target]_[promptHash]_[originalText]
@@ -151,19 +267,46 @@ async function performTranslation(
   }
 
   // Report initial progress
+  const initialPercent = Math.floor(((cues.length - cuesToTranslate.length) / cues.length) * 100);
+  if (!isTestConnection) {
+    activeTranslationState.percent = initialPercent;
+    activeTranslationState.status = `Checked cache. Starting remaining...`;
+  }
   chrome.runtime.sendMessage({
     action: "translationProgress",
-    percent: Math.floor(((cues.length - cuesToTranslate.length) / cues.length) * 100)
-  }).catch(() => {}); // Ignore if extension popup is closed
+    percent: initialPercent,
+    status: `Starting...`
+  }).catch(() => {});
 
   // 2. Call Gemini API for missing cues
   if (cuesToTranslate.length > 0) {
     const onProgress = (percent: number) => {
       const totalCompleted = (cues.length - cuesToTranslate.length) + Math.floor((cuesToTranslate.length * percent) / 100);
+      const finalPercent = Math.floor((totalCompleted / cues.length) * 100);
+      
+      if (!isTestConnection) {
+        activeTranslationState.percent = finalPercent;
+        activeTranslationState.status = `Translating: ${finalPercent}%`;
+      }
+
       chrome.runtime.sendMessage({
         action: "translationProgress",
-        percent: Math.floor((totalCompleted / cues.length) * 100)
+        percent: finalPercent,
+        status: `Translating: ${finalPercent}%`
       }).catch(() => {});
+    };
+
+    const onBatchComplete = async (batchStart: number, batchCues: SubtitleCue[], translatedTexts: string[]) => {
+      if (signal?.aborted) throw new DOMException("Aborted", "AbortError");
+      if (!config.useCache) return;
+      for (let j = 0; j < batchCues.length; j++) {
+        const cue = batchCues[j];
+        const translatedText = translatedTexts[j];
+        if (translatedText && translatedText !== cue.text) {
+          const cacheKey = `${config.model}_${sourceLanguage}_${targetLanguage}_${promptHash}_${cue.text}`;
+          await setCachedValue(cacheKey, translatedText);
+        }
+      }
     };
 
     const translatedBatch = await translateBatchWithContext(
@@ -172,27 +315,27 @@ async function performTranslation(
       sourceLanguage,
       config,
       onProgress,
-      undefined,
+      onBatchComplete,
+      signal,
       isTestConnection
     );
 
-    // 3. Write newly translated cues back to cache & result
+    // 3. Map newly translated cues back to result
     for (let j = 0; j < cuesToTranslate.length; j++) {
+      if (signal?.aborted) throw new DOMException("Aborted", "AbortError");
       const origIndex = missingIndexes[j];
       const cue = cuesToTranslate[j];
       const translatedText = translatedBatch[j] || cue.text;
-      
       result[origIndex] = translatedText;
-
-      if (config.useCache && translatedText && translatedText !== cue.text) {
-        const cacheKey = `${config.model}_${sourceLanguage}_${targetLanguage}_${promptHash}_${cue.text}`;
-        await setCachedValue(cacheKey, translatedText);
-      }
     }
   }
 
   // Send final progress update
-  chrome.runtime.sendMessage({ action: "translationProgress", percent: 100 }).catch(() => {});
+  if (!isTestConnection) {
+    activeTranslationState.percent = 100;
+    activeTranslationState.status = "Completed";
+  }
+  chrome.runtime.sendMessage({ action: "translationProgress", percent: 100, status: "Completed" }).catch(() => {});
 
   return result;
 }
