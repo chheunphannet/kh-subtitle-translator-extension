@@ -432,7 +432,7 @@ const App = () => {
         <Tabs defaultActiveKey="1" style={{ flex: 1, overflow: 'hidden' }}>
           
           {/* Inject Tab */}
-          <Tabs.TabPane tab={loc.tabInject} key="1" style={{ overflowY: 'auto', height: 430, paddingRight: 8 }}>
+          <Tabs.TabPane tab={loc.tabInject} key="1" style={{ overflowY: 'auto', height: 415, paddingRight: 8 }}>
             
             <Card size="small" style={{ marginBottom: 16, backgroundColor: detectedSubUrl ? 'rgba(107, 142, 90, 0.1)' : undefined, borderColor: detectedSubUrl ? '#6B8E5A' : undefined }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -518,7 +518,7 @@ const App = () => {
           </Tabs.TabPane>
 
           {/* Settings Tab */}
-          <Tabs.TabPane tab={loc.tabSettings} key="2" style={{ overflowY: 'auto', height: 430, paddingRight: 8 }}>
+          <Tabs.TabPane tab={loc.tabSettings} key="2" style={{ overflowY: 'auto', height: 415, paddingRight: 8 }}>
             <Space direction="vertical" style={{ width: '100%' }} size="middle">
               <div>
                 <Text><SettingOutlined /> Translation API</Text>
@@ -587,7 +587,7 @@ const App = () => {
           </Tabs.TabPane>
 
           {/* Prompts Tab */}
-          <Tabs.TabPane tab={loc.tabPrompts} key="3" style={{ overflowY: 'auto', height: 430, paddingRight: 8 }}>
+          <Tabs.TabPane tab={loc.tabPrompts} key="3" style={{ overflowY: 'auto', height: 415, paddingRight: 8 }}>
             <Space direction="vertical" style={{ width: '100%' }} size="middle">
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 0' }}>
                 <Switch checked={config.isMature} onChange={val => updateConfig('isMature', val)} />
@@ -610,7 +610,7 @@ const App = () => {
           </Tabs.TabPane>
 
           {/* Advanced Tab */}
-          <Tabs.TabPane tab={loc.tabAdvanced} key="4" style={{ overflowY: 'auto', height: 430, paddingRight: 8 }}>
+          <Tabs.TabPane tab={loc.tabAdvanced} key="4" style={{ overflowY: 'auto', height: 415, paddingRight: 8 }}>
             <Space direction="vertical" style={{ width: '100%' }} size="middle">
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Switch checked={config.useCache} onChange={val => updateConfig('useCache', val)} />
