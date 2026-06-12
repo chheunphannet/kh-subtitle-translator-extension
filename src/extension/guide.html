@@ -260,9 +260,9 @@
       <h1>KH-Translator Guide</h1>
     </div>
     <div class="lang-switcher">
-      <button class="lang-btn active" onclick="switchLang('en')">English</button>
-      <button class="lang-btn" onclick="switchLang('km')">ភាសាខ្មែរ</button>
-      <button class="lang-btn" onclick="switchLang('zh')">中文</button>
+      <button class="lang-btn active" data-lang="en" onclick="switchLang('en')">English</button>
+      <button class="lang-btn" data-lang="km" onclick="switchLang('km')">ភាសាខ្មែរ</button>
+      <button class="lang-btn" data-lang="zh" onclick="switchLang('zh')">中文</button>
     </div>
   </header>
 
@@ -271,7 +271,7 @@
     <div id="guide-en" class="guide-section active">
       <h2>1. How to Use the Extension</h2>
       <div class="card">
-        <h3>⚡ Auto-Translate & Inject</h3>
+        <h3>Auto-Translate & Inject</h3>
         <p>If you are watching video streams with English subtitles, the extension can translate and overlay them instantly:</p>
         <ol>
           <li>Open the stream page (e.g., Anistream) and start playing the video.</li>
@@ -281,7 +281,7 @@
       </div>
 
       <div class="card">
-        <h3>📁 Manual Subtitle Injection</h3>
+        <h3>Manual Subtitle Injection</h3>
         <p>You can also translate and inject your own local subtitle files:</p>
         <ol>
           <li>Drag & drop a subtitle file (<code>.srt</code>, <code>.vtt</code>, <code>.ass</code>, or <code>.lrc</code>) into the upload zone.</li>
@@ -337,7 +337,7 @@
     <div id="guide-km" class="guide-section">
       <h2>១. របៀបប្រើប្រាស់ Extension</h2>
       <div class="card">
-        <h3>⚡ បកប្រែ & បញ្ចូលដោយស្វ័យប្រវត្ត (Auto-Translate & Inject)</h3>
+        <h3>បកប្រែ & បញ្ចូលដោយស្វ័យប្រវត្ត (Auto-Translate & Inject)</h3>
         <p>ប្រសិនបើអ្នកកំពុងទស្សនាខ្សែភាពយន្តដែលមាន Subtitle ភាសាអង់គ្លេស Extension អាចបកប្រែនិងបញ្ចូលវាភ្លាមៗ៖</p>
         <ol>
           <li>បើកគេហទំព័រខ្សែភាពយន្ត (ឧទាហរណ៍ Anistream) រួចចាក់វីដេអូ។</li>
@@ -347,7 +347,7 @@
       </div>
 
       <div class="card">
-        <h3>📁 បញ្ចូល Subtitle ដោយខ្លួនឯង (Manual Subtitle Injection)</h3>
+        <h3>បញ្ចូល Subtitle ដោយខ្លួនឯង (Manual Subtitle Injection)</h3>
         <p>អ្នកក៏អាចបកប្រែនិងបញ្ចូល file Subtitle ផ្ទាល់ខ្លួនរបស់អ្នកបានដែរ៖</p>
         <ol>
           <li>អូសនិងទម្លាក់ file Subtitle (<code>.srt</code>, <code>.vtt</code>, <code>.ass</code>, ឬ <code>.lrc</code>) ចូលក្នុងប្រអប់បង្ហោះ។</li>
@@ -386,7 +386,7 @@
         </div>
         <div class="setting-item">
           <div class="setting-name">ពន្យារពេល (Delay) <span class="tag-badge tag-optional">កំណត់តម្លៃ</span></div>
-          <p class="setting-desc">រយៈពេលរង់ចាំរវាងសំណើនីមួយៗ។ ប្រសិនបើជួបបញ្ហាកំហុសបកប្រែ Rate Limit (Error 429) សូមបង្កើនតម្លៃពន្យារពេលនេះ។</p>
+          <p class="setting-desc">រយៈពេលរង់ចាំរវាងសំណើនីមួយៗ。 ប្រសិនបើជួបបញ្ហាកំហុសបកប្រែ Rate Limit (Error 429) សូមបង្កើនតម្លៃពន្យារពេលនេះ។</p>
         </div>
         <div class="setting-item">
           <div class="setting-name">មាតិកា 18+ / ហិង្សា (Mature Content) <span class="tag-badge tag-optional">បើក/បិទ</span></div>
@@ -403,7 +403,7 @@
     <div id="guide-zh" class="guide-section">
       <h2>1. 插件使用方法</h2>
       <div class="card">
-        <h3>⚡ 自动翻译并注入</h3>
+        <h3>自动翻译并注入</h3>
         <p>如果您正在观看含有英文字幕的视频流媒体，插件可以实时翻译并显示：</p>
         <ol>
           <li>打开播放网页（如 Anistream）并开始播放视频。</li>
@@ -413,7 +413,7 @@
       </div>
 
       <div class="card">
-        <h3>📁 手动字幕注入</h3>
+        <h3>手动字幕注入</h3>
         <p>您也可以上传并注入本地字幕文件：</p>
         <ol>
           <li>将字幕文件（支持 <code>.srt</code>, <code>.vtt</code>, <code>.ass</code>, <code>.lrc</code>）拖拽到上传框中。</li>
@@ -475,14 +475,27 @@
       document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.guide-section').forEach(section => section.classList.remove('active'));
 
-      const clickedBtn = document.querySelector(`.lang-btn[onclick="switchLang('${lang}')"]`);
+      const clickedBtn = document.querySelector(`.lang-btn[data-lang="${lang}"]`);
       const targetSection = document.getElementById(`guide-${lang}`);
 
       if (clickedBtn && targetSection) {
         clickedBtn.classList.add('active');
         targetSection.classList.add('active');
+        // Save to storage to sync with popup
+        chrome.storage.local.set({ uiLanguage: lang });
       }
     }
+
+    // On Load, read language from storage and sync
+    document.addEventListener("DOMContentLoaded", () => {
+      chrome.storage.local.get(["uiLanguage"]).then((result) => {
+        const lang = result.uiLanguage || 'km';
+        switchLang(lang);
+      }).catch(() => {
+        // Fallback if storage fails
+        switchLang('km');
+      });
+    });
   </script>
 </body>
 </html>
