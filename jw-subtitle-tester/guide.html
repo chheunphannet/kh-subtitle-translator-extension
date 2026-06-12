@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JW Subtitle Tester & Translator - User Guide</title>
+  <title>KHTranslator - User Guide</title>
   <style>
     @font-face {
       font-family: 'Kantumruy Pro';
@@ -258,12 +258,12 @@
   <header>
     <div class="brand">
       <img src="icons/icon32.png" alt="Logo">
-      <h1>KH-Translator Guide</h1>
+      <h1>khtranslator</h1>
     </div>
     <div class="lang-switcher">
-      <button class="lang-btn active" data-lang="en" onclick="switchLang('en')">English</button>
-      <button class="lang-btn" data-lang="km" onclick="switchLang('km')">ភាសាខ្មែរ</button>
-      <button class="lang-btn" data-lang="zh" onclick="switchLang('zh')">中文</button>
+      <button class="lang-btn active" data-lang="en">English</button>
+      <button class="lang-btn" data-lang="km">ភាសាខ្មែរ</button>
+      <button class="lang-btn" data-lang="zh">中文</button>
     </div>
   </header>
 
@@ -352,7 +352,7 @@
         <p>អ្នកក៏អាចបកប្រែនិងបញ្ចូល file Subtitle ផ្ទាល់ខ្លួនរបស់អ្នកបានដែរ៖</p>
         <ol>
           <li>អូសនិងទម្លាក់ file Subtitle (<code>.srt</code>, <code>.vtt</code>, <code>.ass</code>, ឬ <code>.lrc</code>) ចូលក្នុងប្រអប់បង្ហោះ។</li>
-          <li>ជ្រើសរើស <strong>ភាសាដើម</strong> និង <strong>ភាសាបកប្រែ</strong> (ឧទាហរណ៍៖ ខ្មែរ)。</li>
+          <li>ជ្រើសរើស <strong>ភាសាដើម</strong> និង <strong>ភាសាបកប្រែ</strong> (ឧទាហរណ៍៖ ខ្មែរ)។</li>
           <li>ចុច <strong>"បកប្រែ & បញ្ចូល"</strong> ដើម្បីបកប្រែ Subtitle តាមរយៈ Gemini AI រួចបញ្ចូលទៅក្នុង Player។</li>
           <li>ឬ ចុច <strong>"បញ្ចូលតែប៉ុណ្ណោះ"</strong> ដើម្បីបញ្ចូល Subtitle ទៅក្នុង Player ភ្លាមៗដោយមិនបាច់បកប្រែ។</li>
           <li>បន្ទាប់ពីបកប្រែរួចរាល់ អ្នកអាចចុច <strong>"ទាញយក Subtitle បកប្រែរួច"</strong> ដើម្បីរក្សាទុក file ចូលក្នុងកុំព្យូទ័រ។</li>
@@ -387,7 +387,7 @@
         </div>
         <div class="setting-item">
           <div class="setting-name">ពន្យារពេល (Delay) <span class="tag-badge tag-optional">កំណត់តម្លៃ</span></div>
-          <p class="setting-desc">រយៈពេលរង់ចាំរវាងសំណើនីមួយៗ。 ប្រសិនបើជួបបញ្ហាកំហុសបកប្រែ Rate Limit (Error 429) សូមបង្កើនតម្លៃពន្យារពេលនេះ។</p>
+          <p class="setting-desc">រយៈពេលរង់ចាំរវាងសំណើនីមួយៗ。 ប្រសិនបើជួបបញ្ហាកំហុសបកប្រែ Rate Limit (Error 429) សូមបង្កើនតម្លៃពន្យារពេលនេះ。</p>
         </div>
         <div class="setting-item">
           <div class="setting-name">មាតិកា 18+ / ហិង្សា (Mature Content) <span class="tag-badge tag-optional">បើក/បិទ</span></div>
@@ -468,35 +468,9 @@
   </main>
 
   <footer>
-    JW Subtitle Tester & Translator &copy; 2026. Made with ❤️ for developers and translators.
+    khtranslator &copy; 2026. Made with ❤️ for developers and translators.
   </footer>
 
-  <script>
-    function switchLang(lang) {
-      document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.guide-section').forEach(section => section.classList.remove('active'));
-
-      const clickedBtn = document.querySelector(`.lang-btn[data-lang="${lang}"]`);
-      const targetSection = document.getElementById(`guide-${lang}`);
-
-      if (clickedBtn && targetSection) {
-        clickedBtn.classList.add('active');
-        targetSection.classList.add('active');
-        // Save to storage to sync with popup
-        chrome.storage.local.set({ uiLanguage: lang });
-      }
-    }
-
-    // On Load, read language from storage and sync
-    document.addEventListener("DOMContentLoaded", () => {
-      chrome.storage.local.get(["uiLanguage"]).then((result) => {
-        const lang = result.uiLanguage || 'km';
-        switchLang(lang);
-      }).catch(() => {
-        // Fallback if storage fails
-        switchLang('km');
-      });
-    });
-  </script>
+  <script src="guide.js"></script>
 </body>
 </html>
