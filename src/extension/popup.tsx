@@ -672,6 +672,15 @@ const App = () => {
         {/* Footer */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, paddingTop: 12, borderTop: '1px solid rgba(245, 240, 230, 0.10)' }}>
           <Text type="secondary" style={{ fontSize: 11 }}>v{chrome.runtime.getManifest().version}</Text>
+          
+          <Space size="small" style={{ fontSize: 10 }}>
+            <a href="https://anistream.one" target="_blank" rel="noopener noreferrer" style={{ color: '#E54D2E' }}>Anistream</a>
+            <Text type="secondary" style={{ fontSize: 9, opacity: 0.3 }}>|</Text>
+            <a href="https://khanime.co" target="_blank" rel="noopener noreferrer" style={{ color: '#E54D2E' }}>Khanime</a>
+            <Text type="secondary" style={{ fontSize: 9, opacity: 0.3 }}>|</Text>
+            <a href="https://khfullhd.com" target="_blank" rel="noopener noreferrer" style={{ color: '#E54D2E' }}>KHFullHD</a>
+          </Space>
+
           <Space size="middle">
             <span onClick={() => chrome.tabs.create({ url: 'guide.html' })} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
               <QuestionCircleOutlined style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)' }} />
