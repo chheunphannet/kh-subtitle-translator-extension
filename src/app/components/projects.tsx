@@ -110,7 +110,7 @@ export const useAppMenu = () => {
       children: generateCategoryItems(projectCategories.translate),
     },
     {
-      label: <Link href={`https://tools.newzone.top/${locale}/feedback`}>{t("feedback.feedback1")}</Link>,
+      label: t("feedback.feedback1"),
       key: "feedback",
     },
   ];

@@ -37,7 +37,7 @@ const App = () => {
   const loc = locales[uiLanguage as keyof typeof locales] || locales['en'];
 
   useEffect(() => {
-    chrome.storage.local.get(["userConfig", "uiLanguage", "exportMode", "bilingualOrder", "formatPref"]).then((storage) => {
+    chrome.storage.local.get(["userConfig", "uiLanguage", "exportMode", "bilingualOrder", "formatPref"]).then((storage: any) => {
       if (storage.uiLanguage) setUiLanguage(storage.uiLanguage);
       if (storage.exportMode) setExportMode(storage.exportMode);
       if (storage.bilingualOrder) setBilingualOrder(storage.bilingualOrder);

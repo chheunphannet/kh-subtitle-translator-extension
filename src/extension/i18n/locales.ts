@@ -19,6 +19,7 @@ export interface LocaleStrings {
 
   detectedSuccess: string;
   detecting: string;
+  detectDesc: string;
   btnAutoTranslate: string;
   orManualUpload: string;
   btnTranslateInject: string;
@@ -78,6 +79,7 @@ export const locales: Record<string, LocaleStrings> = {
 
     detectedSuccess: "បានរកឃើញ Subtitle ភាសាអង់គ្លេស!",
     detecting: "កំពុងស្វែងរក Player...",
+    detectDesc: "មិនទាន់រកឃើញ Player វីដេអូ ឬ Subtitle ភាសាអង់គ្លេសនៅលើទំព័រនេះទេ។ អ្នកអាចបញ្ចូល file Subtitle ដោយផ្ទាល់ខាងក្រោម។",
     btnAutoTranslate: "បកប្រែ & បញ្ចូលដោយស្វ័យប្រវត្ត",
     orManualUpload: "ឬ បញ្ចូលដោយខ្លួនឯង",
     btnTranslateInject: "បកប្រែ & បញ្ចូល",
@@ -149,6 +151,7 @@ export const locales: Record<string, LocaleStrings> = {
 
     detectedSuccess: "English Subtitles Detected!",
     detecting: "Searching for Player...",
+    detectDesc: "No active video player with English subtitles detected on the current page. You can still manually upload subtitles below.",
     btnAutoTranslate: "Auto Translate & Inject",
     orManualUpload: "Or manual upload",
     btnTranslateInject: "Translate & Inject",
@@ -220,6 +223,7 @@ export const locales: Record<string, LocaleStrings> = {
 
     detectedSuccess: "检测到英文字幕！",
     detecting: "正在搜索播放器...",
+    detectDesc: "当前页面未检测到含有英文字幕的视频播放器。您仍可在下方手动上传字幕。",
     btnAutoTranslate: "自动翻译并注入",
     orManualUpload: "或手动上传",
     btnTranslateInject: "翻译并注入",

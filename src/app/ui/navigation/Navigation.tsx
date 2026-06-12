@@ -1,11 +1,12 @@
 "use client";
-import React, { memo, useSyncExternalStore } from "react";
+import React, { memo, useSyncExternalStore, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Layout, Menu, Space, Button, Dropdown, Flex } from "antd";
 import { GithubOutlined, QqOutlined, SunOutlined, MoonOutlined, TeamOutlined, SendOutlined } from "@ant-design/icons";
 import { useTheme } from "next-themes";
 import { useLocale } from "next-intl";
 import { useAppMenu } from "@/app/components/projects";
+import { FeedbackModal } from "@/app/components/FeedbackModal";
 import { isChineseLocale } from "@/app/utils";
 import { SOCIAL_LINKS } from "./config";
 import { LanguageSelector } from "./LanguageSelector";
@@ -34,6 +35,7 @@ export function Navigation() {
   const pathname = usePathname();
   const { resolvedTheme, setTheme } = useTheme();
   const locale = useLocale();
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   // useSyncExternalStore for hydration-safe client detection
   const mounted = useSyncExternalStore(
@@ -55,7 +57,17 @@ export function Navigation() {
   return (
     <Header style={{ padding: 0, background: "transparent", height: 48, lineHeight: "48px" }}>
       <Flex justify="space-between" align="center" style={{ padding: "0 16px", borderBottom: "1px solid rgba(128, 128, 128, 0.25)" }}>
-        <Menu selectedKeys={[currentMenuKey]} mode="horizontal" items={menuItems} style={{ flex: 1, minWidth: 0, border: "none", background: "transparent" }} />
+        <Menu
+          selectedKeys={feedbackOpen ? ["feedback"] : [currentMenuKey]}
+          mode="horizontal"
+          items={menuItems}
+          onClick={(e) => {
+            if (e.key === "feedback") {
+              setFeedbackOpen(true);
+            }
+          }}
+          style={{ flex: 1, minWidth: 0, border: "none", background: "transparent" }}
+        />
         <Space size="middle">
           <LanguageSelector />
 
@@ -99,6 +111,7 @@ export function Navigation() {
           <Button type="text" icon={themeIcon} onClick={handleThemeToggle} aria-label="Toggle theme" />
         </Space>
       </Flex>
+      <FeedbackModal open={feedbackOpen} onCancel={() => setFeedbackOpen(false)} />
     </Header>
   );
 }
