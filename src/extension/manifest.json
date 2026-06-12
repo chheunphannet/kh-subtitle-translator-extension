@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "khtranslator",
-  "version": "2.0",
+  "version": "2.1",
   "description": "Inject local or auto-translated subtitles into JW Player (with Gemini AI & Khmer support).",
   "icons": {
     "16": "icons/icon16.png",
