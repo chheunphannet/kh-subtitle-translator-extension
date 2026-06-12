@@ -416,8 +416,8 @@ const App = () => {
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
           <Title level={4} style={{ margin: 0, display: 'flex', alignItems: 'center' }}>
-            <img src="icons/icon32.png" alt="KH-Translator Logo" style={{ width: 20, height: 20, marginRight: 6, borderRadius: 4 }} />
-            KH-Translator
+            <img src="icons/icon32.png" alt="khtranslator Logo" style={{ width: 20, height: 20, marginRight: 6, borderRadius: 4 }} />
+            khtranslator
           </Title>
           <Select value={uiLanguage} onChange={(val) => {
             setUiLanguage(val);
@@ -433,8 +433,8 @@ const App = () => {
           
           {/* Inject Tab */}
           <Tabs.TabPane tab={loc.tabInject} key="1" style={{ overflowY: 'auto', maxHeight: 415, paddingRight: 8 }}>
-            
-            <Card size="small" style={{ marginBottom: 16, backgroundColor: detectedSubUrl ? 'rgba(107, 142, 90, 0.1)' : undefined, borderColor: detectedSubUrl ? '#6B8E5A' : undefined }}>
+            <div style={{ paddingBottom: 32 }}>
+              <Card size="small" style={{ marginBottom: 16, backgroundColor: detectedSubUrl ? 'rgba(107, 142, 90, 0.1)' : undefined, borderColor: detectedSubUrl ? '#6B8E5A' : undefined }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 {detectedSubUrl ? <CheckCircleOutlined style={{ color: '#6B8E5A' }} /> : <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#faad14' }} />}
                 <Text strong style={{ color: detectedSubUrl ? '#6B8E5A' : undefined }}>{detectedSubUrl ? loc.detectedSuccess : loc.detecting}</Text>
@@ -514,12 +514,12 @@ const App = () => {
                 {loc.btnSave}
               </Button>
             )}
-
+            </div>
           </Tabs.TabPane>
 
           {/* Settings Tab */}
           <Tabs.TabPane tab={loc.tabSettings} key="2" style={{ overflowY: 'auto', maxHeight: 415, paddingRight: 8 }}>
-            <Space direction="vertical" style={{ width: '100%' }} size="middle">
+            <Space direction="vertical" style={{ width: '100%', paddingBottom: 32 }} size="middle">
               <div>
                 <Text><SettingOutlined /> Translation API</Text>
               </div>
@@ -588,7 +588,7 @@ const App = () => {
 
           {/* Prompts Tab */}
           <Tabs.TabPane tab={loc.tabPrompts} key="3" style={{ overflowY: 'auto', maxHeight: 415, paddingRight: 8 }}>
-            <Space direction="vertical" style={{ width: '100%' }} size="middle">
+            <Space direction="vertical" style={{ width: '100%', paddingBottom: 32 }} size="middle">
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 0' }}>
                 <Switch checked={config.isMature} onChange={val => updateConfig('isMature', val)} />
                 <Text strong style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
@@ -611,7 +611,7 @@ const App = () => {
 
           {/* Advanced Tab */}
           <Tabs.TabPane tab={loc.tabAdvanced} key="4" style={{ overflowY: 'auto', maxHeight: 415, paddingRight: 8 }}>
-            <Space direction="vertical" style={{ width: '100%' }} size="middle">
+            <Space direction="vertical" style={{ width: '100%', paddingBottom: 32 }} size="middle">
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Switch checked={config.useCache} onChange={val => updateConfig('useCache', val)} />
                 <Text>{loc.cacheToggle}</Text>
