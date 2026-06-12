@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "eslint",
     "outdated": "ncu",
-    "build:extension": "esbuild src/extension/background.ts src/extension/content.ts src/extension/popup.tsx src/extension/inject.ts --bundle --outdir=jw-subtitle-tester --minify --target=chrome100 --jsx=automatic"
+    "build:extension": "esbuild src/extension/background.ts src/extension/content.ts src/extension/popup.tsx src/extension/inject.ts --bundle --outdir=jw-subtitle-tester --minify --target=chrome100 --jsx=automatic && node scripts/copyExtensionAssets.js"
   },
   "dependencies": {
     "@ant-design/icons": "^6.2.5",
