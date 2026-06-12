@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ConfigProvider, theme, Tabs, Select, Button, Upload, message, Progress, Switch, Input, InputNumber, Divider, Card, Typography, Space, AutoComplete, Segmented, Tooltip } from 'antd';
-import { InboxOutlined, GlobalOutlined, SettingOutlined, FileTextOutlined, ControlOutlined, ApiOutlined, CheckCircleOutlined, InfoCircleOutlined, SendOutlined, MessageOutlined, GithubOutlined } from '@ant-design/icons';
+import { InboxOutlined, GlobalOutlined, SettingOutlined, FileTextOutlined, ControlOutlined, ApiOutlined, CheckCircleOutlined, InfoCircleOutlined, SendOutlined, QuestionCircleOutlined, GithubOutlined } from '@ant-design/icons';
 import { locales } from "./i18n/locales";
 import { languagesList, parseSrt, parseVtt, parseAss, parseLrc, buildSrt, buildVtt, buildAss, buildLrc, SubtitleCue, formatSubtitleText, generateSubtitleExport } from "./parsers";
 import { GeminiConfig, DEFAULT_GEMINI_CONFIG } from "./services/gemini";
@@ -673,14 +673,14 @@ const App = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, paddingTop: 12, borderTop: '1px solid rgba(245, 240, 230, 0.10)' }}>
           <Text type="secondary" style={{ fontSize: 11 }}>v{chrome.runtime.getManifest().version}</Text>
           <Space size="middle">
+            <a href="https://github.com/chheunphannet/kh-subtitle-translator/blob/main/EXTENSION-GUIDE.md" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center' }}>
+              <QuestionCircleOutlined style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)' }} />
+            </a>
             <a href="https://github.com/chheunphannet/kh-subtitle-translator" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center' }}>
               <GithubOutlined style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)' }} />
             </a>
             <a href="https://t.me/ifitworkitwork" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center' }}>
               <SendOutlined style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)' }} />
-            </a>
-            <a href="https://discord.gg/PZTQfJ4GjX" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center' }}>
-              <MessageOutlined style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)' }} />
             </a>
           </Space>
         </div>
