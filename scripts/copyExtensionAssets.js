@@ -51,9 +51,16 @@ filesToCopy.forEach(file => {
 
 // 3. Process Manifests
 const manifestPath = path.join(srcDir, 'manifest.json');
+const packageJsonPath = path.join(__dirname, '../package.json');
 if (fs.existsSync(manifestPath)) {
   const manifestRaw = fs.readFileSync(manifestPath, 'utf8');
   const manifest = JSON.parse(manifestRaw);
+
+  // Sync version with package.json
+  if (fs.existsSync(packageJsonPath)) {
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+    manifest.version = packageJson.version;
+  }
 
   // Generate Chrome Manifest (Remove scripts fallback & browser_specific_settings)
   const chromeManifest = JSON.parse(JSON.stringify(manifest));
