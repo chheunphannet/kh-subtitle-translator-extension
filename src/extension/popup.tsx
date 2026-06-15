@@ -33,6 +33,7 @@ const App = () => {
   const [bilingualOrder, setBilingualOrder] = useState<'translationFirst' | 'originalFirst'>('translationFirst');
 
   const configLoaded = useRef(false);
+  const hasPlayerRef = useRef(false);
 
   const loc = locales[uiLanguage as keyof typeof locales] || locales['en'];
 
@@ -112,7 +113,25 @@ const App = () => {
 
     checkActivePagePlayer();
 
+    // Poll for the player if it wasn't found immediately
+    const pollInterval = setInterval(() => {
+      if (!hasPlayerRef.current && !translating) {
+        checkActivePagePlayer();
+      }
+    }, 1000);
+
     const messageListener = (msg: any) => {
+      if (msg.action === "playerDetected") {
+        if (msg.info && msg.info.hasPlayer) {
+          hasPlayerRef.current = true;
+          if (msg.info.englishSubUrl) {
+            setDetectedSubUrl(msg.info.englishSubUrl);
+            setDetectedTitle(msg.info.videoTitle);
+          } else {
+            setDetectedSubUrl(null);
+          }
+        }
+      }
       if (msg.action === "translationProgress") {
         setProgress(msg.percent);
         if (msg.percent === 100) {
@@ -129,8 +148,12 @@ const App = () => {
       }
     };
     chrome.runtime.onMessage.addListener(messageListener);
-    return () => chrome.runtime.onMessage.removeListener(messageListener);
-  }, [restoreCompletedTranslation]);
+    
+    return () => {
+      clearInterval(pollInterval);
+      chrome.runtime.onMessage.removeListener(messageListener);
+    };
+  }, [restoreCompletedTranslation, translating]);
 
   useEffect(() => {
     // Only save after initial load completes to avoid overwriting stored config with defaults
@@ -147,6 +170,7 @@ const App = () => {
       chrome.tabs.sendMessage(activeTab.id, { action: "getDetectedSubtitles" }, (response) => {
         if (chrome.runtime.lastError) return; // ignore
         if (response && response.hasPlayer) {
+          hasPlayerRef.current = true;
           if (response.englishSubUrl) {
             setDetectedSubUrl(response.englishSubUrl);
             setDetectedTitle(response.videoTitle);

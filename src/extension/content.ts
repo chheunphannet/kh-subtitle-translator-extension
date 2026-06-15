@@ -29,6 +29,26 @@ const matchedSite = SUPPORTED_SITES.find(site => site.isMatch(window.location.ho
 if (matchedSite) {
   console.log(`[JW Subtitle Tester] ${matchedSite.name} player iframe detected. Initializing auto-translator...`);
   
+  const announcePlayer = () => {
+    const info = scanForSubtitles();
+    if (info.hasPlayer) {
+      chrome.runtime.sendMessage({ action: "playerDetected", info }).catch(() => {});
+      return true;
+    }
+    return false;
+  };
+
+  // Announce immediately, or poll for up to 10 seconds if the player is loading slowly
+  if (!announcePlayer()) {
+    let attempts = 0;
+    const interval = setInterval(() => {
+      attempts++;
+      if (announcePlayer() || attempts >= 20) {
+        clearInterval(interval);
+      }
+    }, 500);
+  }
+  
   // Listen for the popup requests (or check if we should auto-trigger)
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     const info = scanForSubtitles();
