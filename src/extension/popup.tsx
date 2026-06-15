@@ -71,11 +71,13 @@ const App = () => {
   };
 
   useEffect(() => {
-    chrome.storage.local.get(["userConfig", "uiLanguage", "exportMode", "bilingualOrder", "formatPref"]).then((storage: any) => {
+    chrome.storage.local.get(["userConfig", "uiLanguage", "exportMode", "bilingualOrder", "formatPref", "targetLang", "sourceLang"]).then((storage: any) => {
       if (storage.uiLanguage) setUiLanguage(storage.uiLanguage);
       if (storage.exportMode) setExportMode(storage.exportMode);
       if (storage.bilingualOrder) setBilingualOrder(storage.bilingualOrder);
       if (storage.formatPref) setFormatPref(storage.formatPref);
+      if (storage.targetLang) setTargetLang(storage.targetLang);
+      if (storage.sourceLang) setSourceLang(storage.sourceLang);
       
       const userConfig = storage.userConfig || {};
 
@@ -133,8 +135,8 @@ const App = () => {
   useEffect(() => {
     // Only save after initial load completes to avoid overwriting stored config with defaults
     if (!configLoaded.current) return;
-    chrome.storage.local.set({ userConfig: config, exportMode, bilingualOrder, formatPref });
-  }, [config, exportMode, bilingualOrder, formatPref]);
+    chrome.storage.local.set({ userConfig: config, exportMode, bilingualOrder, formatPref, targetLang, sourceLang });
+  }, [config, exportMode, bilingualOrder, formatPref, targetLang, sourceLang]);
 
   const checkActivePagePlayer = () => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -312,7 +314,8 @@ const App = () => {
       chrome.tabs.sendMessage(activeTab.id, {
         action: "injectSubtitles",
         content: vttText,
-        fileName
+        fileName,
+        targetLanguage: targetLang
       });
     });
   };

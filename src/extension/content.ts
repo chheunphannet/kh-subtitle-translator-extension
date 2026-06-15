@@ -1,4 +1,4 @@
-import { parseSrt, parseVtt, parseAss, parseLrc, buildVtt, SubtitleCue, formatSubtitleText, generateSubtitleExport, formatMsToVttTime } from "./parsers";
+import { parseSrt, parseVtt, parseAss, parseLrc, buildVtt, SubtitleCue, formatSubtitleText, generateSubtitleExport, formatMsToVttTime, parseTimeToMs, languagesList } from "./parsers";
 import { GeminiConfig, DEFAULT_GEMINI_CONFIG } from "./services/gemini";
 
 // ------------------------------------
@@ -50,7 +50,7 @@ if (matchedSite) {
 
     if (request.action === "injectSubtitles") {
       // Manual inject VTT text directly into the frame
-      injectVttToPlayer(request.content, request.fileName)
+      injectVttToPlayer(request.content, request.fileName, undefined, request.targetLanguage)
         .then(() => sendResponse({ success: true }))
         .catch((err) => sendResponse({ success: false, error: err.message }));
       return true;
@@ -178,8 +178,10 @@ async function getSubtitleCuesFromVideoElement(): Promise<SubtitleCue[]> {
     startTime: formatMsToVttTime(cue.startTime * 1000),
     endTime: formatMsToVttTime(cue.endTime * 1000),
     text: cue.text,
-    originalText: cue.text
-  }));
+    originalText: cue.text,
+    _rawStartTime: cue.startTime,
+    _rawEndTime: cue.endTime
+  } as any));
 
   englishTrack.mode = oldMode;
   return cueArray;
@@ -260,7 +262,7 @@ async function runAutoTranslateFlow(
   const vttFileName = `${baseName}_${targetLanguage}.vtt`;
 
   // 6. Inject VTT into JW Player
-  await injectVttToPlayer(translatedVttText, vttFileName);
+  await injectVttToPlayer(translatedVttText, vttFileName, translatedCues, targetLanguage);
 
   // 7. Generate export file using user's preferred format
   // For Auto Translate, we only have VTT/SRT source, so AssFile is not preserved. generateBasicAss will be used.
@@ -288,9 +290,9 @@ function getGeminiConfig(user: any): GeminiConfig {
 }
 
 // Create blob URL and inject via inject.js script injection
-async function injectVttToPlayer(vttText: string, fileName: string): Promise<void> {
+async function injectVttToPlayer(vttText: string, fileName: string, cues?: any[], targetLanguage?: string): Promise<void> {
   if (matchedSite?.name === "Anistream") {
-    setupKhmerSubtitle(vttText);
+    setupNativeSubtitle(cues || parseVtt(vttText), targetLanguage || 'km');
     return;
   }
 
@@ -321,7 +323,7 @@ async function injectVttToPlayer(vttText: string, fileName: string): Promise<voi
   });
 }
 
-function setupKhmerSubtitle(khmerVTT: string) {
+function setupNativeSubtitle(cues: any[], targetLanguage: string) {
   const video     = document.querySelector('video');
   const videoSkin = document.querySelector('video-skin');
   const shadow    = videoSkin?.shadowRoot;
@@ -368,22 +370,37 @@ function setupKhmerSubtitle(khmerVTT: string) {
 
   function injectTrack() {
     if (!video) return;
-    const existing = document.querySelector('track[data-anistream-caption-key="captions-khmer"]');
-    if (existing) return;
+    const existing = Array.from(video.textTracks).find(t => t.label === targetLanguage);
+    if (existing) {
+      // Clear old cues and replace them
+      const oldMode = existing.mode;
+      existing.mode = 'hidden'; // Must be hidden or showing to access cues list
+      try {
+        while (existing.cues && existing.cues.length > 0) {
+          existing.removeCue(existing.cues[0]);
+        }
+      } catch (e) {}
+      existing.mode = oldMode;
+      
+      cues.forEach(cue => {
+        try {
+          const start = cue._rawStartTime ?? parseTimeToMs(cue.startTime) / 1000;
+          const end = cue._rawEndTime ?? parseTimeToMs(cue.endTime) / 1000;
+          existing.addCue(new (window as any).VTTCue(start, end, cue.text));
+        } catch (e) {}
+      });
+      return;
+    }
 
-    const blob    = new Blob([khmerVTT], { type: 'text/vtt' });
-    const blobUrl = URL.createObjectURL(blob);
-    const tracks  = document.querySelectorAll('track[data-anistream-managed-caption-track]');
-
-    const track = document.createElement('track');
-    track.setAttribute('data-anistream-managed-caption-track', '');
-    track.setAttribute('data-anistream-caption-key', 'captions-khmer');
-    track.kind    = 'captions';
-    track.label   = 'Khmer';
-    track.srclang = `und-x-${tracks.length + 1}`;
-    track.src     = blobUrl;
-    video.appendChild(track);
-    console.log('✅ Track injected');
+    const track = video.addTextTrack("captions", targetLanguage, targetLanguage);
+    cues.forEach(cue => {
+      try {
+        const start = cue._rawStartTime ?? parseTimeToMs(cue.startTime) / 1000;
+        const end = cue._rawEndTime ?? parseTimeToMs(cue.endTime) / 1000;
+        track.addCue(new (window as any).VTTCue(start, end, cue.text));
+      } catch (e) {}
+    });
+    console.log('✅ Native VTTCue Track injected');
   }
 
   function activateTrack(label: string) {
@@ -394,102 +411,125 @@ function setupKhmerSubtitle(khmerVTT: string) {
     currentActiveLabel = label;
   }
 
-  function updateMainMeta() {
-    if (!shadow || isUpdating) return;
-    isUpdating = true;
-    const allButtons = shadow.querySelectorAll('.anistream-vjs-settings-menu-item');
-    allButtons.forEach(btn => {
-      const firstSpan = btn.querySelector('span');
-      if (firstSpan && firstSpan.textContent?.trim() === 'Captions') {
-        const meta = btn.querySelector('.anistream-vjs-settings-menu-item__meta');
-        if (meta && meta.textContent !== currentActiveLabel) {
-          meta.textContent = currentActiveLabel;
-        }
+  function addIndependentToggle() {
+    const existingBtn = document.getElementById('native-independent-toggle');
+    if (existingBtn) existingBtn.remove();
+    
+    const langInfo = languagesList.find(l => l.value === targetLanguage) || { value: 'km', name: 'Khmer', nativelabel: 'ភាសាខ្មែរ' };
+    const langLabel = langInfo.name.split(' (')[0];
+    
+    const toggleBtn = document.createElement('div');
+    toggleBtn.id = 'native-independent-toggle';
+    toggleBtn.style.position = 'absolute';
+    toggleBtn.style.bottom = '60px';
+    toggleBtn.style.right = '20px';
+    toggleBtn.style.zIndex = '999999';
+    toggleBtn.style.display = 'flex';
+    toggleBtn.style.alignItems = 'center';
+    toggleBtn.style.gap = '8px';
+    toggleBtn.style.padding = '4px 12px 4px 6px';
+    toggleBtn.style.borderRadius = '20px';
+    toggleBtn.style.cursor = 'pointer';
+    toggleBtn.style.backgroundColor = 'rgba(0, 0, 0, 0.4)';
+    toggleBtn.style.backdropFilter = 'blur(4px)';
+    toggleBtn.style.transition = 'opacity 0.3s ease';
+
+    // Switch Track
+    const switchBg = document.createElement('div');
+    switchBg.style.width = '32px';
+    switchBg.style.height = '18px';
+    switchBg.style.borderRadius = '18px';
+    switchBg.style.position = 'relative';
+    switchBg.style.transition = 'background-color 0.2s ease';
+    
+    // Switch Handle
+    const switchKnob = document.createElement('div');
+    switchKnob.style.width = '14px';
+    switchKnob.style.height = '14px';
+    switchKnob.style.backgroundColor = '#fff';
+    switchKnob.style.borderRadius = '50%';
+    switchKnob.style.position = 'absolute';
+    switchKnob.style.top = '2px';
+    switchKnob.style.transition = 'left 0.2s ease';
+    switchKnob.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+
+    switchBg.appendChild(switchKnob);
+
+    // Label Text
+    const textSpan = document.createElement('span');
+    textSpan.style.fontFamily = "'Kantumruy Pro', sans-serif";
+    textSpan.style.fontSize = '13px';
+    textSpan.style.color = '#fff';
+    textSpan.style.textShadow = '0 1px 2px rgba(0,0,0,0.8)';
+    textSpan.textContent = langInfo.nativelabel;
+
+    toggleBtn.appendChild(switchBg);
+    toggleBtn.appendChild(textSpan);
+
+    const updateBtnUI = () => {
+      const nativeTrack = Array.from(video!.textTracks).find(t => t.label === targetLanguage);
+      const isShowing = nativeTrack?.mode === 'showing';
+      
+      switchBg.style.backgroundColor = isShowing ? '#E54D2E' : 'rgba(255, 255, 255, 0.25)';
+      switchKnob.style.left = isShowing ? '16px' : '2px';
+      textSpan.style.opacity = isShowing ? '1' : '0.8';
+    };
+
+    let fadeTimeout: any;
+    const showButton = () => {
+      toggleBtn.style.opacity = '1';
+      clearTimeout(fadeTimeout);
+      fadeTimeout = setTimeout(() => {
+        toggleBtn.style.opacity = '0.3';
+      }, 2500); // Fade out after 2.5 seconds of no movement
+    };
+
+    toggleBtn.addEventListener('mouseenter', () => {
+      clearTimeout(fadeTimeout);
+      toggleBtn.style.opacity = '1';
+      toggleBtn.style.transform = 'scale(1.05)';
+    });
+    toggleBtn.addEventListener('mouseleave', () => {
+      toggleBtn.style.transform = 'scale(1)';
+      showButton();
+    });
+
+    toggleBtn.addEventListener('click', () => {
+      const nativeTrack = Array.from(video!.textTracks).find(t => t.label === targetLanguage);
+      if (nativeTrack) {
+        const isShowing = nativeTrack.mode === 'showing';
+        activateTrack(isShowing ? 'English' : targetLanguage);
+        updateBtnUI();
       }
     });
-    isUpdating = false;
-  }
 
-  function injectMenuButton() {
-    if (!shadow || !video) return;
-    const menuList = shadow.querySelector('.anistream-vjs-settings-menu-list[aria-label="Captions"]');
-    if (!menuList) return;
-    if (menuList.querySelector('[data-khmer-btn]')) return;
-
-    const englishBtn = Array.from(
-      menuList.querySelectorAll('button.anistream-vjs-settings-menu-option')
-    ).find(b => b.textContent?.trim() === 'English');
-    if (!englishBtn) return;
-
-    const khmerBtn = englishBtn.cloneNode(true) as HTMLButtonElement;
-    khmerBtn.setAttribute('data-khmer-btn', 'true');
-    khmerBtn.setAttribute('aria-checked', 'false');
-    khmerBtn.classList.remove('is-active');
-    const labelSpan = khmerBtn.querySelector('span');
-    if (labelSpan) labelSpan.textContent = 'Khmer';
-
-    khmerBtn.addEventListener('click', () => {
-      menuList.querySelectorAll('button.anistream-vjs-settings-menu-option').forEach(b => {
-        b.classList.remove('is-active');
-        b.setAttribute('aria-checked', 'false');
-      });
-      khmerBtn.classList.add('is-active');
-      khmerBtn.setAttribute('aria-checked', 'true');
-      activateTrack('Khmer');
-      updateMainMeta();
-    });
-
-    menuList.querySelectorAll('button.anistream-vjs-settings-menu-option').forEach(btn => {
-      btn.addEventListener('click', () => {
-        menuList.querySelectorAll('button.anistream-vjs-settings-menu-option').forEach(b => {
-          b.classList.remove('is-active');
-          b.setAttribute('aria-checked', 'false');
-        });
-        btn.classList.add('is-active');
-        btn.setAttribute('aria-checked', 'true');
-        khmerBtn.classList.remove('is-active');
-        khmerBtn.setAttribute('aria-checked', 'false');
-        activateTrack(btn.textContent?.trim() || '');
-        updateMainMeta();
-      });
-    });
-
-    // Insert Khmer button below the "Off" button if found, otherwise prepend
-    const offBtn = Array.from(
-      menuList.querySelectorAll('button.anistream-vjs-settings-menu-option')
-    ).find(b => {
-      const txt = b.textContent?.trim().toLowerCase();
-      return txt === 'off' || txt === 'disable' || txt === 'none';
-    });
-
-    if (offBtn) {
-      offBtn.after(khmerBtn);
-    } else {
-      menuList.prepend(khmerBtn);
-    }
-
-    const khmerTrack = Array.from(video.textTracks).find(t => t.label === 'Khmer');
-    if (khmerTrack?.mode === 'showing') {
-      menuList.querySelectorAll('button.anistream-vjs-settings-menu-option').forEach(b => {
-        b.classList.remove('is-active');
-        b.setAttribute('aria-checked', 'false');
-      });
-      khmerBtn.classList.add('is-active');
-      khmerBtn.setAttribute('aria-checked', 'true');
+    const playerContainer = document.querySelector('.jwplayer') || document.querySelector('#player') || video.parentElement;
+    if (playerContainer) {
+      playerContainer.style.position = 'relative';
+      playerContainer.appendChild(toggleBtn);
+      
+      // Listen to activity on the video player to wake up the button opacity
+      playerContainer.addEventListener('mousemove', showButton);
+      playerContainer.addEventListener('mousedown', showButton);
+      playerContainer.addEventListener('touchstart', showButton);
+      video!.addEventListener('play', showButton);
+      video!.addEventListener('pause', showButton);
+      
+      updateBtnUI(); // Initial render
+      showButton(); // Start idle timer
     }
   }
 
-  const observer = new MutationObserver(() => {
-    if (isUpdating) return;
-    injectTrack();
-    injectMenuButton();
-    updateMainMeta();
-  });
-
-  observer.observe(shadow, { childList: true, subtree: true });
   injectStyle();
   injectTrack();
-  injectMenuButton();
+  activateTrack(targetLanguage); // Automatically activate it
+  addIndependentToggle();
 
-  console.log('✅ Khmer subtitle setup complete!');
+  // JW Player detects new tracks via 'addtrack' event and asynchronously forces them 
+  // to 'disabled' to match its internal state menu. We wait for its sync to finish, 
+  // then forcefully reactivate our track so the user doesn't have to click twice.
+  setTimeout(() => activateTrack(targetLanguage), 50);
+  setTimeout(() => activateTrack(targetLanguage), 250);
+
+  console.log(`✅ ${targetLanguage} subtitle VTTCue setup complete!`);
 }
