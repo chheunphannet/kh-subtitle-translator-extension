@@ -18,7 +18,12 @@ This is a customized version of the excellent [Subtitle Translator](https://gith
 2. **Khmer Language Support (`km`)**: 
    - Added full UI localization for the Khmer language.
    - Integrated the **[Kantumruy Pro](https://fonts.google.com/specimen/Kantumruy+Pro)** Google Font specifically optimized for Khmer rendering across both global styles and Ant Design's component theme.
-3. **Qwen-MT Translation Support**: Improved translation capability with optimized Qwen-MT models for higher translation accuracy and flow.
+3. **Chrome & Firefox Extension with Two-Step Manga Translation Pipeline**:
+   - **Step 1 (Vision Detection):** Detects bounding boxes (`box_2d`), font styles, and transcribes text in natural human manga reading order (right-to-left, top-to-bottom).
+   - **Step 2 (Text Translation):** Dedicated text-only translation using configurable Gemini models (e.g., `gemini-3.5-flash`) with XML-tagged markers (`[TRANSLATE_X]`) for structural precision.
+   - **Character & Lore Preservation:** Enforces strict rules to keep character names (*Luffy*, *Zoro*) and special abilities (*Rasengan*, *Nen*) in English.
+   - **Smart Canvas / Main-World Fetching:** Extracts decrypted manga page canvas textures directly to bypass CORS restrictions.
+   - **Local FastAPI Inpainting Server:** Integrates with an optional EasyOCR + Playwright server (`/erase`) to erase original bubbles and render Khmer text overlays (`Koulen` & `Kdam Thmor Pro`).
 
 ### 💖 Credits
 All credit for the core engine, UI layout, translation API integrations, and local caching architecture goes to the original creator, **[rockbenben](https://github.com/rockbenben)**. You can find the original repository here: [rockbenben/subtitle-translator](https://github.com/rockbenben/subtitle-translator).
