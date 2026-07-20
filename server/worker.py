@@ -272,7 +272,7 @@ workers_tasks = []
 
 def init_workers(queue):
     global executor, workers_tasks
-    executor = ProcessPoolExecutor(max_workers=WORKER_COUNT)
+    executor = ProcessPoolExecutor(max_workers=WORKER_COUNT, initializer=init_worker_globals)
     loop = asyncio.get_running_loop()
     for _ in range(WORKER_COUNT):
         task = loop.create_task(worker_loop(queue))
