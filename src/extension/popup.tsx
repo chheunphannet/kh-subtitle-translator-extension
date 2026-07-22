@@ -85,7 +85,7 @@ const App = () => {
   };
 
   useEffect(() => {
-    chrome.storage.local.get(["userConfig", "uiLanguage", "exportMode", "bilingualOrder", "formatPref", "targetLang", "sourceLang"]).then((storage: any) => {
+    chrome.storage.local.get(["userConfig", "uiLanguage", "exportMode", "bilingualOrder", "formatPref", "targetLang", "sourceLang", "mangaServerUrl"]).then((storage: any) => {
       if (storage.uiLanguage) setUiLanguage(storage.uiLanguage);
       if (storage.exportMode) setExportMode(storage.exportMode);
       if (storage.bilingualOrder) setBilingualOrder(storage.bilingualOrder);
