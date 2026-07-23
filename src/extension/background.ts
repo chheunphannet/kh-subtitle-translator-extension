@@ -489,7 +489,7 @@ async function performMangaTranslation(
           throw new Error(`Server returned status ${healthRes.status}`);
         }
       } catch (e: any) {
-        reject(new Error(`Server offline or unreachable at ${serverUrl}. Make sure run_server.bat is running.`));
+        reject(new Error(`Server offline or unreachable at ${serverUrl}. Please check your Manga Server URL in settings or verify that your server is running.`));
         return;
       }
     }
@@ -672,7 +672,7 @@ CRITICAL RULES:
                 signal
               });
             } catch (fetchErr) {
-              throw new Error(`Server connection error: Cannot reach the translation server at ${serverUrl}. Make sure run_server.bat is running.`);
+              throw new Error(`Server connection error: Cannot reach the translation server at ${serverUrl}. Please check your Manga Server URL in settings or verify that your server is running.`);
             }
 
             if (serverRes.status === 503) {
