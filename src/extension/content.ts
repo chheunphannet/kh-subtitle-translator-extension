@@ -556,25 +556,72 @@ async function loadMangaFonts(): Promise<void> {
   }
 }
 
+function buildFontString(fontSize: number, fontFamily: string, isBold: boolean, isItalic: boolean): string {
+  const style = isItalic ? 'italic' : 'normal';
+  const weight = isBold ? 'bold' : 'normal';
+  return `${style} ${weight} ${fontSize}px "${fontFamily}", sans-serif`;
+}
+
 function getWrappedLines(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
-  const words = text.split(/(\s+)/);
+  let units: string[] = [];
+  try {
+    if (typeof Intl !== 'undefined' && (Intl as any).Segmenter) {
+      const segmenter = new (Intl as any).Segmenter('km', { granularity: 'word' });
+      units = Array.from(segmenter.segment(text), (s: any) => s.segment);
+    }
+  } catch (e) {
+    // Fallback if Segmenter unavailable
+  }
+
+  if (units.length === 0) {
+    units = text.split(/(\s+)/);
+  }
+
   const lines: string[] = [];
   let currentLine = '';
 
-  for (const word of words) {
-    const testLine = currentLine + word;
+  for (const unit of units) {
+    const testLine = currentLine + unit;
     const metrics = ctx.measureText(testLine);
-    if (metrics.width > maxWidth && currentLine.trim().length > 0) {
+    if (metrics.width > maxWidth && currentLine.length > 0) {
       lines.push(currentLine.trim());
-      currentLine = word;
+      currentLine = unit.trimStart();
     } else {
       currentLine = testLine;
     }
   }
-  if (currentLine.trim().length > 0) {
+  if (currentLine.length > 0) {
     lines.push(currentLine.trim());
   }
-  return lines.length > 0 ? lines : [text];
+
+  // Secondary Grapheme-cluster fallback for any individual line that exceeds maxWidth
+  const finalLines: string[] = [];
+  for (const line of lines) {
+    if (ctx.measureText(line).width > maxWidth && line.length > 1) {
+      let graphemes: string[] = Array.from(line);
+      try {
+        if (typeof Intl !== 'undefined' && (Intl as any).Segmenter) {
+          const gSegmenter = new (Intl as any).Segmenter('km', { granularity: 'grapheme' });
+          graphemes = Array.from(gSegmenter.segment(line), (s: any) => s.segment);
+        }
+      } catch (e) {}
+
+      let subLine = '';
+      for (const g of graphemes) {
+        if (ctx.measureText(subLine + g).width > maxWidth && subLine.length > 0) {
+          finalLines.push(subLine);
+          subLine = g;
+        } else {
+          subLine += g;
+        }
+      }
+      if (subLine.length > 0) finalLines.push(subLine);
+    } else {
+      finalLines.push(line);
+    }
+  }
+
+  return finalLines.length > 0 ? finalLines : [text];
 }
 
 function renderTextOnCanvas(
@@ -582,14 +629,15 @@ function renderTextOnCanvas(
   text: string,
   x: number, y: number,
   maxWidth: number, maxHeight: number,
-  fontFamily: string, startSize: number, minSize: number
+  fontFamily: string, startSize: number, minSize: number,
+  isBold: boolean = false, isItalic: boolean = false
 ) {
   let fontSize = startSize;
   let lines: string[] = [];
   let lineHeight = fontSize * 1.3;
 
   while (fontSize >= minSize) {
-    ctx.font = `${fontSize}px "${fontFamily}", sans-serif`;
+    ctx.font = buildFontString(fontSize, fontFamily, isBold, isItalic);
     lineHeight = fontSize * 1.3;
     lines = getWrappedLines(ctx, text, Math.max(10, maxWidth - 4));
     const totalHeight = lines.length * lineHeight;
@@ -598,7 +646,7 @@ function renderTextOnCanvas(
     fontSize--;
   }
 
-  ctx.font = `${fontSize}px "${fontFamily}", sans-serif`;
+  ctx.font = buildFontString(fontSize, fontFamily, isBold, isItalic);
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillStyle = 'black';
@@ -702,7 +750,10 @@ async function renderMangaFastMode(
     // Min size: 12px for short text (<=10 chars), 10px otherwise
     minSize = block.text.length <= 10 ? 12 : 10;
 
-    renderTextOnCanvas(ctx, block.text, px1, py1, boxW, boxH, fontFamily, startSize, minSize);
+    const isBold = (block as any).isBold || false;
+    const isItalic = (block as any).isItalic || false;
+
+    renderTextOnCanvas(ctx, block.text, px1, py1, boxW, boxH, fontFamily, startSize, minSize, isBold, isItalic);
   }
 
   // Replace the image source with the canvas content directly using CSS content property
