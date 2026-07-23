@@ -130,7 +130,8 @@ if (matchedSite) {
       // Fast mode: render text blocks on canvas overlay
       if (imgEl.getAttribute('data-translated-applied')) return;
       imgEl.setAttribute('data-translated-applied', 'true');
-      renderMangaFastMode(imgEl, result.text_blocks)
+      const url = activeMangaUrls[imageIndex];
+      renderMangaFastMode(imgEl, result.text_blocks, url)
         .then(() => console.log(`[Manga] Image ${imageIndex} translated (fast mode) [${completedCount}/${totalImages}]`))
         .catch((err) => {
           console.error(`[Manga] Fast mode rendering error for image ${imageIndex}:`, err);
@@ -577,15 +578,36 @@ function renderTextOnCanvas(
 
 async function renderMangaFastMode(
   imgEl: HTMLImageElement,
-  textBlocks: Array<{ coords: number[]; text: string; font_size?: string }>
+  textBlocks: Array<{ coords: number[]; text: string; font_size?: string }>,
+  url?: string
 ): Promise<void> {
   await loadMangaFonts();
 
+  let sourceImage: HTMLImageElement = imgEl;
+  if (url) {
+    try {
+      const base64 = await grabDecryptedImageBytes(url);
+      if (base64) {
+        const dataImg = new Image();
+        dataImg.src = `data:image/jpeg;base64,${base64}`;
+        await new Promise<void>((resolve) => {
+          dataImg.onload = () => resolve();
+          dataImg.onerror = () => resolve();
+        });
+        if (dataImg.naturalWidth > 0) {
+          sourceImage = dataImg;
+        }
+      }
+    } catch (e) {
+      console.warn("[Manga] Fast mode grabDecryptedImageBytes fallback warning:", e);
+    }
+  }
+
   // Wait for image to be fully loaded
-  if (!imgEl.complete) {
+  if (!sourceImage.complete) {
     await new Promise<void>((resolve) => {
-      imgEl.onload = () => resolve();
-      imgEl.onerror = () => resolve();
+      sourceImage.onload = () => resolve();
+      sourceImage.onerror = () => resolve();
     });
   }
 
@@ -593,11 +615,11 @@ async function renderMangaFastMode(
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error("Failed to create canvas context");
 
-  canvas.width = imgEl.naturalWidth;
-  canvas.height = imgEl.naturalHeight;
+  canvas.width = sourceImage.naturalWidth || imgEl.naturalWidth;
+  canvas.height = sourceImage.naturalHeight || imgEl.naturalHeight;
 
-  // Draw the original image
-  ctx.drawImage(imgEl, 0, 0, canvas.width, canvas.height);
+  // Draw the non-tainted original image
+  ctx.drawImage(sourceImage, 0, 0, canvas.width, canvas.height);
 
   for (const block of textBlocks) {
     // coords are normalized 0-1000
