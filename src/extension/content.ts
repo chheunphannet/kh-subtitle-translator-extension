@@ -543,14 +543,16 @@ function getFirstVisibleImageIndex(imgElements: NodeListOf<Element>): number {
 async function loadMangaFonts(): Promise<void> {
   if (document.fonts.check('1px Koulen') && document.fonts.check('1px Kdam Thmor Pro')) return;
   try {
-    const koulen = new FontFace('Koulen', 'url(https://fonts.gstatic.com/s/koulen/v28/AMOQz46as3KIBPeWgnA9kuYMUg.woff2)');
-    const kdamThmor = new FontFace('Kdam Thmor Pro', 'url(https://fonts.gstatic.com/s/kdamthmorpro/v4/EJRPQgAzVdcI-Qdvt34jzs7uGZMH0dWKAb8.woff2)');
+    const koulenUrl = chrome.runtime.getURL('fonts/koulen-khmer.woff2');
+    const kdamThmorUrl = chrome.runtime.getURL('fonts/kdamthmorpro-khmer.woff2');
+    const koulen = new FontFace('Koulen', `url("${koulenUrl}")`);
+    const kdamThmor = new FontFace('Kdam Thmor Pro', `url("${kdamThmorUrl}")`);
     const [f1, f2] = await Promise.all([koulen.load(), kdamThmor.load()]);
     document.fonts.add(f1);
     document.fonts.add(f2);
     await document.fonts.ready;
   } catch (e) {
-    console.warn("[Manga] Font load warning:", e);
+    console.warn("[Manga] Local font load warning:", e);
   }
 }
 
