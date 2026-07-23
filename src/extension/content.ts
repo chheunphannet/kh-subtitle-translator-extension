@@ -541,7 +541,10 @@ function getFirstVisibleImageIndex(imgElements: NodeListOf<Element>): number {
 }
 
 async function loadMangaFonts(): Promise<void> {
-  if (document.fonts.check('1px Koulen') && document.fonts.check('1px Kdam Thmor Pro')) return;
+  const isKoulenLoaded = Array.from(document.fonts).some(f => f.family === 'Koulen');
+  const isKdamLoaded = Array.from(document.fonts).some(f => f.family === 'Kdam Thmor Pro');
+  if (isKoulenLoaded && isKdamLoaded) return;
+
   try {
     const koulenUrl = chrome.runtime.getURL('fonts/koulen-khmer.woff2');
     const kdamThmorUrl = chrome.runtime.getURL('fonts/kdamthmorpro-khmer.woff2');
@@ -551,6 +554,7 @@ async function loadMangaFonts(): Promise<void> {
     document.fonts.add(f1);
     document.fonts.add(f2);
     await document.fonts.ready;
+    console.log("[Manga] Registered Koulen & Kdam Thmor Pro fonts in document.fonts");
   } catch (e) {
     console.warn("[Manga] Local font load warning:", e);
   }
