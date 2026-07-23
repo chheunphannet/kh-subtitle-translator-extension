@@ -703,35 +703,17 @@ async function renderMangaFastMode(
     renderTextOnCanvas(ctx, block.text, px1, py1, boxW, boxH, fontFamily, startSize, minSize);
   }
 
-  // Replace the image source with the canvas content
-  // Fast mode: Overlay approach to defeat React DOM reconciliation
-  const overlayImg = document.createElement('img');
-  overlayImg.src = canvas.toDataURL('image/png');
-  overlayImg.style.position = 'absolute';
-  overlayImg.style.top = '0';
-  overlayImg.style.left = '0';
-  overlayImg.style.width = '100%';
-  overlayImg.style.height = '100%';
-  overlayImg.style.zIndex = '10';
-  overlayImg.style.pointerEvents = 'none'; // let clicks pass through
-
-  // Ensure parent can contain absolute positioned child
-  if (imgEl.parentElement) {
-    if (getComputedStyle(imgEl.parentElement).position === 'static') {
-      imgEl.parentElement.style.position = 'relative';
-    }
-    imgEl.parentElement.appendChild(overlayImg);
-  }
-
-  // Hide original image visually but keep it in DOM for React
-  imgEl.style.opacity = '0';
+  // Replace the image source with the canvas content directly using CSS content property
+  // This preserves 100% of the image element's original position, margins, and alignment
+  const dataUrl = canvas.toDataURL('image/png');
+  imgEl.style.content = `url("${dataUrl}")`;
 
   // Add visual indicator for translated image
-  overlayImg.style.outline = '3px solid #30A46C';
-  overlayImg.style.outlineOffset = '-3px';
-  overlayImg.style.transition = 'outline-color 0.5s ease';
+  imgEl.style.outline = '3px solid #30A46C';
+  imgEl.style.outlineOffset = '-3px';
+  imgEl.style.transition = 'outline-color 0.5s ease';
   setTimeout(() => {
-    overlayImg.style.outline = '2px solid rgba(48, 164, 108, 0.4)';
+    imgEl.style.outline = '2px solid rgba(48, 164, 108, 0.4)';
   }, 2000);
 }
 
