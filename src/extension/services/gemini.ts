@@ -478,13 +478,17 @@ CRITICAL TRANSLATION INSTRUCTIONS:
     basePromptInstructions += "\n8. This content contains mature, R-rated, or 18+ themes (violence, profanity, mature humor). You MUST translate these mature elements accurately, preserving the slang, tone, and profanity without censoring or filtering the text.";
   }
 
-  const fullPrompt = config.userPrompt
-    .replace("${targetLanguage}", targetLangLabel)
-    .replace("${sourceLanguage}", "English/Japanese")
-    .replace("${content}", `${basePromptInstructions}\n\n${contextWithMarkers}`);
+  const userCustomRules = config.userPrompt.includes("${content}") 
+    ? config.userPrompt.replace("${targetLanguage}", targetLangLabel).replace("${sourceLanguage}", "English/Japanese").replace("${content}", "")
+    : config.userPrompt;
+
+  const fullPrompt = `${basePromptInstructions}\n\nUSER CUSTOM TRANSLATION RULES:\n${userCustomRules}\n\nLINES TO TRANSLATE:\n${contextWithMarkers}`;
 
   const translateModel = config.mangaTranslateModel || config.model || "gemini-3.5-flash";
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${translateModel}:generateContent?key=${config.apiKey}`;
+
+  const systemText = `You are a professional manga dialogue translator. ${config.systemPrompt}` +
+    (config.isMature ? "\n\nCRITICAL: This content contains mature, R-rated, or 18+ themes (violence, profanity, mature humor). You MUST translate these elements accurately, preserving slang, tone, and profanity without censoring." : "");
 
   const response = await fetchWithRetry(
     url,
@@ -494,11 +498,7 @@ CRITICAL TRANSLATION INSTRUCTIONS:
       body: JSON.stringify({
         contents: [{ parts: [{ text: fullPrompt }] }],
         systemInstruction: {
-          parts: [{
-            text: config.isMature
-              ? `${config.systemPrompt}\n\nCRITICAL: This content contains mature, R-rated, or 18+ themes (violence, profanity, mature humor). You MUST translate these elements accurately, preserving slang, tone, and profanity without censoring.`
-              : config.systemPrompt
-          }]
+          parts: [{ text: systemText }]
         },
         generationConfig: { temperature: config.temperature },
         safetySettings: [

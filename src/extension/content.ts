@@ -541,12 +541,38 @@ function getFirstVisibleImageIndex(imgElements: NodeListOf<Element>): number {
 }
 
 async function loadMangaFonts(): Promise<void> {
-  if (document.fonts.check('1px Koulen')) return; // already loaded
-  const koulen = new FontFace('Koulen', 'url(https://fonts.gstatic.com/s/koulen/v28/AMOQz46as3KIBPeWgnA9kuYMUg.woff2)');
-  const kdamThmor = new FontFace('Kdam Thmor Pro', 'url(https://fonts.gstatic.com/s/kdamthmorpro/v4/EJRPQgAzVdcI-Qdvt34jzs7uGZMH0dWKAb8.woff2)');
-  const [f1, f2] = await Promise.all([koulen.load(), kdamThmor.load()]);
-  document.fonts.add(f1);
-  document.fonts.add(f2);
+  if (document.fonts.check('1px Koulen') && document.fonts.check('1px Kdam Thmor Pro')) return;
+  try {
+    const koulen = new FontFace('Koulen', 'url(https://fonts.gstatic.com/s/koulen/v28/AMOQz46as3KIBPeWgnA9kuYMUg.woff2)');
+    const kdamThmor = new FontFace('Kdam Thmor Pro', 'url(https://fonts.gstatic.com/s/kdamthmorpro/v4/EJRPQgAzVdcI-Qdvt34jzs7uGZMH0dWKAb8.woff2)');
+    const [f1, f2] = await Promise.all([koulen.load(), kdamThmor.load()]);
+    document.fonts.add(f1);
+    document.fonts.add(f2);
+    await document.fonts.ready;
+  } catch (e) {
+    console.warn("[Manga] Font load warning:", e);
+  }
+}
+
+function getWrappedLines(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
+  const words = text.split(/(\s+)/);
+  const lines: string[] = [];
+  let currentLine = '';
+
+  for (const word of words) {
+    const testLine = currentLine + word;
+    const metrics = ctx.measureText(testLine);
+    if (metrics.width > maxWidth && currentLine.trim().length > 0) {
+      lines.push(currentLine.trim());
+      currentLine = word;
+    } else {
+      currentLine = testLine;
+    }
+  }
+  if (currentLine.trim().length > 0) {
+    lines.push(currentLine.trim());
+  }
+  return lines.length > 0 ? lines : [text];
 }
 
 function renderTextOnCanvas(
@@ -557,15 +583,16 @@ function renderTextOnCanvas(
   fontFamily: string, startSize: number, minSize: number
 ) {
   let fontSize = startSize;
+  let lines: string[] = [];
+  let lineHeight = fontSize * 1.3;
 
-  // Shrink font until text fits
-  while (fontSize > minSize) {
+  while (fontSize >= minSize) {
     ctx.font = `${fontSize}px "${fontFamily}", sans-serif`;
-    const metrics = ctx.measureText(text);
-    const textWidth = metrics.width;
-    const textHeight = fontSize * 1.4; // approximate line height
+    lineHeight = fontSize * 1.3;
+    lines = getWrappedLines(ctx, text, Math.max(10, maxWidth - 4));
+    const totalHeight = lines.length * lineHeight;
 
-    if (textWidth <= maxWidth && textHeight <= maxHeight) break;
+    if (totalHeight <= maxHeight) break;
     fontSize--;
   }
 
@@ -573,7 +600,13 @@ function renderTextOnCanvas(
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillStyle = 'black';
-  ctx.fillText(text, x + maxWidth / 2, y + maxHeight / 2, maxWidth);
+
+  const totalHeight = lines.length * lineHeight;
+  const startY = y + (maxHeight - totalHeight) / 2 + lineHeight / 2;
+
+  lines.forEach((line, index) => {
+    ctx.fillText(line, x + maxWidth / 2, startY + index * lineHeight);
+  });
 }
 
 async function renderMangaFastMode(

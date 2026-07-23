@@ -75,7 +75,8 @@ body {{ background: transparent; width: {box_width}px; height: {box_height}px;
 
     page.set_viewport_size({"width": box_width, "height": box_height})
     page.set_content(html, wait_until="networkidle")
-    result = page.evaluate(f"""() => {{
+    result = page.evaluate(f"""async () => {{
+        await document.fonts.ready;
         const el = document.getElementById('text-container');
         el.textContent = {json.dumps(text)};
         let fontSize = {start_px};
