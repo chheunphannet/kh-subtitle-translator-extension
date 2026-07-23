@@ -638,11 +638,11 @@ function renderTextOnCanvas(
 ) {
   let fontSize = startSize;
   let lines: string[] = [];
-  let lineHeight = fontSize * 1.3;
+  let lineHeight = fontSize * 1.35 + 2;
 
   while (fontSize >= minSize) {
     ctx.font = buildFontString(fontSize, fontFamily, isBold, isItalic);
-    lineHeight = fontSize * 1.3;
+    lineHeight = fontSize * 1.35 + 2;
     lines = getWrappedLines(ctx, text, Math.max(10, maxWidth - 4));
     const totalHeight = lines.length * lineHeight;
 
@@ -741,13 +741,13 @@ async function renderMangaFastMode(
     let fontFamily: string;
 
     if (sizeCategory === 'large') {
-      startSize = 26;
+      startSize = 28;
       fontFamily = 'Koulen';
     } else if (sizeCategory === 'medium') {
-      startSize = 20;
+      startSize = 22;
       fontFamily = 'Kdam Thmor Pro';
     } else {
-      startSize = 15;
+      startSize = 17;
       fontFamily = 'Kdam Thmor Pro';
     }
 
