@@ -1,5 +1,5 @@
 <h1 align="center">
-⚡️ Subtitle Translator
+Subtitle Translator
 </h1>
 <p align="center">
     English | <a href="./README-zh.md">中文</a> | <a href="./README-km.md">ភាសាខ្មែរ</a>
@@ -10,12 +10,12 @@
 
 ---
 
-## 📌 About This Fork
+## About This Fork
 This is a customized version of the excellent [Subtitle Translator](https://github.com/rockbenben/subtitle-translator) created by [rockbenben](https://github.com/rockbenben). 
 
-### 🔧 Key Customizations & Updates:
+### Key Customizations & Updates:
 1. **Simplified Toolset**: Removed unrelated tools (parsers, text utilities) to keep the focus strictly on translation (Subtitle Translator, Markdown Translator, and Multi JSON Translator).
-2. **Khmer Language Support (`km`)**: 
+2. **Khmer Language Support (km)**: 
    - Added full UI localization for the Khmer language.
    - Integrated the **[Kantumruy Pro](https://fonts.google.com/specimen/Kantumruy+Pro)** Google Font specifically optimized for Khmer rendering across both global styles and Ant Design's component theme.
 3. **Chrome & Firefox Extension with Two-Step Manga Translation Pipeline**:
@@ -24,14 +24,14 @@ This is a customized version of the excellent [Subtitle Translator](https://gith
    - **Character & Lore Preservation:** Enforces strict rules to keep character names (*Luffy*, *Zoro*) and special abilities (*Rasengan*, *Nen*) in English.
    - **Smart Canvas / Main-World Fetching:** Extracts decrypted manga page canvas textures directly to bypass CORS restrictions.
    - **Cloud & Local FastAPI Inpainting Server:** Integrates with an EasyOCR + Playwright server (`/erase`) to clean original text and render Khmer text overlays using stylized fonts (`Koulen` and `Kdam Thmor Pro`). It can be hosted on a local machine or any Linux VM/VPS (Google Cloud, AWS, DigitalOcean, etc.).
-   - **One-Click Cloud VM Deployer:** Includes a fully automated setup script (`server/setup_vm.sh`) that installs Redis, configures memory safety parameters (Swap memory), sets up python environments with PyTorch/EasyOCR, installs headless Chromium rendering libraries, and manages the server as an automatic background service.
+   - **Automated Cloud VM Installer:** Includes a shell script (`server/setup_vm.sh`) that installs Redis, configures memory safety parameters (Swap memory), sets up python environments with PyTorch/EasyOCR, installs headless Chromium rendering libraries, and manages the server as an automatic background service.
 
-### 💖 Credits
+### Credits
 All credit for the core engine, UI layout, translation API integrations, and local caching architecture goes to the original creator, **[rockbenben](https://github.com/rockbenben)**. You can find the original repository here: [rockbenben/subtitle-translator](https://github.com/rockbenben/subtitle-translator).
 
 ---
 
-👈 **Original Live Demo**: <https://tools.newzone.top/en/subtitle-translator>
+**Original Live Demo**: <https://tools.newzone.top/en/subtitle-translator>
 
 ![Batch Translation Demo](./public/img/subtitle-translator-en.webp)
 
@@ -84,7 +84,7 @@ LLM modes can send surrounding lines as context for each batch, improving dialog
 - **Concurrent Lines**: max lines translated in parallel (default 20). Too high triggers rate limits.
 - **Context Lines**: lines included per batch as context (default 50). Higher = better coherence but more tokens.
 
-⚠️ **Tip**: Models under 70B parameters may produce misaligned output. Mainstream online large models (Claude, GPT, DeepSeek, Gemini) are recommended for context mode.
+**Tip**: Models under 70B parameters may produce misaligned output. Mainstream online large models (Claude, GPT, DeepSeek, Gemini) are recommended for context mode.
 
 ## Subtitle Format Support
 
@@ -151,9 +151,9 @@ Visit [http://localhost:3000](http://localhost:3000).
 yarn build
 ```
 
-### 🎨 Manga Erase Server Deployment (VM/VPS)
+### Manga Erase Server Deployment (VM/VPS)
 
-If you use the **Manga Translation & Erasing features**, you can host your own FastAPI inpainting server. We provide a one-click setup script for any Linux VM/VPS (e.g. Google Cloud, AWS, DigitalOcean running Ubuntu or Debian):
+If you use the Manga Translation & Erasing features, you can host your own FastAPI inpainting server. We provide an automated setup script for Linux VMs and VPS servers (like Google Cloud, AWS, or DigitalOcean running Ubuntu/Debian):
 
 1. **Upload or create the setup file** on your Linux VM (`setup_vm.sh`).
 2. **Execute the script** in your VM terminal:
@@ -165,7 +165,7 @@ If you use the **Manga Translation & Erasing features**, you can host your own F
    ```bash
    curl http://localhost/health
    ```
-   *The server is automatically configured to run in the background on port 8000 and forwarded to port 80, using Redis caching, Playwright Chromium dependencies, and a memory safety Swap file.*
+   *The script automatically configures the server to run in the background on port 8000 (forwarded to port 80), installs Redis caching, sets up Playwright Chromium dependencies, and creates a Swap file for system memory safety.*
 
 ## Documentation & Deployment
 
