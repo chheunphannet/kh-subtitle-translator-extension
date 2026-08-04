@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+python-multipart
+redis
+easyocr
+opencv-python-headless
+numpy
+slowapi

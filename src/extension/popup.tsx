@@ -41,7 +41,7 @@ const App = () => {
   const [bilingualOrder, setBilingualOrder] = useState<'translationFirst' | 'originalFirst'>('translationFirst');
 
   const [activeTranslationType, setActiveTranslationType] = useState<'subtitle' | 'manga' | null>(null);
-  const [mangaServerUrl, setMangaServerUrl] = useState('http://127.0.0.1:8000');
+  const [mangaServerUrl, setMangaServerUrl] = useState('https://example.com');
 
   const configLoaded = useRef(false);
   const hasPlayerRef = useRef(false);

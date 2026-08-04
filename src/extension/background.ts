@@ -259,7 +259,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     };
     mangaAbortController = new AbortController();
     
-    const mangaServerUrl = message.mangaServerUrl || "http://127.0.0.1:8000";
+    const mangaServerUrl = message.mangaServerUrl || "https://example.com";
     const tabId = sender.tab?.id || message.tabId;
     performMangaTranslation(urlsToTranslate, message.config, mangaServerUrl, message.targetLanguage, tabId, mangaAbortController.signal, message.startIndex || 0)
       .then(() => {

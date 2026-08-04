@@ -46,3 +46,11 @@ src-tauri
 # agents and workspace local configuration
 .agents/
 skills-lock.json
+
+# Python virtual environments & bytecode
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
