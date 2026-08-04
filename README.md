@@ -23,7 +23,8 @@ This is a customized version of the excellent [Subtitle Translator](https://gith
    - **Step 2 (Text Translation):** Dedicated text-only translation using configurable Gemini models (e.g., `gemini-3.5-flash`) with XML-tagged markers (`[TRANSLATE_X]`) for structural precision.
    - **Character & Lore Preservation:** Enforces strict rules to keep character names (*Luffy*, *Zoro*) and special abilities (*Rasengan*, *Nen*) in English.
    - **Smart Canvas / Main-World Fetching:** Extracts decrypted manga page canvas textures directly to bypass CORS restrictions.
-   - **Local FastAPI Inpainting Server:** Integrates with an optional EasyOCR + Playwright server (`/erase`) to erase original bubbles and render Khmer text overlays (`Koulen` & `Kdam Thmor Pro`).
+   - **Cloud & Local FastAPI Inpainting Server:** Integrates with an EasyOCR + Playwright server (`/erase`) to clean original text and render Khmer text overlays using stylized fonts (`Koulen` and `Kdam Thmor Pro`). It can be hosted on a local machine or any Linux VM/VPS (Google Cloud, AWS, DigitalOcean, etc.).
+   - **One-Click Cloud VM Deployer:** Includes a fully automated setup script (`server/setup_vm.sh`) that installs Redis, configures memory safety parameters (Swap memory), sets up python environments with PyTorch/EasyOCR, installs headless Chromium rendering libraries, and manages the server as an automatic background service.
 
 ### 💖 Credits
 All credit for the core engine, UI layout, translation API integrations, and local caching architecture goes to the original creator, **[rockbenben](https://github.com/rockbenben)**. You can find the original repository here: [rockbenben/subtitle-translator](https://github.com/rockbenben/subtitle-translator).
@@ -149,6 +150,22 @@ Visit [http://localhost:3000](http://localhost:3000).
 ```bash
 yarn build
 ```
+
+### 🎨 Manga Erase Server Deployment (VM/VPS)
+
+If you use the **Manga Translation & Erasing features**, you can host your own FastAPI inpainting server. We provide a one-click setup script for any Linux VM/VPS (e.g. Google Cloud, AWS, DigitalOcean running Ubuntu or Debian):
+
+1. **Upload or create the setup file** on your Linux VM (`setup_vm.sh`).
+2. **Execute the script** in your VM terminal:
+   ```bash
+   chmod +x setup_vm.sh
+   ./setup_vm.sh
+   ```
+3. **Verify the server is running**:
+   ```bash
+   curl http://localhost/health
+   ```
+   *The server is automatically configured to run in the background on port 8000 and forwarded to port 80, using Redis caching, Playwright Chromium dependencies, and a memory safety Swap file.*
 
 ## Documentation & Deployment
 
