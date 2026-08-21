@@ -154,9 +154,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const buffer = await blob.arrayBuffer();
         const bytes = new Uint8Array(buffer);
         let binary = "";
-        const chunkSize = 0xffff;
+        const chunkSize = 8192;
         for (let i = 0; i < bytes.length; i += chunkSize) {
-          binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize) as any);
+          const chunk = bytes.subarray(i, i + chunkSize);
+          binary += String.fromCharCode(...chunk);
         }
         const base64 = btoa(binary);
         sendResponse({ success: true, base64 });
