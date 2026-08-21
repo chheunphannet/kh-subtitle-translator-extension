@@ -20,7 +20,7 @@ fi
 
 echo "=== 2. Updating System and Installing Packages ==="
 sudo apt-get update
-sudo apt-get install -y python3-pip python3-venv redis-server libgl1-mesa-glx libglib2.0-0 git
+sudo apt-get install -y python3-pip python3-venv redis-server libgl1 libglib2.0-0 git
 
 echo "=== 3. Starting Redis Cache ==="
 sudo systemctl start redis-server
