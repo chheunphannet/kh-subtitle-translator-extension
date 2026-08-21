@@ -144,6 +144,30 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true; // Keep channel open
   }
 
+  if (message.action === "fetchImageAsBase64") {
+    fetch(message.url)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP status ${res.status}`);
+        return res.blob();
+      })
+      .then(async (blob) => {
+        const buffer = await blob.arrayBuffer();
+        const bytes = new Uint8Array(buffer);
+        let binary = "";
+        const chunkSize = 0xffff;
+        for (let i = 0; i < bytes.length; i += chunkSize) {
+          binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize) as any);
+        }
+        const base64 = btoa(binary);
+        sendResponse({ success: true, base64 });
+      })
+      .catch((err) => {
+        console.error("[Background] Failed to fetch image as base64:", err);
+        sendResponse({ success: false, error: err.message });
+      });
+    return true; // Keep channel open
+  }
+
   if (message.action === "translateSubtitles") {
     const { cues, targetLanguage, sourceLanguage, config, isTestConnection, fileName, exportMode, bilingualOrder, formatPref } = message as {
       cues: SubtitleCue[];

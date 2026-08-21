@@ -1329,8 +1329,21 @@ async function grabDecryptedImageBytes(url: string): Promise<string> {
   try {
     return await fetchDecryptedImageViaMainWorld(url);
   } catch (mainWorldErr: any) {
-    console.error("[Manga] Main world fetch failed:", mainWorldErr);
-    throw new Error(`Decrypted page-fetch failed: ${mainWorldErr.message}`);
+    console.warn("[Manga] Main world fetch failed, falling back to background fetch:", mainWorldErr?.message || String(mainWorldErr));
+  }
+
+  // Method 3: Request background script to fetch the image bytes (bypassing CORS)
+  try {
+    const res = await chrome.runtime.sendMessage({ action: "fetchImageAsBase64", url });
+    if (res && res.success && res.base64) {
+      console.log("[Manga] Successfully fetched image bytes via background script!");
+      return res.base64;
+    } else {
+      throw new Error(res?.error || "Empty base64 from background");
+    }
+  } catch (bgErr: any) {
+    console.error("[Manga] Background image fetch failed:", bgErr);
+    throw new Error(`Failed to grab image bytes: ${bgErr.message}`);
   }
 }
 
