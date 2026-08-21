@@ -158,6 +158,7 @@ if (matchedSite) {
       mangaKeepAliveInterval = setInterval(() => {
         if (mangaKeepAlivePort) {
           mangaKeepAlivePort.postMessage({ action: "ping" });
+          console.log("[Manga] Sent local ping to keep service worker alive.");
         }
       }, 15000);
       console.log("[Manga] Started background keep-alive heartbeat port.");

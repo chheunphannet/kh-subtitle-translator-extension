@@ -114,11 +114,16 @@ function getPromptHash(prompt: string): string {
 // ------------------------------------
 chrome.runtime.onConnect.addListener((port) => {
   if (port.name === "manga-keep-alive") {
+    console.log("[Background] Keep-alive port connected.");
     port.onMessage.addListener((message) => {
       if (message.action === "ping") {
+        console.log("[Background] Received local ping. Resetting idle timer...");
         // Trigger a dummy Chrome API call to keep service worker alive
         chrome.storage.local.get(["keep_alive_dummy"]).catch(() => {});
       }
+    });
+    port.onDisconnect.addListener(() => {
+      console.log("[Background] Keep-alive port disconnected.");
     });
   }
 });
