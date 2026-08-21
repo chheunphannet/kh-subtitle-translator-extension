@@ -57,10 +57,11 @@ source .venv/bin/activate
 echo "=== 6. Installing Python dependencies ==="
 pip install --upgrade pip
 pip install -r requirements.txt
+pip install playwright
 
 echo "=== 7. Downloading EasyOCR Model Weights (Pre-download to prevent race conditions) ==="
 # Running a quick script in Python to pre-download the models safely in a single thread
-python3 -c "import easyocr; easyocr.Reader(['en', 'ja'])"
+.venv/bin/python3 -c "import easyocr; easyocr.Reader(['en', 'ja'])"
 
 echo "=== 8. Installing Playwright Chromium browser ==="
 .venv/bin/playwright install chromium
@@ -88,6 +89,7 @@ ExecStart=$APP_DIR/server/.venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000
 Restart=always
 Environment=WORKER_COUNT=2
 Environment=REDIS_URL=redis://localhost:6379
+Environment=HOME=$USER_HOME
 
 [Install]
 WantedBy=multi-user.target
