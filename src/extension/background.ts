@@ -110,6 +110,20 @@ function getPromptHash(prompt: string): string {
 }
 
 // ------------------------------------
+// Service Worker Keep-Alive Heartbeat
+// ------------------------------------
+chrome.runtime.onConnect.addListener((port) => {
+  if (port.name === "manga-keep-alive") {
+    port.onMessage.addListener((message) => {
+      if (message.action === "ping") {
+        // Trigger a dummy Chrome API call to keep service worker alive
+        chrome.storage.local.get(["keep_alive_dummy"]).catch(() => {});
+      }
+    });
+  }
+});
+
+// ------------------------------------
 // Service Worker Message Handlers
 // ------------------------------------
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {

@@ -147,6 +147,39 @@ if (matchedSite) {
   const mangaImageElementMap = new Map<number, HTMLImageElement>();
   let activeMangaUrls: string[] = [];
 
+  // Keep-alive port setup for manga translation in MV3
+  let mangaKeepAlivePort: chrome.runtime.Port | null = null;
+  let mangaKeepAliveInterval: any = null;
+
+  function startMangaKeepAlive() {
+    stopMangaKeepAlive();
+    try {
+      mangaKeepAlivePort = chrome.runtime.connect({ name: "manga-keep-alive" });
+      mangaKeepAliveInterval = setInterval(() => {
+        if (mangaKeepAlivePort) {
+          mangaKeepAlivePort.postMessage({ action: "ping" });
+        }
+      }, 15000);
+      console.log("[Manga] Started background keep-alive heartbeat port.");
+    } catch (e) {
+      console.warn("[Manga] Failed to establish keep-alive port:", e);
+    }
+  }
+
+  function stopMangaKeepAlive() {
+    if (mangaKeepAliveInterval) {
+      clearInterval(mangaKeepAliveInterval);
+      mangaKeepAliveInterval = null;
+    }
+    if (mangaKeepAlivePort) {
+      try {
+        mangaKeepAlivePort.disconnect();
+      } catch (e) {}
+      mangaKeepAlivePort = null;
+      console.log("[Manga] Stopped background keep-alive heartbeat port.");
+    }
+  }
+
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     const info = scanForMedia();
     if (!info.hasPlayer && !info.hasManga) {
@@ -232,6 +265,8 @@ if (matchedSite) {
       // Store the starting index so background can map back
       mangaStartIndex = visibleIndex;
 
+      startMangaKeepAlive();
+
       chrome.runtime.sendMessage({
         action: "translateMangaPages",
         imageUrls,
@@ -239,7 +274,10 @@ if (matchedSite) {
         targetLanguage: request.targetLanguage,
         mangaServerUrl: request.mangaServerUrl,
         startIndex: visibleIndex
-      }).catch((err) => console.error("[Manga] Failed to send translateMangaPages:", err));
+      }).catch((err) => {
+        console.error("[Manga] Failed to send translateMangaPages:", err);
+        stopMangaKeepAlive();
+      });
 
       sendResponse({ success: true, totalImages: imageUrls.length, startIndex: visibleIndex });
       return true;
@@ -263,10 +301,15 @@ if (matchedSite) {
         console.error(`[Manga] Translation error for image ${imageIndex}:`, result.error);
         imgEl.style.outline = "3px solid #E54D2E";
         imgEl.style.outlineOffset = "-3px";
+        stopMangaKeepAlive();
         return false;
       }
 
       applyTranslationToImage(imgEl, result, completedCount, totalImages, imageIndex);
+      
+      if (completedCount === totalImages) {
+        stopMangaKeepAlive();
+      }
       return false;
     }
 
@@ -282,6 +325,7 @@ if (matchedSite) {
     }
 
     if (request.action === "cancelMangaTranslation") {
+      stopMangaKeepAlive();
       chrome.runtime.sendMessage({
         action: "cancelMangaTranslation"
       }).catch((err) => console.error("[Manga] Failed to send cancel:", err));
