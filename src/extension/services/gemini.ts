@@ -152,11 +152,15 @@ export interface GeminiConfig {
   delayTime: number;
   useCache: boolean;
   isMature?: boolean;
+  mangaConcurrency: number;
+  mangaTranslationMode: 'normal' | 'fast';
+  mangaLimit: number;
+  mangaTranslateModel: string;
 }
 
 export const DEFAULT_GEMINI_CONFIG: GeminiConfig = {
   apiKey: "",
-  model: "gemini-3.5-flash",
+  model: "gemini-3.1-flash-lite",
   temperature: 0.7,
   systemPrompt: "You are a professional subtitle translator. Translate the given text to the target language accurately, maintaining natural dialogue flow and character voices.",
   userPrompt: "Translate this text into ${targetLanguage}:\n\n${content}",
@@ -165,12 +169,16 @@ export const DEFAULT_GEMINI_CONFIG: GeminiConfig = {
   delayTime: 200,
   useCache: true,
   isMature: false,
+  mangaConcurrency: 3,
+  mangaTranslationMode: 'normal',
+  mangaLimit: 5,
+  mangaTranslateModel: "gemini-3.5-flash",
 };
 
 async function fetchWithRetry(
   url: string,
   options: RequestInit,
-  retries = 5,
+  retries = 3,
   backoff = 2000
 ): Promise<Response> {
   try {
@@ -381,7 +389,7 @@ CRITICAL REQUIREMENTS:
             }),
             signal
           },
-          isTestConnection ? 0 : 5
+          isTestConnection ? 0 : 3
         );
 
         if (!response.ok) {
@@ -437,4 +445,89 @@ CRITICAL REQUIREMENTS:
   await Promise.all(workers);
 
   return translatedLines;
+}
+
+// Dedicated Manga Text-Only Translation Function (No subtitle cache connection)
+export async function translateMangaTexts(
+  texts: string[],
+  targetLanguage: string,
+  config: GeminiConfig,
+  signal?: AbortSignal
+): Promise<string[]> {
+  if (texts.length === 0) return [];
+
+  const targetLangLabel = targetLanguage === "km" ? "Khmer" : targetLanguage === "zh" ? "Simplified Chinese" : targetLanguage;
+  
+  // Format the text blocks with markers
+  const contextWithMarkers = texts
+    .map((line, idx) => `[TRANSLATE_${idx}]${line}[/TRANSLATE_${idx}]`)
+    .join("\n");
+
+  let basePromptInstructions = `Context: This is a list of dialogue and narration text blocks from a manga page, ordered in their natural reading sequence (right-to-left, top-to-bottom). 
+
+CRITICAL TRANSLATION INSTRUCTIONS:
+1. Target Language: You MUST translate EVERY sentence strictly into ${targetLangLabel}.
+2. Output Language Exception: Translate the body of the sentences into ${targetLangLabel}. Do NOT output in Thai or other unrelated scripts. However, character names, special attacks, and magic terms MUST remain in English as specified in Rule 7.
+3. Only translate the lines marked with [TRANSLATE_X][/TRANSLATE_X] tags (where X is the line number index).
+4. You MUST translate ALL ${texts.length} lines marked with [TRANSLATE_X] tags.
+5. Do NOT skip any numbers from 0 to ${texts.length - 1}.
+6. Keep the exact tag format in your response: [TRANSLATE_0]translation[/TRANSLATE_0].
+7. EXCEPTION TO RULE 2: DO NOT translate character names (e.g., Luffy, Zoro), special attacks (e.g., Rasengan), power systems (e.g., Nen, Chakra), or unique in-world lore/terminology. Keep these specific keywords completely in English within the ${targetLangLabel} sentence.`;
+
+  if (config.isMature) {
+    basePromptInstructions += "\n8. This content contains mature, R-rated, or 18+ themes (violence, profanity, mature humor). You MUST translate these mature elements accurately, preserving the slang, tone, and profanity without censoring or filtering the text.";
+  }
+
+  const userCustomRules = config.userPrompt.includes("${content}") 
+    ? config.userPrompt.replace("${targetLanguage}", targetLangLabel).replace("${sourceLanguage}", "English/Japanese").replace("${content}", "")
+    : config.userPrompt;
+
+  const fullPrompt = `${basePromptInstructions}\n\nUSER CUSTOM TRANSLATION RULES:\n${userCustomRules}\n\nLINES TO TRANSLATE:\n${contextWithMarkers}`;
+
+  const translateModel = config.mangaTranslateModel || config.model || "gemini-3.5-flash";
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${translateModel}:generateContent?key=${config.apiKey}`;
+
+  const systemText = `You are a professional manga dialogue translator. ${config.systemPrompt}` +
+    (config.isMature ? "\n\nCRITICAL: This content contains mature, R-rated, or 18+ themes (violence, profanity, mature humor). You MUST translate these elements accurately, preserving slang, tone, and profanity without censoring." : "");
+
+  const response = await fetchWithRetry(
+    url,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: fullPrompt }] }],
+        systemInstruction: {
+          parts: [{ text: systemText }]
+        },
+        generationConfig: { temperature: config.temperature },
+        safetySettings: [
+          { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+          { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+          { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+          { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
+        ]
+      }),
+      signal
+    },
+    3 // 3 retries default
+  );
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(parseGeminiError(response.status, errText));
+  }
+
+  const data = await response.json();
+  const candidate = data.candidates?.[0];
+  if (candidate?.finishReason === "MAX_TOKENS") {
+    throw new Error("Gemini response truncated - MAX_TOKENS reached.");
+  }
+  const textResult = candidate?.content?.parts?.[0]?.text;
+  if (typeof textResult !== "string") {
+    throw new Error("Invalid response format from Gemini API");
+  }
+
+  const translations = extractTranslatedLinesWithNumbers(textResult, texts.length);
+  return translations.map((t, idx) => t || texts[idx]);
 }

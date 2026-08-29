@@ -1,88 +1,187 @@
-# ⚡️ KH Subtitle Translator Extension
-
-A powerful, light-weight Chrome and Firefox extension designed to inject real-time translated subtitles directly into HTML5 video players (specifically optimized for **JW Player** instances on sites like **KHAnime, KHFullHD, and Anistream**) using Google's **Gemini AI**.
-
----
-
-## 📌 Features
-
-1. **Direct Video Player Injection**  
-   Automatically translates and injects subtitle files directly into the active video player, bypassing the need for external subtitle players.
-
-2. **Native VTTCue Injection (Lag-Free)**  
-   Features a native `VTTCue` injection engine specifically optimized for Anistream. It loads subtitles instantly into the underlying HTML5 `<video>` element with zero audio sync lag, zero FPS drops, and without reloading the player.
-
-3. **Sleek Floating Toggle Switch**  
-   Injects a modern, Ant Design-style floating toggle switch overlay onto the video player.
-   - **Target Language Label:** Shows only the native name of the selected language (e.g. `ភាសាខ្មែរ` for Khmer) next to the switch.
-   - **Orange Color Theme:** Toggles active states using a signature orange theme color (`#E54D2E`).
-   - **Inactivity Fade:** Auto-fades to `30%` opacity after 2.5 seconds of mouse inactivity so it doesn't distract you during playback.
-
-4. **Context-Aware Translation**  
-   Uses Google's Gemini models with advanced context-window batching to translate sentences based on surrounding dialogue context, ensuring natural translations and consistent character voices.
-
-5. **Local Configurations & Auto-Save**  
-   Remembers your target language configurations (e.g. defaulting to Khmer or Thai) so you don't have to reconfigure them every time the extension reopens.
+<h1 align="center">
+Subtitle Translator
+</h1>
+<p align="center">
+    English | <a href="./README-zh.md">中文</a> | <a href="./README-km.md">ភាសាខ្មែរ</a>
+</p>
+<p align="center">
+    <em>Customized subtitle translation tool with Khmer language support and curated tools list</em>
+</p>
 
 ---
 
-## 🛠 Installation
+## About This Fork
+This is a customized version of the excellent [Subtitle Translator](https://github.com/rockbenben/subtitle-translator) created by [rockbenben](https://github.com/rockbenben). 
 
-### Chrome / Edge / Brave (Developer Mode)
-1. Download the latest **`khtranslate-chrome.zip`** from the [Releases](https://github.com/chheunphannet/kh-subtitle-translator-extension/releases) page.
-2. Extract the ZIP file into a folder on your computer.
-3. Open your browser and navigate to `chrome://extensions/`.
-4. Turn on **Developer mode** (toggle in the top-right corner).
-5. Click **Load unpacked** and select the folder where you extracted the extension.
+### Key Customizations & Updates:
+1. **Simplified Toolset**: Removed unrelated tools (parsers, text utilities) to keep the focus strictly on translation (Subtitle Translator, Markdown Translator, and Multi JSON Translator).
+2. **Khmer Language Support (km)**: 
+   - Added full UI localization for the Khmer language.
+   - Integrated the **[Kantumruy Pro](https://fonts.google.com/specimen/Kantumruy+Pro)** Google Font specifically optimized for Khmer rendering across both global styles and Ant Design's component theme.
+3. **Chrome & Firefox Extension with Two-Step Manga Translation Pipeline**:
+   - **Step 1 (Vision Detection):** Detects bounding boxes (`box_2d`), font styles, and transcribes text in natural human manga reading order (right-to-left, top-to-bottom).
+   - **Step 2 (Text Translation):** Dedicated text-only translation using configurable Gemini models (e.g., `gemini-3.5-flash`) with XML-tagged markers (`[TRANSLATE_X]`) for structural precision.
+   - **Character & Lore Preservation:** Enforces strict rules to keep character names (*Luffy*, *Zoro*) and special abilities (*Rasengan*, *Nen*) in English.
+   - **Smart Canvas / Main-World Fetching:** Extracts decrypted manga page canvas textures directly to bypass CORS restrictions.
+   - **Cloud & Local FastAPI Inpainting Server:** Integrates with an EasyOCR + Playwright server (`/erase`) to clean original text and render Khmer text overlays using stylized fonts (`Koulen` and `Kdam Thmor Pro`). It can be hosted on a local machine or any Linux VM/VPS (Google Cloud, AWS, DigitalOcean, etc.).
+   - **Automated Cloud VM Installer:** Includes a shell script (`server/setup_vm.sh`) that installs Redis, configures memory safety parameters (Swap memory), sets up python environments with PyTorch/EasyOCR, installs headless Chromium rendering libraries, and manages the server as an automatic background service.
 
-### Firefox (Developer Mode)
-1. Download the latest **`khtranslate-firefox.zip`** from the [Releases](https://github.com/chheunphannet/kh-subtitle-translator-extension/releases) page.
-2. Extract the ZIP file into a folder on your computer.
-3. Open Firefox and navigate to `about:debugging#/runtime/this-firefox`.
-4. Click **Load Temporary Add-on...** and select the `manifest.json` file inside the extracted folder.
+### Credits
+All credit for the core engine, UI layout, translation API integrations, and local caching architecture goes to the original creator, **[rockbenben](https://github.com/rockbenben)**. You can find the original repository here: [rockbenben/subtitle-translator](https://github.com/rockbenben/subtitle-translator).
 
 ---
 
-## ⚙️ Development & Build Instructions
+**Original Live Demo**: <https://tools.newzone.top/en/subtitle-translator>
 
-### Prerequisites
-Make sure you have [Node.js](https://nodejs.org/) installed (version `>=20.9.0` recommended).
+![Batch Translation Demo](./public/img/subtitle-translator-en.webp)
 
-### Setup & Installation
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/chheunphannet/kh-subtitle-translator-extension.git
-   cd kh-subtitle-translator-extension
-   ```
-2. Install the compilation dependencies:
-   ```bash
-   npm install
-   ```
+## Key Features
 
-### Compile the Extension
-To bundle the TypeScript scripts and build the manifests for both Chrome and Firefox, run:
+- **Real-Time Translation**: Chunked compression + parallel processing → ~1 second per episode (GTX is slightly slower).
+- **Batch Processing**: Drop hundreds of subtitle files at once (a whole season in one go); each file translates and downloads independently with its original filename, and you get an aggregated success/failure summary (e.g. "Exported (3/5)") when the run finishes.
+- **Multi-Language Output**: Translate into multiple target languages in a single pass — each language is exported as its own file with the language code appended (e.g. `movie.zh.srt`, `movie.fr.srt`).
+- **Format Compatibility**: Auto-detects `.srt`, `.ass`, `.vtt`, and `.lrc`. WebVTT NOTE / STYLE / REGION non-cue blocks are correctly skipped (not translated as dialogue). One-click format conversion (SRT ↔ VTT, SRT/VTT → ASS) during translation.
+- **Bilingual Output**: Insert the translation above or below the original; alignment preserved across formats. For SRT / VTT sources you can also export **ASS** with separate styles for original and translation (Default 70pt white + Secondary 55pt cyan), tweakable in any subtitle editor.
+- **Context-Aware Translation** (LLM only): Sends surrounding lines as context for more coherent dialogue and consistent character voice.
+- **Structural Separation**: Timecodes, cue numbers, ASS headers, and VTT cue IDs are extracted locally — only dialogue text is sent to the engine, so the model can never disrupt your timeline.
+- **Subtitle Extraction**: Strip cues / timing and export clean text (auto-copied to clipboard) for AI summarization, scripts, or content repurposing.
+- **Unlimited Caching** (IndexedDB): All translations cached locally with no browser-storage size limit; refreshing the page doesn't lose translated files.
+- **120+ Languages**: Translate to/from 120+ languages, with source defaulting to Auto-detect.
+- **Multi-Locale UI**: Powered by next-intl, with full UI translation across 18 languages.
+- **Private by Design**: Fully client-side — subtitle content and API keys stay in your browser; LLM requests go directly from your browser to the API endpoint you configure.
+
+## Translation APIs
+
+Supports **7 traditional MT APIs** and **17+ LLM providers**:
+
+### Traditional APIs
+
+| API                  | Quality | Stability | Free Tier                             |
+| -------------------- | ------- | --------- | ------------------------------------- |
+| **DeepL**            | ★★★★★   | ★★★★☆     | 500K chars/month                      |
+| **Google Translate** | ★★★★☆   | ★★★★★     | 500K chars/month                      |
+| **Azure Translate**  | ★★★★☆   | ★★★★★     | 2M chars/month (first 12 months)      |
+| **DeepLX (Free)**    | ★★★★☆   | ★★★☆☆     | Self-host or free public endpoints    |
+| **Qwen-MT**          | ★★★★☆   | ★★★★☆     | Alibaba DashScope quota               |
+| **TranslateGemma**   | ★★★★☆   | ★★★★☆     | Self-host (LM Studio / Ollama / etc.) |
+| **GTX API (Free)**   | ★★★☆☆   | ★★★☆☆     | Free (rate-limited)                   |
+
+### LLM Providers
+
+Supports **DeepSeek**, **OpenAI**, **Claude**, **Gemini**, **Qwen**, **Moonshot**, **Doubao**, **Zhipu GLM**, **MiniMax**, **Mistral**, **Perplexity**, **Cohere**, **OpenRouter**, **Groq**, **SiliconFlow**, **Nvidia NIM**, **Azure OpenAI**, plus any **Custom (OpenAI-compatible)** endpoint (Ollama / LM Studio / vLLM / Together AI / Fireworks AI etc.).
+
+LLM modes give you:
+
+- **Best for**: literary works, technical talks, multilingual dialogue
+- **Customization**: configure system / user prompts for a specific translation style
+- **Temperature Control**: adjust AI creativity (0–1 scale)
+- **Thinking Mode**: per-provider toggle for reasoning-capable models
+
+## Context-Aware Translation (LLM only)
+
+LLM modes can send surrounding lines as context for each batch, improving dialogue coherence and character-voice consistency.
+
+- **Concurrent Lines**: max lines translated in parallel (default 20). Too high triggers rate limits.
+- **Context Lines**: lines included per batch as context (default 50). Higher = better coherence but more tokens.
+
+**Tip**: Models under 70B parameters may produce misaligned output. Mainstream online large models (Claude, GPT, DeepSeek, Gemini) are recommended for context mode.
+
+## Subtitle Format Support
+
+| Format   | Auto-detect | Bilingual | Notes                                                                        |
+| -------- | ----------- | --------- | ---------------------------------------------------------------------------- |
+| **.srt** | ✅          | ✅        | 1–3 digit milliseconds, 100+ hour timestamps                                 |
+| **.ass** | ✅          | ✅        | Line-leading position tags (e.g. `\an8`) auto-restored; complex inline effect tags simplified |
+| **.vtt** | ✅          | ✅        | NOTE / STYLE / REGION blocks correctly skipped; inline `<c.classname>` and karaoke timestamps handled on VTT→SRT |
+| **.lrc** | ✅          | ✅        | Karaoke lines with multiple time tags handled correctly                      |
+
+- **Automatic Encoding Detection**: jschardet auto-detects UTF-8 / UTF-16 / GBK / Shift-JIS, avoiding garbled output (falls back to UTF-8 if detection fails).
+- **Filename Preservation**: Exported files inherit the original name; multi-language output appends a language code suffix.
+- **Format Conversion**: Convert SRT ↔ VTT and SRT/VTT → ASS during translation — no separate converter needed (identical source/target languages are blocked, so conversion requires a translation pass).
+
+## Translation Modes
+
+- **Batch Mode (default)**: drop hundreds of files (a whole season) at once; each file translates independently and auto-downloads, with an aggregated success/failure summary.
+- **Single-File Mode**: instant preview; uploading a new file replaces the current one.
+
+## FAQ
+
+**Which formats are supported?** SRT, ASS, VTT, and LRC. SRT/VTT suit YouTube and HTML5 players; ASS suits Aegisub / anime fansubs (position tags like `\an8` auto-restored); LRC suits music lyrics.
+
+**Machine translation or LLM?** Machine translation (Google, DeepL, Azure, Qwen-MT) is cheap or free but reads flat. LLMs bill per token but produce far more natural dialogue — DeepSeek is the value pick for whole-season batches, Claude Sonnet / GPT give the most natural dialogue, and Gemini's large context handles book-length subtitles.
+
+**How do I keep names and proper nouns consistent?** Add a glossary in the System Prompt (e.g. "Keep verbatim: iPhone, OpenAI, John Smith") on any LLM engine; all episodes share the same context, so terminology stays consistent across a season.
+
+**Do I need "preserve timecodes / line numbers" prompts?** No. Timecodes, cue numbers, and headers are extracted locally and re-inserted after translation — the model never sees them. Keep your prompt focused on style, glossary, and tone.
+
+**Is it private?** Yes. Everything runs client-side: subtitle parsing, translation requests, and caching all happen in your browser. API keys are stored only in local browser storage, and LLM requests go directly from your browser to your configured endpoint.
+
+See the [full FAQ in the docs](https://docs.newzone.top/en/guide/translation/subtitle-translator/) for more.
+
+## Tech Stack
+
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router) + React 19 with the React Compiler
+- **UI**: [Ant Design 6](https://ant.design/) + [Tailwind CSS 4](https://tailwindcss.com/)
+- **i18n**: [next-intl](https://next-intl-docs.vercel.app/)
+- **Caching**: [idb](https://github.com/jakearchibald/idb) (IndexedDB)
+- **Encoding Detection**: [jschardet](https://github.com/aadsm/jschardet)
+
+## Getting Started
+
+### Requirements
+
+- Node.js >= 20.9.0
+- Yarn (recommended), npm, or pnpm
+
+### Install & Run
+
 ```bash
-npm run build:extension
+git clone https://github.com/rockbenben/subtitle-translator.git
+cd subtitle-translator
+
+yarn install
+yarn dev
 ```
 
-This compiles the source code using `esbuild` and produces two build folders:
-- **`jw-subtitle-tester/`** (Chrome build output)
-- **`jw-subtitle-tester-firefox/`** (Firefox build output)
+Visit [http://localhost:3000](http://localhost:3000).
 
-To package these builds into zip archives, you can use:
-```powershell
-Compress-Archive -Path "jw-subtitle-tester\*" -DestinationPath "khtranslate-chrome.zip" -Force
-Compress-Archive -Path "jw-subtitle-tester-firefox\*" -DestinationPath "khtranslate-firefox.zip" -Force
+### Production Build
+
+```bash
+yarn build
 ```
 
----
+### Manga Erase Server Deployment (VM/VPS)
 
-## 📂 Project Structure
+If you use the Manga Translation & Erasing features, you can host your own FastAPI inpainting server. We provide an automated setup script for Linux VMs and VPS servers (like Google Cloud, AWS, or DigitalOcean running Ubuntu/Debian):
 
-- **`src/extension/`** - Core extension files
-  - `popup.tsx` / `popup.html` - Extension configuration interface
-  - `content.ts` - Webpage controller & native VTTCue injection logic
-  - `background.ts` - Chrome background service worker
-  - `inject.ts` - Fallback JW Player configuration loader
-  - `manifest.json` - Browser extension configuration template
-- **`scripts/copyExtensionAssets.js`** - Moves compilation assets and automatically syncs manifest versions with `package.json`.
+1. **Upload or create the setup file** on your Linux VM (`setup_vm.sh`).
+2. **Execute the script** in your VM terminal:
+   ```bash
+   chmod +x setup_vm.sh
+   ./setup_vm.sh
+   ```
+3. **Verify the server is running**:
+   ```bash
+   curl http://localhost/health
+   ```
+   *The script automatically configures the server to run in the background on port 8000 (forwarded to port 80), installs Redis caching, sets up Playwright Chromium dependencies, and creates a Swap file for system memory safety.*
+
+## Documentation & Deployment
+
+For detailed configuration, API setup, and self-hosting instructions, see the **[Official Documentation](https://docs.newzone.top/en/guide/translation/subtitle-translator/)**.
+
+**Quick Deployment**: [Deploy Guide](https://docs.newzone.top/en/guide/translation/subtitle-translator/deploy.html)
+
+## Contributing
+
+Contributions are welcome! Feel free to open issues and pull requests.
+
+1. Fork the repo and create a feature branch
+2. Run `yarn` and `yarn dev` locally
+3. Add tests / docs when applicable
+4. Submit a PR with a clear description
+
+## License
+
+MIT © 2025 [rockbenben](https://github.com/rockbenben). See [LICENSE](./LICENSE).

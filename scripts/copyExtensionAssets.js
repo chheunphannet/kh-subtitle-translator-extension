@@ -37,7 +37,7 @@ if (!fs.existsSync(firefoxDestDir)) {
   fs.mkdirSync(firefoxDestDir, { recursive: true });
 }
 
-// 2. Copy static files to Chrome destination
+// 2. Copy static files & folders to Chrome destination
 filesToCopy.forEach(file => {
   const srcPath = path.join(srcDir, file);
   const destPath = path.join(chromeDestDir, file);
@@ -48,6 +48,13 @@ filesToCopy.forEach(file => {
     console.warn(`Warning: Source file ${srcPath} does not exist.`);
   }
 });
+
+const fontsSrc = path.join(srcDir, 'fonts');
+const fontsDest = path.join(chromeDestDir, 'fonts');
+if (fs.existsSync(fontsSrc)) {
+  copyFolderSync(fontsSrc, fontsDest);
+  console.log('Copied fonts/ to jw-subtitle-tester/fonts/');
+}
 
 // 3. Process Manifests
 const manifestPath = path.join(srcDir, 'manifest.json');

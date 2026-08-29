@@ -19,12 +19,19 @@ export interface LocaleStrings {
   statusEmpty: string;
 
   detectedSuccess: string;
+  detectedMangaSuccess: string;
+  mangaTitleLabel: string;
+  mangaChapterLabel: string;
+  mangaPagesLabel: string;
+  btnAutoTranslateManga: string;
   detecting: string;
   detectDesc: string;
   btnAutoTranslate: string;
   orManualUpload: string;
   btnTranslateInject: string;
   btnInjectOnly: string;
+  mangaUploadDisabled: string;
+  mangaUploadDisabledTooltip: string;
 
   apiKeyLabel: string;
   apiKeyPlaceholder: string;
@@ -39,6 +46,25 @@ export interface LocaleStrings {
   concurrencyLabel: string;
   delayLabel: string;
   isMatureLabel: string;
+  animeSettingsLabel: string;
+  mangaSettingsLabel: string;
+  mangaConcurrencyLabel: string;
+  mangaConcurrencyTooltip: string;
+  mangaTranslationModeLabel: string;
+  mangaModeNormal: string;
+  mangaModeFast: string;
+  mangaModeNormalDesc: string;
+  mangaModeFastDesc: string;
+  mangaTranslatingStatus: string;
+  mangaCompleteStatus: string;
+  mangaCancelledStatus: string;
+  mangaServerUrlLabel: string;
+  mangaServerUrlTooltip: string;
+  mangaLimitLabel: string;
+  mangaLimitTooltip: string;
+  mangaTranslateModelLabel: string;
+  mangaTranslateModelTooltip: string;
+  btnTestServer: string;
 
   systemPromptLabel: string;
   userPromptLabel: string;
@@ -74,7 +100,7 @@ export const locales: Record<string, LocaleStrings> = {
     tabPrompts: "LLM Prompts",
     tabAdvanced: "កម្រិតខ្ពស់",
     
-    dragDropText: "អូស & ទម្លាក់ file Subtitle ទីនេះ",
+    dragDropText: "អូស & ទម្លាក់ file Subtitle ឬរូបភាព Manga ទីនេះ",
     orSelectText: "ឬ ចុចដើម្បីជ្រើសរើស file",
     sourceLang: "ភាសាដើម",
     targetLang: "ភាសាបកប្រែ",
@@ -89,12 +115,19 @@ export const locales: Record<string, LocaleStrings> = {
     statusEmpty: "សូមជ្រើសរើស file ជាមុនសិន។",
 
     detectedSuccess: "បានរកឃើញ Subtitle ភាសាអង់គ្លេស!",
-    detecting: "កំពុងស្វែងរក Player...",
-    detectDesc: "មិនទាន់រកឃើញ Player វីដេអូ ឬ Subtitle ភាសាអង់គ្លេសនៅលើទំព័រនេះទេ។ អ្នកអាចបញ្ចូល file Subtitle ដោយផ្ទាល់ខាងក្រោម។",
+    detectedMangaSuccess: "បានរកឃើញជំពូក Manga!",
+    mangaTitleLabel: "ចំណងជើង Manga:",
+    mangaChapterLabel: "ភាគ/ជំពូក:",
+    mangaPagesLabel: "ចំនួនទំព័រ:",
+    btnAutoTranslateManga: "បកប្រែ Manga",
+    detecting: "កំពុងស្វែងរក Player ឬ Manga...",
+    detectDesc: "មិនទាន់រកឃើញ វីដេអូ ឬ Manga លើទំព័រនេះទេ។ អ្នកអាចបញ្ចូលឯកសារ ឬរូបភាពដោយផ្ទាល់ខាងក្រោម។",
     btnAutoTranslate: "បកប្រែ & បញ្ចូលដោយស្វ័យប្រវត្ត",
     orManualUpload: "ឬ បញ្ចូលដោយខ្លួនឯង",
     btnTranslateInject: "បកប្រែ & បញ្ចូល",
     btnInjectOnly: "បញ្ចូលតែប៉ុណ្ណោះ",
+    mangaUploadDisabled: "ការបង្ហោះ Subtitle ត្រូវបានបិទលើគេហទំព័រ Manga",
+    mangaUploadDisabledTooltip: "ការបង្ហោះ Subtitle គឺសម្រាប់តែវីដេអូ ឬ Anime ប៉ុណ្ណោះ មិនអាចប្រើលើទំព័រ Manga ឡើយ",
 
     apiKeyLabel: "Gemini API Key",
     apiKeyPlaceholder: "បញ្ចូល Gemini API Key របស់អ្នក",
@@ -109,6 +142,25 @@ export const locales: Record<string, LocaleStrings> = {
     concurrencyLabel: "ចំនួនបកប្រែទន្ទឹមគ្នា (Concurrency)",
     delayLabel: "ពន្យារពេល (Delay - ms)",
     isMatureLabel: "មាតិកា 18+ (បកប្រែពាក្យអសុរស/ហិង្សាដោយមិនបិទបាំង)",
+    animeSettingsLabel: "ការកំណត់ Anime",
+    mangaSettingsLabel: "ការកំណត់ Manga Settings",
+    mangaConcurrencyLabel: "ចំនួនសំណើស្របគ្នា",
+    mangaConcurrencyTooltip: "ចំនួនរូបភាព Manga ដែលត្រូវផ្ញើបកប្រែស្របគ្នាក្នុងពេលតែមួយ (1 រូបភាព = 1 សំណើ)។",
+    mangaTranslationModeLabel: "របៀបបកប្រែ (Translation Mode)",
+    mangaModeNormal: "Normal (EasyOCR)",
+    mangaModeFast: "Fast (Gemini)",
+    mangaModeNormalDesc: "ប្រើ Gemini សម្រាប់ស្វែងរក & បកប្រែ និងប្រើ EasyOCR ដើម្បីលុបអត្ថបទដើមសម្រាប់លទ្ធផលស្អាតជាងមុន (ត្រូវការភ្ជាប់ទៅម៉ាស៊ីនមេ និងមិនប្រើប្រាស់ឬប៉ះពាល់ API Key Gemini របស់អ្នកឡើយ)។",
+    mangaModeFastDesc: "ប្រើតែ Gemini API ផ្ទាល់សម្រាប់គ្រប់យ៉ាង (ស្វែងរក, បកប្រែ, និងលុប) ដោយមិនចាំបាច់មានសំណើទៅម៉ាស៊ីនមេបន្ថែម។",
+    mangaTranslatingStatus: "កំពុងបកប្រែ Manga...",
+    mangaCompleteStatus: "បកប្រែ Manga រួចរាល់!",
+    mangaCancelledStatus: "បានបោះបង់ការបកប្រែ Manga។",
+    mangaServerUrlLabel: "Server URL",
+    mangaServerUrlTooltip: "URL ម៉ាស៊ីនមេ EasyOCR សម្រាប់ Normal Mode។",
+    mangaLimitLabel: "កំណត់ចំនួនទំព័រ",
+    mangaLimitTooltip: "បកប្រែត្រឹមចំនួនទំព័រកំណត់នេះប៉ុណ្ណោះ (០ សម្រាប់បកប្រែទាំងអស់)។",
+    mangaTranslateModelLabel: "ម៉ូដែលបកប្រែ Manga",
+    mangaTranslateModelTooltip: "ម៉ូដែល Gemini សម្រាប់បកប្រែអត្ថបទ Manga ជំហានទី២ (ឧទាហរណ៍ gemini-3.5-flash)។",
+    btnTestServer: "តេស្ត Server",
 
     systemPromptLabel: "Global System Prompt",
     userPromptLabel: "User Prompt",
@@ -156,7 +208,7 @@ export const locales: Record<string, LocaleStrings> = {
     tabPrompts: "LLM Prompts",
     tabAdvanced: "Advanced",
     
-    dragDropText: "Drag & drop subtitle file here",
+    dragDropText: "Drag & drop subtitle file or manga images here",
     orSelectText: "or click to select file",
     sourceLang: "Source Lang",
     targetLang: "Target Lang",
@@ -171,12 +223,19 @@ export const locales: Record<string, LocaleStrings> = {
     statusEmpty: "Please select a file first.",
 
     detectedSuccess: "English Subtitles Detected!",
-    detecting: "Searching for Player...",
-    detectDesc: "No active video player with English subtitles detected on the current page. You can still manually upload subtitles below.",
+    detectedMangaSuccess: "Manga Chapter Detected!",
+    mangaTitleLabel: "Manga Title:",
+    mangaChapterLabel: "Chapter:",
+    mangaPagesLabel: "Pages:",
+    btnAutoTranslateManga: "Translate Manga",
+    detecting: "Searching for Player / Manga...",
+    detectDesc: "No video player or manga detected on the current page. You can manually upload subtitles or manga images below.",
     btnAutoTranslate: "Auto Translate & Inject",
     orManualUpload: "Or manual upload",
     btnTranslateInject: "Translate & Inject",
     btnInjectOnly: "Inject Only",
+    mangaUploadDisabled: "Subtitle upload disabled on Manga sites",
+    mangaUploadDisabledTooltip: "Subtitles upload is only for video players and cannot be used on manga pages",
 
     apiKeyLabel: "Gemini API Key",
     apiKeyPlaceholder: "Enter your Gemini API key",
@@ -191,6 +250,25 @@ export const locales: Record<string, LocaleStrings> = {
     concurrencyLabel: "Concurrency",
     delayLabel: "Delay (ms)",
     isMatureLabel: "18+ / Mature Content (translate profanity/violence uncensored)",
+    animeSettingsLabel: "Anime Settings",
+    mangaSettingsLabel: "Manga Settings",
+    mangaConcurrencyLabel: "Concurrent Requests",
+    mangaConcurrencyTooltip: "Number of manga images sent for translation concurrently (1 image = 1 request).",
+    mangaTranslationModeLabel: "Translation Mode",
+    mangaModeNormal: "Normal (EasyOCR)",
+    mangaModeFast: "Fast (Gemini only)",
+    mangaModeNormalDesc: "Uses Gemini for detection & translation, and EasyOCR to clean/erase the original text for better visual results (requires server request; server requests do NOT use or touch your Gemini API key).",
+    mangaModeFastDesc: "Uses Gemini API directly for everything (detection, translation, and erasing) without extra server requests.",
+    mangaTranslatingStatus: "Translating Manga...",
+    mangaCompleteStatus: "Manga Translation Complete!",
+    mangaCancelledStatus: "Manga translation cancelled.",
+    mangaServerUrlLabel: "Server URL",
+    mangaServerUrlTooltip: "URL of the EasyOCR server for Normal Mode.",
+    mangaLimitLabel: "Limit Translate",
+    mangaLimitTooltip: "Only translate up to this many pages (0 for unlimited).",
+    mangaTranslateModelLabel: "Manga Translate Model",
+    mangaTranslateModelTooltip: "Gemini model used for Step 2 text translation (e.g., gemini-3.5-flash).",
+    btnTestServer: "Test Server",
 
     systemPromptLabel: "Global System Prompt",
     userPromptLabel: "User Prompt",
@@ -238,7 +316,7 @@ export const locales: Record<string, LocaleStrings> = {
     tabPrompts: "LLM 提示词",
     tabAdvanced: "高级设置",
     
-    dragDropText: "拖拽字幕文件到此处",
+    dragDropText: "拖拽字幕文件或漫画图片到此处",
     orSelectText: "或 点击选择文件",
     sourceLang: "源语言",
     targetLang: "目标语言",
@@ -253,12 +331,19 @@ export const locales: Record<string, LocaleStrings> = {
     statusEmpty: "请先选择一个文件。",
 
     detectedSuccess: "检测到英文字幕！",
-    detecting: "正在搜索播放器...",
-    detectDesc: "当前页面未检测到含有英文字幕的视频播放器。您仍可在下方手动上传字幕。",
+    detectedMangaSuccess: "检测到漫画章节！",
+    mangaTitleLabel: "漫画标题:",
+    mangaChapterLabel: "章节:",
+    mangaPagesLabel: "页数:",
+    btnAutoTranslateManga: "翻译漫画",
+    detecting: "正在搜索播放器或漫画...",
+    detectDesc: "当前页面未检测到视频播放器或漫画。您可在下方手动上传字幕或漫画图片。",
     btnAutoTranslate: "自动翻译并注入",
     orManualUpload: "或手动上传",
     btnTranslateInject: "翻译并注入",
     btnInjectOnly: "仅注入",
+    mangaUploadDisabled: "在漫画页面上已禁用字幕上传",
+    mangaUploadDisabledTooltip: "字幕上传仅适用于视频播放器，不能在漫画页面上使用",
 
     apiKeyLabel: "Gemini API Key",
     apiKeyPlaceholder: "请输入您的 Gemini API Key",
@@ -273,6 +358,25 @@ export const locales: Record<string, LocaleStrings> = {
     concurrencyLabel: "并发数",
     delayLabel: "延迟时间 (毫秒)",
     isMatureLabel: "18+ / 成人内容 (不加审查地翻译脏话和暴力)",
+    animeSettingsLabel: "动漫设置",
+    mangaSettingsLabel: "Manga Settings (漫画设置)",
+    mangaConcurrencyLabel: "并发请求数",
+    mangaConcurrencyTooltip: "同时发送翻译的漫画图片数量 (1 张图片 = 1 个请求)。",
+    mangaTranslationModeLabel: "翻译模式",
+    mangaModeNormal: "常规模式 (EasyOCR)",
+    mangaModeFast: "极速模式 (仅 Gemini)",
+    mangaModeNormalDesc: "使用 Gemini 进行检测和翻译，并使用 EasyOCR 清除/擦除原始文本以获得更好的视觉效果 (需要请求服务器，服务器请求不会使用或触碰您的 Gemini API Key)。",
+    mangaModeFastDesc: "直接使用 Gemini API 处理所有内容 (检测、翻译和擦除)，无需额外的服务器请求。",
+    mangaTranslatingStatus: "正在翻译漫画...",
+    mangaCompleteStatus: "漫画翻译完成！",
+    mangaCancelledStatus: "漫画翻译已取消。",
+    mangaServerUrlLabel: "服务器 URL",
+    mangaServerUrlTooltip: "用于常规模式的 EasyOCR 服务器 URL。",
+    mangaLimitLabel: "限制翻译页数",
+    mangaLimitTooltip: "仅翻译此数量的页面（0表示无限制）。",
+    mangaTranslateModelLabel: "漫画翻译模型",
+    mangaTranslateModelTooltip: "用于第二步文本翻译的 Gemini 模型 (例如 gemini-3.5-flash)。",
+    btnTestServer: "测试服务器",
 
     systemPromptLabel: "全局系统提示词 (System Prompt)",
     userPromptLabel: "用户提示词 (User Prompt)",

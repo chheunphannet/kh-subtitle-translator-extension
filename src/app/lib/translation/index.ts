@@ -1,0 +1,110 @@
+// Translation barrel: re-exports submodules + top-level testTranslation /
+// translateText / useTranslation orchestration.
+
+"use client";
+
+import type { TranslateTextParams, TranslationMethod } from "./types";
+import { translationServices } from "./services";
+import { generateCacheKey, getCachedTranslation, setCachedTranslation } from "./cache";
+import { cleanTranslatedText } from "./utils";
+
+// Re-export everything for backwards compatibility
+export * from "./types";
+export * from "./registry";
+export * from "./config";
+export * from "./cache";
+export * from "./languages-data";
+export * from "./utils";
+export { translationServices } from "./services";
+export { translategemmaHealthCheck } from "./services/traditional";
+export { completeOpenAICompatUrl } from "./services/shared";
+
+/**
+ * Test translation with a given method and config
+ */
+export const testTranslation = async (translationMethod: TranslationMethod, config: Partial<TranslateTextParams>, systemPrompt?: string, userPrompt?: string): Promise<boolean> => {
+  try {
+    const params: TranslateTextParams = {
+      text: "Hello, world!",
+      targetLanguage: "zh",
+      sourceLanguage: "en",
+      cacheSuffix: "test",
+      translationMethod,
+      useCache: false,
+      ...config,
+      ...(systemPrompt && { systemPrompt }),
+      ...(userPrompt && { userPrompt }),
+    };
+
+    const result = await translationServices[translationMethod](params);
+
+    if (!result) throw new Error("Translation Test failed, no result received.");
+
+    // Validate that translation actually occurred
+    // For Chinese target language, result should contain Chinese characters
+    if (params.targetLanguage === "zh" && !/[\u4e00-\u9fa5]/.test(result)) {
+      console.warn("Translation result does not contain Chinese characters, may not have actually translated:", result);
+    }
+
+    // Warn if result is identical to source (possible translation failure)
+    if (result === params.text) {
+      console.warn("Translation returned original text unchanged, may indicate translation service issue");
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Translation Test failed", error);
+    return false;
+  }
+};
+
+// Skip translation if text has no translatable characters
+const HAS_TRANSLATABLE_CONTENT = /[a-zA-Z\p{L}]/u;
+
+/**
+ * Translate text using the specified method
+ * Throws on error to allow retry logic to work properly
+ */
+const translateText = async (params: TranslateTextParams): Promise<string> => {
+  const { text, cacheSuffix, translationMethod, targetLanguage, sourceLanguage, useCache = true } = params;
+
+  if (!HAS_TRANSLATABLE_CONTENT.test(text) || sourceLanguage === targetLanguage) {
+    return text;
+  }
+
+  // Check cache
+  const cacheKey = generateCacheKey(text, cacheSuffix);
+  if (useCache) {
+    const cachedTranslation = await getCachedTranslation(cacheKey);
+    if (cachedTranslation) return cachedTranslation;
+  }
+
+  // Get translation service
+  const service = translationServices[translationMethod];
+  if (!service) {
+    throw new Error(`Unsupported translation method: ${translationMethod}`);
+  }
+
+  const translatedText = await service(params);
+
+  if (!translatedText) {
+    throw new Error(`No translation result received for method: ${translationMethod}`);
+  }
+
+  // Fire-and-forget cache write — failures swallowed in indexedDBStorage.set,
+  // and the next read of this key is ≥1s later (retry interval) so the write
+  // has plenty of time to settle. Awaiting would add 5-50ms per line for nothing.
+  const cleanedText = cleanTranslatedText(translatedText);
+  if (useCache) {
+    void setCachedTranslation(cacheKey, cleanedText);
+  }
+
+  return cleanedText;
+};
+
+/**
+ * React hook for translation
+ */
+export const useTranslation = () => ({
+  translate: translateText,
+});
