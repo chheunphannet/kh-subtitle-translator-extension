@@ -30,6 +30,8 @@ export interface LocaleStrings {
   orManualUpload: string;
   btnTranslateInject: string;
   btnInjectOnly: string;
+  mangaUploadDisabled: string;
+  mangaUploadDisabledTooltip: string;
 
   apiKeyLabel: string;
   apiKeyPlaceholder: string;
@@ -124,6 +126,8 @@ export const locales: Record<string, LocaleStrings> = {
     orManualUpload: "ឬ បញ្ចូលដោយខ្លួនឯង",
     btnTranslateInject: "បកប្រែ & បញ្ចូល",
     btnInjectOnly: "បញ្ចូលតែប៉ុណ្ណោះ",
+    mangaUploadDisabled: "ការបង្ហោះ Subtitle ត្រូវបានបិទលើគេហទំព័រ Manga",
+    mangaUploadDisabledTooltip: "ការបង្ហោះ Subtitle គឺសម្រាប់តែវីដេអូ ឬ Anime ប៉ុណ្ណោះ មិនអាចប្រើលើទំព័រ Manga ឡើយ",
 
     apiKeyLabel: "Gemini API Key",
     apiKeyPlaceholder: "បញ្ចូល Gemini API Key របស់អ្នក",
@@ -230,6 +234,8 @@ export const locales: Record<string, LocaleStrings> = {
     orManualUpload: "Or manual upload",
     btnTranslateInject: "Translate & Inject",
     btnInjectOnly: "Inject Only",
+    mangaUploadDisabled: "Subtitle upload disabled on Manga sites",
+    mangaUploadDisabledTooltip: "Subtitles upload is only for video players and cannot be used on manga pages",
 
     apiKeyLabel: "Gemini API Key",
     apiKeyPlaceholder: "Enter your Gemini API key",
@@ -336,6 +342,8 @@ export const locales: Record<string, LocaleStrings> = {
     orManualUpload: "或手动上传",
     btnTranslateInject: "翻译并注入",
     btnInjectOnly: "仅注入",
+    mangaUploadDisabled: "在漫画页面上已禁用字幕上传",
+    mangaUploadDisabledTooltip: "字幕上传仅适用于视频播放器，不能在漫画页面上使用",
 
     apiKeyLabel: "Gemini API Key",
     apiKeyPlaceholder: "请输入您的 Gemini API Key",

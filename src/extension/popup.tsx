@@ -636,7 +636,7 @@ const App = () => {
 
             <Divider plain>{loc.orManualUpload}</Divider>
 
-            <Tooltip title={detectedManga ? "Subtitles upload is only for video players and cannot be used on manga pages" : ""}>
+            <Tooltip title={detectedManga ? loc.mangaUploadDisabledTooltip : ""}>
               <div style={{ opacity: detectedManga ? 0.35 : 1, pointerEvents: detectedManga ? 'none' : 'auto' }}>
                 <Dragger 
                   accept=".srt,.vtt,.ass,.lrc"
@@ -653,7 +653,7 @@ const App = () => {
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                     <InboxOutlined style={{ fontSize: '20px', color: '#E54D2E' }} />
                     <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.65)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '220px', display: 'inline-block' }}>
-                      {selectedFile ? selectedFile.name : (detectedManga ? "Subtitle upload disabled on Manga sites" : loc.dragDropText)}
+                      {selectedFile ? selectedFile.name : (detectedManga ? loc.mangaUploadDisabled : loc.dragDropText)}
                     </span>
                   </div>
                 </Dragger>
