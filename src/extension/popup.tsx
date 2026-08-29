@@ -634,55 +634,59 @@ const App = () => {
                 </Card>
               )}
 
-            <Divider plain>{loc.orManualUpload}</Divider>
+            {!detectedManga && (
+              <>
+                <Divider plain>{loc.orManualUpload}</Divider>
 
-            <Dragger 
-              accept=".srt,.vtt,.ass,.lrc"
-              showUploadList={false}
-              beforeUpload={(file) => {
-                setSelectedFile(file);
-                return false;
-              }}
-              style={{ marginBottom: 12 }}
-              height={64}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                <InboxOutlined style={{ fontSize: '20px', color: '#E54D2E' }} />
-                <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.65)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '220px', display: 'inline-block' }}>{selectedFile ? selectedFile.name : loc.dragDropText}</span>
-              </div>
-            </Dragger>
+                <Dragger 
+                  accept=".srt,.vtt,.ass,.lrc"
+                  showUploadList={false}
+                  beforeUpload={(file) => {
+                    setSelectedFile(file);
+                    return false;
+                  }}
+                  style={{ marginBottom: 12 }}
+                  height={64}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                    <InboxOutlined style={{ fontSize: '20px', color: '#E54D2E' }} />
+                    <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.65)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '220px', display: 'inline-block' }}>{selectedFile ? selectedFile.name : loc.dragDropText}</span>
+                  </div>
+                </Dragger>
 
-            <div style={{ display: 'flex', gap: 16, marginBottom: 16 }}>
-              <div style={{ flex: 1 }}>
-                <Text>{loc.sourceLang}:</Text>
-                <Select value={sourceLang} onChange={setSourceLang} style={{ width: '100%' }}>
-                  {languagesList.map(l => (
-                    <Select.Option key={l.value} value={l.value}>
-                      {loc.languages[l.value] ? `${loc.languages[l.value]} (${l.nativelabel})` : l.name}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </div>
-              <div style={{ flex: 1 }}>
-                <Text>{loc.targetLang}:</Text>
-                <Select value={targetLang} onChange={setTargetLang} style={{ width: '100%' }}>
-                  {languagesList.filter(l => l.value !== 'auto').map(l => (
-                    <Select.Option key={l.value} value={l.value}>
-                      {loc.languages[l.value] ? `${loc.languages[l.value]} (${l.nativelabel})` : l.name}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </div>
-            </div>
+                <div style={{ display: 'flex', gap: 16, marginBottom: 16 }}>
+                  <div style={{ flex: 1 }}>
+                    <Text>{loc.sourceLang}:</Text>
+                    <Select value={sourceLang} onChange={setSourceLang} style={{ width: '100%' }}>
+                      {languagesList.map(l => (
+                        <Select.Option key={l.value} value={l.value}>
+                          {loc.languages[l.value] ? `${loc.languages[l.value]} (${l.nativelabel})` : l.name}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <Text>{loc.targetLang}:</Text>
+                    <Select value={targetLang} onChange={setTargetLang} style={{ width: '100%' }}>
+                      {languagesList.filter(l => l.value !== 'auto').map(l => (
+                        <Select.Option key={l.value} value={l.value}>
+                          {loc.languages[l.value] ? `${loc.languages[l.value]} (${l.nativelabel})` : l.name}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </div>
+                </div>
 
-            <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-              <Button type="primary" style={{ flex: 1 }} disabled={!selectedFile || translating} onClick={handleManualInject}>
-                {loc.btnTranslateInject}
-              </Button>
-              <Button style={{ flex: 1 }} disabled={!selectedFile || translating} onClick={handleInjectOnly}>
-                {loc.btnInjectOnly}
-              </Button>
-            </div>
+                <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+                  <Button type="primary" style={{ flex: 1 }} disabled={!selectedFile || translating} onClick={handleManualInject}>
+                    {loc.btnTranslateInject}
+                  </Button>
+                  <Button style={{ flex: 1 }} disabled={!selectedFile || translating} onClick={handleInjectOnly}>
+                    {loc.btnInjectOnly}
+                  </Button>
+                </div>
+              </>
+            )}
 
             {translating && (
               <div style={{ textAlign: 'center', marginBottom: 16 }}>
