@@ -10,6 +10,16 @@ const { Dragger } = Upload;
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 
+const normalizeServerUrl = (url: string): string => {
+  let u = (url || '').trim();
+  if (!u) return '';
+  u = u.replace(/\/+$/, ''); // Remove trailing slashes
+  if (!/^https?:\/\//i.test(u)) {
+    u = `https://${u}`; // Default to https://
+  }
+  return u;
+};
+
 const App = () => {
   const [uiLanguage, setUiLanguage] = useState('km');
   const [sourceLang, setSourceLang] = useState('auto');
@@ -41,7 +51,7 @@ const App = () => {
   const [bilingualOrder, setBilingualOrder] = useState<'translationFirst' | 'originalFirst'>('translationFirst');
 
   const [activeTranslationType, setActiveTranslationType] = useState<'subtitle' | 'manga' | null>(null);
-  const [mangaServerUrl, setMangaServerUrl] = useState('https://example.com');
+  const [mangaServerUrl, setMangaServerUrl] = useState('https://khdownloader.xyz');
 
   const configLoaded = useRef(false);
   const hasPlayerRef = useRef(false);
@@ -230,7 +240,7 @@ const App = () => {
   useEffect(() => {
     // Only save after initial load completes to avoid overwriting stored config with defaults
     if (!configLoaded.current) return;
-    const trimmedUrl = (mangaServerUrl || '').trim();
+    const trimmedUrl = normalizeServerUrl(mangaServerUrl);
     chrome.storage.local.set({ userConfig: config, exportMode, bilingualOrder, formatPref, targetLang, sourceLang, mangaServerUrl: trimmedUrl });
   }, [config, exportMode, bilingualOrder, formatPref, targetLang, sourceLang, mangaServerUrl]);
 
@@ -427,7 +437,7 @@ const App = () => {
     setProgress(0);
     setProgressStatus(loc.mangaTranslatingStatus);
 
-    const trimmedUrl = (mangaServerUrl || '').trim();
+    const trimmedUrl = normalizeServerUrl(mangaServerUrl);
 
     chrome.storage.local.set({ userConfig: config, mangaServerUrl: trimmedUrl }).then(() => {
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -501,7 +511,7 @@ const App = () => {
   };
 
   const handleTestServer = async () => {
-    const trimmedUrl = (mangaServerUrl || '').trim();
+    const trimmedUrl = normalizeServerUrl(mangaServerUrl);
     if (!trimmedUrl) {
       message.error("Please enter your Server URL first.");
       return;

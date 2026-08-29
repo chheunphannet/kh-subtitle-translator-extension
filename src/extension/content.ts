@@ -280,7 +280,11 @@ if (matchedSite) {
         stopMangaKeepAlive();
       });
 
-      sendResponse({ success: true, totalImages: imageUrls.length, startIndex: visibleIndex });
+      const mangaLimit = request.config?.mangaLimit || 0;
+      const remainingImages = imageUrls.length - visibleIndex;
+      const actualTranslateCount = mangaLimit > 0 ? Math.min(mangaLimit, remainingImages) : remainingImages;
+
+      sendResponse({ success: true, totalImages: actualTranslateCount, startIndex: visibleIndex });
       return true;
     }
 

@@ -284,11 +284,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
     }
     
-    // Apply mangaLimit slice if configured
+    // Apply mangaLimit slice starting from message.startIndex
     let urlsToTranslate = message.imageUrls;
+    const startIndex = message.startIndex || 0;
     const limit = message.config?.mangaLimit || 0;
-    if (limit > 0 && urlsToTranslate.length > limit) {
-      urlsToTranslate = urlsToTranslate.slice(0, limit);
+    if (limit > 0 && urlsToTranslate.length > (startIndex + limit)) {
+      urlsToTranslate = urlsToTranslate.slice(startIndex, startIndex + limit);
+    } else {
+      urlsToTranslate = urlsToTranslate.slice(startIndex);
     }
     
     // Reset manga state
