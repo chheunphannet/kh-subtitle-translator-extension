@@ -56,6 +56,13 @@ if (fs.existsSync(fontsSrc)) {
   console.log('Copied fonts/ to jw-subtitle-tester/fonts/');
 }
 
+const iconsSrc = path.join(srcDir, 'icons');
+const iconsDest = path.join(chromeDestDir, 'icons');
+if (fs.existsSync(iconsSrc)) {
+  copyFolderSync(iconsSrc, iconsDest);
+  console.log('Copied icons/ to jw-subtitle-tester/icons/');
+}
+
 // 3. Process Manifests
 const manifestPath = path.join(srcDir, 'manifest.json');
 const packageJsonPath = path.join(__dirname, '../package.json');
@@ -127,8 +134,7 @@ if (fs.existsSync(fontsSrc)) {
   copyFolderSync(fontsSrc, path.join(serverStaticDir, 'fonts'));
 }
 
-const iconsSrc = path.join(chromeDestDir, 'icons');
-if (fs.existsSync(iconsSrc)) {
-  copyFolderSync(iconsSrc, path.join(serverStaticDir, 'icons'));
+if (fs.existsSync(iconsDest)) {
+  copyFolderSync(iconsDest, path.join(serverStaticDir, 'icons'));
 }
 console.log('Server static assets synced to server/static/.');
