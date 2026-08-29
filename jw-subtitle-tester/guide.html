@@ -3,7 +3,58 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>KHTranslator - User Guide</title>
+    
+    <!-- Primary Meta Tags -->
+    <title>khtranslator - Khmer Manga &amp; Anime Subtitle Translator | AI Browser Extension</title>
+    <meta name="title" content="khtranslator - Khmer Manga &amp; Anime Subtitle Translator | AI Browser Extension" />
+    <meta name="description" content="Auto-translate anime subtitles and manga comic pages to natural Khmer instantly in your browser with Google Gemini AI. Free extension for Firefox and Chrome supporting JW Player, MangaKatana, and more." />
+    <meta name="keywords" content="manga translate to khmer, khmer manga, anime translate, manga or anime extension translate, khmer anime subtitle translator, jw player subtitle translator, translate manga to khmer, khmer video translator, khmer subtitles, បកប្រែ manga ខ្មែរ, បកប្រែ anime ខ្មែរ, subtitle ខ្មែរ, khtranslator" />
+    <meta name="author" content="Chheun Phanet (khtranslator)" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://khdownloader.xyz/" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://khdownloader.xyz/" />
+    <meta property="og:title" content="khtranslator - Khmer Manga &amp; Anime Subtitle Translator" />
+    <meta property="og:description" content="Auto-translate anime video subtitles and manga pages directly to Khmer with Google Gemini AI. Fast, accurate, and completely free." />
+    <meta property="og:image" content="https://khdownloader.xyz/icons/icon128.png" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://khdownloader.xyz/" />
+    <meta property="twitter:title" content="khtranslator - Khmer Manga &amp; Anime Subtitle Translator" />
+    <meta property="twitter:description" content="Auto-translate anime video subtitles and manga pages directly to Khmer with Google Gemini AI. Fast, accurate, and completely free." />
+    <meta property="twitter:image" content="https://khdownloader.xyz/icons/icon128.png" />
+
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "khtranslator",
+      "operatingSystem": "Firefox, Chrome, Edge, Brave",
+      "applicationCategory": "BrowserExtension",
+      "description": "Auto-translate anime subtitles and manga pages into natural Khmer using Google Gemini AI.",
+      "url": "https://khdownloader.xyz/",
+      "image": "https://khdownloader.xyz/icons/icon128.png",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Chheun Phanet",
+        "url": "https://github.com/chheunphannet"
+      },
+      "downloadUrl": [
+        "https://addons.mozilla.org/en-GB/firefox/addon/khtranslator/",
+        "https://github.com/chheunphannet/kh-subtitle-translator-extension/releases/latest"
+      ]
+    }
+    </script>
+
     <style>
       @font-face {
         font-family: "Kantumruy Pro";
@@ -56,7 +107,7 @@
       header {
         width: 100%;
         max-width: 800px;
-        padding: 32px 24px 16px 24px;
+        padding: 24px 24px 16px 24px;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -76,7 +127,7 @@
         border-radius: 6px;
       }
 
-      .brand h1 {
+      .brand .title-text {
         margin: 0;
         font-size: 22px;
         font-weight: 700;
@@ -121,6 +172,99 @@
         padding: 24px;
         box-sizing: border-box;
         flex: 1;
+      }
+
+      /* Hero Section */
+      .hero {
+        text-align: center;
+        padding: 24px 0 32px 0;
+        margin-bottom: 28px;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .hero h1 {
+        font-size: 26px;
+        font-weight: 800;
+        line-height: 1.35;
+        margin: 0 0 12px 0;
+        color: var(--text-main);
+      }
+
+      .hero h1 span {
+        color: var(--accent-color);
+      }
+
+      .hero p {
+        font-size: 15px;
+        color: var(--text-muted);
+        max-width: 650px;
+        margin: 0 auto 24px auto;
+        line-height: 1.6;
+      }
+
+      .download-actions {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+
+      .btn-download {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 22px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        font-family: inherit;
+        box-sizing: border-box;
+      }
+
+      .btn-firefox {
+        background-color: #ff7139;
+        color: #ffffff;
+      }
+
+      .btn-firefox:hover {
+        background-color: #ff8554;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(255, 113, 57, 0.35);
+      }
+
+      .btn-chrome {
+        background-color: var(--card-bg);
+        color: var(--text-main);
+        border: 1px solid var(--border-color);
+      }
+
+      .btn-chrome:hover {
+        background-color: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.25);
+        transform: translateY(-2px);
+      }
+
+      .btn-github {
+        background-color: var(--card-bg);
+        color: var(--text-main);
+        border: 1px solid var(--border-color);
+      }
+
+      .btn-github:hover {
+        background-color: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.25);
+        transform: translateY(-2px);
+      }
+
+      .btn-icon {
+        width: 18px;
+        height: 18px;
+        display: inline-block;
+        vertical-align: middle;
       }
 
       .guide-section {
@@ -223,28 +367,42 @@
       }
 
       .setting-desc {
-        font-size: 14px;
-        color: var(--text-muted);
         margin: 0;
+        font-size: 13.5px;
       }
 
       .tag-badge {
-        display: inline-block;
-        padding: 1px 6px;
-        font-size: 11px;
+        font-size: 10px;
+        padding: 2px 6px;
         border-radius: 4px;
         font-weight: normal;
       }
 
       .tag-required {
-        background-color: rgba(247, 104, 74, 0.15);
-        color: #f7684a;
-        border: 1px solid rgba(247, 104, 74, 0.2);
+        background-color: rgba(229, 77, 46, 0.15);
+        color: var(--accent-color);
       }
 
       .tag-optional {
         background-color: rgba(255, 255, 255, 0.08);
         color: var(--text-muted);
+      }
+
+      code {
+        background-color: rgba(255, 255, 255, 0.08);
+        color: var(--accent-color);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 13px;
+      }
+
+      a {
+        color: var(--accent-color);
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
       }
 
       footer {
@@ -255,13 +413,14 @@
         border-top: 1px solid var(--border-color);
         box-sizing: border-box;
         margin-top: 40px;
-        color: rgba(242, 238, 230, 0.3);
-        font-size: 12px;
+        color: rgba(242, 238, 230, 0.4);
+        font-size: 13px;
       }
 
       footer a {
         color: var(--accent-color);
         text-decoration: none;
+        margin: 0 6px;
       }
 
       footer a:hover {
@@ -272,8 +431,8 @@
   <body>
     <header>
       <div class="brand">
-        <img src="icons/icon32.png" alt="Logo" />
-        <h1>khtranslator</h1>
+        <img src="icons/icon32.png" alt="khtranslator Logo" />
+        <span class="title-text">khtranslator</span>
       </div>
       <div class="lang-switcher">
         <button class="lang-btn active" data-lang="en">English</button>
@@ -285,28 +444,50 @@
     <main>
       <!-- ENGLISH GUIDE -->
       <div id="guide-en" class="guide-section active">
+        <!-- Hero & Download Section -->
+        <div class="hero">
+          <h1>Auto-Translate <span>Anime Subtitles</span> &amp; <span>Manga Pages</span> to Khmer</h1>
+          <p>
+            Translate English &amp; Japanese video subtitles and manga speech bubbles into natural, fluent Khmer in real time. Powered by Google Gemini AI.
+          </p>
+          <div class="download-actions">
+            <a href="https://addons.mozilla.org/en-GB/firefox/addon/khtranslator/" target="_blank" rel="noopener noreferrer" class="btn-download btn-firefox">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/></svg>
+              Get for Firefox (Add-on)
+            </a>
+            <a href="https://github.com/chheunphannet/kh-subtitle-translator-extension/releases/latest/download/khtranslate-chrome.zip" class="btn-download btn-chrome">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
+              Download for Chrome (.zip)
+            </a>
+            <a href="https://github.com/chheunphannet/kh-subtitle-translator-extension" target="_blank" rel="noopener noreferrer" class="btn-download btn-github">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+              View on GitHub
+            </a>
+          </div>
+        </div>
+
         <h2>1. How to Translate Video Subtitles (Anime)</h2>
         <div class="card">
-          <h3>Auto-Translate & Inject</h3>
+          <h3>Auto-Translate &amp; Inject</h3>
           <p>
             When watching anime or videos with English subtitles, the extension can translate and overlay them instantly in Khmer:
           </p>
           <ol>
             <li>Open the video streaming page (e.g., <strong>Anistream</strong>, <strong>Khanime</strong>, or <strong>KHFullHD</strong>) and start playing the video.</li>
             <li>Open the extension popup. If player subtitles are found, you will see a green <strong>"English Subtitles Detected!"</strong> notification.</li>
-            <li>Click <strong>"Auto Translate & Inject"</strong>. The AI will translate the lines and overlay them onto the video player.</li>
+            <li>Click <strong>"Auto Translate &amp; Inject"</strong>. The AI will translate the lines and overlay them onto the video player.</li>
           </ol>
         </div>
 
         <div class="card">
-          <h3>Translate & Inject Local Subtitle Files</h3>
+          <h3>Translate &amp; Inject Local Subtitle Files</h3>
           <p>
             You can also translate and play local subtitle files from your computer:
           </p>
           <ol>
-            <li>Drag & drop a subtitle file (<code>.srt</code>, <code>.vtt</code>, <code>.ass</code>, or <code>.lrc</code>) into the upload area in the popup.</li>
+            <li>Drag &amp; drop a subtitle file (<code>.srt</code>, <code>.vtt</code>, <code>.ass</code>, or <code>.lrc</code>) into the upload area in the popup.</li>
             <li>Select your <strong>Source Language</strong> and <strong>Target Language</strong> (Khmer).</li>
-            <li>Click <strong>"Translate & Inject"</strong> to run translation and display them on the video player immediately.</li>
+            <li>Click <strong>"Translate &amp; Inject"</strong> to run translation and display them on the video player immediately.</li>
             <li>Or, click <strong>"Inject Only"</strong> to play your subtitles without running any translation.</li>
             <li>Once completed, you can click <strong>"Save / Download"</strong> to keep the translated subtitle file on your disk.</li>
           </ol>
@@ -338,12 +519,12 @@
         <div class="card">
           <p>The extension automatically integrates and runs on the following platforms:</p>
           <ul>
-            <li><strong>Anime & Video Streaming:</strong> 
+            <li><strong>Anime &amp; Video Streaming:</strong> 
               <a href="https://anistream.one" target="_blank" rel="noopener noreferrer">Anistream</a>, 
               <a href="https://khanime.co" target="_blank" rel="noopener noreferrer">Khanime</a>, 
               <a href="https://khfullhd.co" target="_blank" rel="noopener noreferrer">KHFullHD</a>
             </li>
-            <li><strong>Manga & Comics:</strong> 
+            <li><strong>Manga &amp; Comics:</strong> 
               <a href="https://mangakatana.com/" target="_blank" rel="noopener noreferrer">MangaKatana</a>, 
               <a href="https://comix.to/" target="_blank" rel="noopener noreferrer">Comix.to</a>, 
               <a href="https://mangaplus.shueisha.co.jp/" target="_blank" rel="noopener noreferrer">MangaPlus</a>
@@ -351,15 +532,15 @@
           </ul>
         </div>
 
-        <h2>4. Settings & Configurations Explained</h2>
+        <h2>4. Key Settings &amp; Configuration</h2>
         <div class="card">
           <div class="setting-item">
             <div class="setting-name">
               Gemini API Key
-              <span class="tag-badge tag-required">Required for AI</span>
+              <span class="tag-badge tag-required">Required</span>
             </div>
             <p class="setting-desc">
-              Your personal connection key from Google AI Studio. It is completely free, does not require a credit card, and ensures your translation requests go directly and securely from your browser to Google Gemini.
+              Your personal connection key from Google AI Studio. It is 100% free, requires no credit card, and ensures your translations are sent securely and directly between your browser and Google Gemini.
             </p>
           </div>
           <div class="setting-item">
@@ -368,7 +549,7 @@
               <span class="tag-badge tag-optional">Optional</span>
             </div>
             <p class="setting-desc">
-              Choose the AI model brain. We recommend <code>gemini-3.1-flash-lite</code> for subtitles (very fast and uses less quota) and <code>gemini-3.5-flash</code> for manga.
+              Choose the AI engine for translations. We recommend <code>gemini-3.1-flash-lite</code> for video subtitles (faster &amp; minimal quota usage) and <code>gemini-3.5-flash</code> for Manga pages.
             </p>
           </div>
           <div class="setting-item">
@@ -377,7 +558,7 @@
               <span class="tag-badge tag-required">Required for Normal Mode</span>
             </div>
             <p class="setting-desc">
-              The address of your image-clearing server (e.g. <code>https://khdownloader.xyz</code>). This server removes original text from manga panels so the extension can draw Khmer text in empty bubbles.
+              The text-erasure server address (e.g., <code>https://khdownloader.xyz</code>). This server cleans original text from manga pages so the extension can cleanly render Khmer translations in the speech bubbles.
             </p>
           </div>
           <div class="setting-item">
@@ -386,7 +567,7 @@
               <span class="tag-badge tag-optional">Optional</span>
             </div>
             <p class="setting-desc">
-              Saves all translated dialogue locally in your browser. Replaying a video or re-reading a manga chapter loads translations instantly from your local disk without consuming any API keys.
+              Saves completed translations in your browser. Replaying a video or re-reading a manga chapter loads translations instantly without re-translating, saving you time and API limits.
             </p>
           </div>
           <div class="setting-item">
@@ -403,16 +584,38 @@
 
       <!-- KHMER GUIDE -->
       <div id="guide-km" class="guide-section">
+        <!-- Hero & Download Section -->
+        <div class="hero">
+          <h1>បកប្រែ <span>Subtitle Anime</span> និង <span>រូបភាព Manga</span> ទៅជាភាសាខ្មែរ</h1>
+          <p>
+            បកប្រែ Subtitle វីដេអូ និងអត្ថបទលើរូបភាព Manga ពីភាសាអង់គ្លេស និងជប៉ុន ទៅជាភាសាខ្មែរដែលមានន័យធម្មជាតិ និងរលូនភ្លាមៗ ដោយប្រើ Google Gemini AI។
+          </p>
+          <div class="download-actions">
+            <a href="https://addons.mozilla.org/en-GB/firefox/addon/khtranslator/" target="_blank" rel="noopener noreferrer" class="btn-download btn-firefox">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/></svg>
+              ដំឡើងលើ Firefox (Add-on)
+            </a>
+            <a href="https://github.com/chheunphannet/kh-subtitle-translator-extension/releases/latest/download/khtranslate-chrome.zip" class="btn-download btn-chrome">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
+              ទាញយកសម្រាប់ Chrome (.zip)
+            </a>
+            <a href="https://github.com/chheunphannet/kh-subtitle-translator-extension" target="_blank" rel="noopener noreferrer" class="btn-download btn-github">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+              មើលលើ GitHub
+            </a>
+          </div>
+        </div>
+
         <h2>១. របៀបបកប្រែ Subtitle វីដេអូ (Anime)</h2>
         <div class="card">
-          <h3>បកប្រែ និងបញ្ចូលដោយស្វ័យប្រវត្តិ (Auto-Translate & Inject)</h3>
+          <h3>បកប្រែ និងបញ្ចូលដោយស្វ័យប្រវត្តិ (Auto-Translate &amp; Inject)</h3>
           <p>
             នៅពេលអ្នកទស្សនា Anime ឬវីដេអូដែលមាន Subtitle ជាភាសាអង់គ្លេស កម្មវិធី (Extension) នេះអាចបកប្រែ និងបង្ហាញជាភាសាខ្មែរនៅលើវីដេអូភ្លាមៗ៖
           </p>
           <ol>
             <li>បើកគេហទំព័រវីដេអូ (ដូចជា <strong>Anistream</strong>, <strong>Khanime</strong>, ឬ <strong>KHFullHD</strong>) រួចចាក់វីដេអូ។</li>
             <li>បើកផ្ទាំង Extension popup។ ប្រសិនបើប្រព័ន្ធស្វែងរកឃើញ Subtitle របស់វីដេអូ វានឹងបង្ហាញសារពណ៌បៃតង <strong>"English Subtitles Detected!"</strong>។</li>
-            <li>ចុចប៊ូតុង <strong>"Auto Translate & Inject"</strong>។ AI នឹងដំណើរការបកប្រែ និងបង្ហាញ Subtitle ភាសាខ្មែរនៅលើវីដេអូដោយស្វ័យប្រវត្តិ។</li>
+            <li>ចុចប៊ូតុង <strong>"Auto Translate &amp; Inject"</strong>។ AI នឹងដំណើរការបកប្រែ និងបង្ហាញ Subtitle ភាសាខ្មែរនៅលើវីដេអូដោយស្វ័យប្រវត្តិ។</li>
           </ol>
         </div>
 
@@ -424,7 +627,7 @@
           <ol>
             <li>អូស និងទម្លាក់ឯកសារ Subtitle (ប្រភេទ <code>.srt</code>, <code>.vtt</code>, <code>.ass</code>, ឬ <code>.lrc</code>) ទៅក្នុងប្រអប់បង្ហោះនៅក្នុង Extension popup។</li>
             <li>ជ្រើសរើស <strong>Source Language (ភាសាដើម)</strong> និង <strong>Target Language (ភាសាបកប្រែ)</strong> ជាភាសាខ្មែរ។</li>
-            <li>ចុចប៊ូតុង <strong>"Translate & Inject"</strong> ដើម្បីបកប្រែ និងចាក់នៅលើវីដេអូភ្លាមៗ។</li>
+            <li>ចុចប៊ូតុង <strong>"Translate &amp; Inject"</strong> ដើម្បីបកប្រែ និងចាក់នៅលើវីដេអូភ្លាមៗ។</li>
             <li>ឬចុច <strong>"Inject Only"</strong> ប្រសិនបើអ្នកចង់ចាក់ Subtitle នោះភ្លាមៗដោយមិនបាច់បកប្រែ។</li>
             <li>បន្ទាប់ពីបកប្រែរួចរាល់ អ្នកអាចចុចប៊ូតុង <strong>"Save / Download"</strong> ដើម្បីរក្សាទុកឯកសារ Subtitle ដែលបកប្រែរួចទៅក្នុងកុំព្យូទ័ររបស់អ្នក។</li>
           </ol>
@@ -439,7 +642,7 @@
           <ol>
             <li>បើកទំព័ររឿង Manga នៅលើគេហទំព័រដែលគាំទ្រ (ដូចជា <strong>MangaKatana</strong>)។</li>
             <li>ចុចលើរូបតំណាង Extension។ អ្នកនឹងឃើញកាត <strong>"Manga Detected!"</strong> បង្ហាញចំណងជើង វគ្គ និងចំនួនទំព័រ。</li>
-            <li>ជ្រើសរើស <strong>Manga Translation Mode</strong> នៅក្នុងផ្ទាំងការកំណត់ (Settings) រួចចុចប៊ូតុង <strong>"Auto Translate Manga"</strong>。</li>
+            <li>ជ្រើសរើស <strong>Manga Translation Mode</strong> នៅក្នុងផ្ទាំងការកំណត់ (Settings) រួចចុចប៊ូតុង <strong>"Auto Translate Manga"</strong>។</li>
             <li>Extension នឹងដំណើរការទំព័រនីមួយៗ ដោយលុបអត្ថបទចាស់ចេញ និងជំនួសមកវិញនូវអក្សរខ្មែរនៅក្នុងប្រអប់ជជែកដោយស្វ័យប្រវត្តិ។</li>
           </ol>
         </div>
@@ -521,6 +724,28 @@
 
       <!-- CHINESE GUIDE -->
       <div id="guide-zh" class="guide-section">
+        <!-- Hero & Download Section -->
+        <div class="hero">
+          <h1>即时将 <span>动漫视频字幕</span> 与 <span>漫画页面</span> 翻译为高棉语 (柬埔寨语)</h1>
+          <p>
+            基于 Google Gemini AI，直接在浏览器中将英文和日文动漫字幕与漫画对话气泡即时转换为地道自然的高棉语。
+          </p>
+          <div class="download-actions">
+            <a href="https://addons.mozilla.org/en-GB/firefox/addon/khtranslator/" target="_blank" rel="noopener noreferrer" class="btn-download btn-firefox">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/></svg>
+              获取 Firefox 附加组件
+            </a>
+            <a href="https://github.com/chheunphannet/kh-subtitle-translator-extension/releases/latest/download/khtranslate-chrome.zip" class="btn-download btn-chrome">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
+              下载 Chrome 扩展包 (.zip)
+            </a>
+            <a href="https://github.com/chheunphannet/kh-subtitle-translator-extension" target="_blank" rel="noopener noreferrer" class="btn-download btn-github">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+              查看 GitHub 源码
+            </a>
+          </div>
+        </div>
+
         <h2>1. 如何翻译视频字幕 (动漫)</h2>
         <div class="card">
           <h3>自动翻译与注入</h3>
@@ -530,7 +755,7 @@
           <ol>
             <li>打开视频播放页面（例如 <strong>Anistream</strong>、<strong>Khanime</strong> 或 <strong>KHFullHD</strong>）并开始播放视频。</li>
             <li>打开扩展程序弹窗。如果检测到播放器字幕，您将看到绿色的 <strong>"English Subtitles Detected!"（检测到英文旁白字幕）</strong> 提示。</li>
-            <li>点击 <strong>"Auto Translate & Inject"（自动翻译并注入）</strong>。AI 将执行翻译并自动在视频上展示高棉语字幕。</li>
+            <li>点击 <strong>"Auto Translate &amp; Inject"（自动翻译并注入）</strong>。AI 将执行翻译并自动在视频上展示高棉语字幕。</li>
           </ol>
         </div>
 
@@ -542,7 +767,7 @@
           <ol>
             <li>将字幕文件（<code>.srt</code>、<code>.vtt</code>、<code>.ass</code> 或 <code>.lrc</code>）拖拽到弹窗中的上传区域。</li>
             <li>选择 <strong>源语言</strong> 与 <strong>目标语言</strong>（柬埔寨高棉语）。</li>
-            <li>点击 <strong>"Translate & Inject"</strong> 运行 AI 翻译并立即展示在播放器上。</li>
+            <li>点击 <strong>"Translate &amp; Inject"</strong> 运行 AI 翻译并立即展示在播放器上。</li>
             <li>或者，点击 <strong>"Inject Only"</strong> 仅在播放器上加载字幕而不进行翻译。</li>
             <li>翻译完成后，您可以点击 <strong>"Save / Download"</strong> 将翻译好的字幕文件保存到您的电脑中。</li>
           </ol>
@@ -638,7 +863,13 @@
       </div>
     </main>
 
-    <footer>khtranslator &copy; 2026.</footer>
+    <footer>
+      khtranslator &copy; 2026. Free &amp; Open-Source AI Subtitle &amp; Manga Translator.
+      <br />
+      <a href="https://addons.mozilla.org/en-GB/firefox/addon/khtranslator/" target="_blank" rel="noopener noreferrer">Firefox Add-on</a> &bull;
+      <a href="https://github.com/chheunphannet/kh-subtitle-translator-extension" target="_blank" rel="noopener noreferrer">GitHub</a> &bull;
+      <a href="https://t.me/ifitworkitwork" target="_blank" rel="noopener noreferrer">Telegram Support</a>
+    </footer>
 
     <script src="guide.js"></script>
   </body>
