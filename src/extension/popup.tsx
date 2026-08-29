@@ -132,7 +132,7 @@ const App = () => {
             setTranslating(true);
             if (status.isManga) {
               setActiveTranslationType('manga');
-              setProgress(status.percent);
+              setProgress(status.percent || 0);
               const sIndex = typeof status.startIndex === 'number' ? status.startIndex + 1 : 1;
               const eIndex = typeof status.totalImages === 'number' ? sIndex + status.totalImages - 1 : 1;
               setProgressStatus(`${loc.mangaTranslatingStatus} [Page ${sIndex}-${eIndex}] (${status.completedCount || 0}/${status.totalImages || 0})`);
@@ -142,7 +142,20 @@ const App = () => {
               setProgressStatus(loc.statusTranslating);
             }
           } else if (status.status === "Completed" && !status.isManga && status.translatedTexts && status.cues) {
-            restoreCompletedTranslation(status);
+            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+              const activeTab = tabs[0];
+              if (activeTab?.id) {
+                chrome.tabs.sendMessage(activeTab.id, { action: "getDetectedSubtitles" }, (resp) => {
+                  if (!chrome.runtime.lastError && resp?.hasManga) {
+                    // Do not restore subtitle completion state on a manga page
+                    return;
+                  }
+                  restoreCompletedTranslation(status);
+                });
+              } else {
+                restoreCompletedTranslation(status);
+              }
+            });
           }
         }
       }).catch(() => {});
@@ -179,6 +192,12 @@ const App = () => {
               mangaPagesRange: msg.info.mangaPagesRange
             });
             setDetectedSubUrl(null);
+            if (!translating && activeTranslationType !== 'manga') {
+              setTranslatedContent(null);
+              setTranslatedFileName(null);
+              setProgress(0);
+              setProgressStatus('');
+            }
           }
         }
       }
@@ -272,6 +291,12 @@ const App = () => {
               mangaPagesRange: response.mangaPagesRange
             });
             setDetectedSubUrl(null);
+            if (!translating && activeTranslationType !== 'manga') {
+              setTranslatedContent(null);
+              setTranslatedFileName(null);
+              setProgress(0);
+              setProgressStatus('');
+            }
           } else {
             setDetectedSubUrl(null);
             setDetectedManga(null);
@@ -436,6 +461,8 @@ const App = () => {
     setTranslating(true);
     setProgress(0);
     setProgressStatus(loc.mangaTranslatingStatus);
+    setTranslatedContent(null);
+    setTranslatedFileName(null);
 
     const trimmedUrl = normalizeServerUrl(mangaServerUrl);
 
