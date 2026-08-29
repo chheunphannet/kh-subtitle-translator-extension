@@ -285,103 +285,73 @@
     <main>
       <!-- ENGLISH GUIDE -->
       <div id="guide-en" class="guide-section active">
-        <h2>1. How to Use the Extension</h2>
+        <h2>1. How to Translate Video Subtitles (Anime)</h2>
         <div class="card">
           <h3>Auto-Translate & Inject</h3>
           <p>
-            If you are watching video streams with English subtitles, the
-            extension can translate and overlay them instantly:
+            When watching anime or videos with English subtitles, the extension can translate and overlay them instantly in Khmer:
           </p>
           <ol>
-            <li>
-              Open the stream page (e.g., Anistream) and start playing the
-              video.
-            </li>
-            <li>
-              Open the extension popup. If supported player subtitles are found,
-              you will see a green
-              <strong>"English Subtitles Detected!"</strong> notice.
-            </li>
-            <li>
-              Click the <strong>"Auto Translate & Inject"</strong> button. The
-              translation will execute, and the target subtitles will be
-              overlayed onto the video player.
-            </li>
+            <li>Open the video streaming page (e.g., <strong>Anistream</strong>, <strong>Khanime</strong>, or <strong>KHFullHD</strong>) and start playing the video.</li>
+            <li>Open the extension popup. If player subtitles are found, you will see a green <strong>"English Subtitles Detected!"</strong> notification.</li>
+            <li>Click <strong>"Auto Translate & Inject"</strong>. The AI will translate the lines and overlay them onto the video player.</li>
           </ol>
         </div>
 
         <div class="card">
-          <h3>Manual Subtitle Injection</h3>
+          <h3>Translate & Inject Local Subtitle Files</h3>
           <p>
-            You can also translate and inject your own local subtitle files:
+            You can also translate and play local subtitle files from your computer:
           </p>
           <ol>
-            <li>
-              Drag & drop a subtitle file (<code>.srt</code>, <code>.vtt</code>,
-              <code>.ass</code>, or <code>.lrc</code>) into the upload zone.
-            </li>
-            <li>
-              Select the <strong>Source Lang</strong> and
-              <strong>Target Lang</strong> (e.g. Khmer).
-            </li>
-            <li>
-              Click <strong>"Translate & Inject"</strong> to translate the
-              subtitles using Gemini AI and inject them into the player.
-            </li>
-            <li>
-              Or, click <strong>"Inject Only"</strong> to overlay the subtitle
-              file onto the video immediately without translating.
-            </li>
-            <li>
-              After translation completes, you can click
-              <strong>"Download Translated"</strong> to save the file to your
-              disk.
-            </li>
+            <li>Drag & drop a subtitle file (<code>.srt</code>, <code>.vtt</code>, <code>.ass</code>, or <code>.lrc</code>) into the upload area in the popup.</li>
+            <li>Select your <strong>Source Language</strong> and <strong>Target Language</strong> (Khmer).</li>
+            <li>Click <strong>"Translate & Inject"</strong> to run translation and display them on the video player immediately.</li>
+            <li>Or, click <strong>"Inject Only"</strong> to play your subtitles without running any translation.</li>
+            <li>Once completed, you can click <strong>"Save / Download"</strong> to keep the translated subtitle file on your disk.</li>
           </ol>
         </div>
 
-        <h2>2. Supported Streaming Sites</h2>
-        <p>
-          The extension contains built-in injectors that auto-detect and sync
-          subtitles on these platforms:
-        </p>
-        <ul style="list-style-type: none; padding-left: 0;">
-          <li>
-            <strong
-              ><a
-                href="https://anistream.one"
-                target="_blank"
-                rel="noopener noreferrer"
-                style="color: var(--accent-color); text-decoration: underline"
-                >Anistream</a
-              ></strong
-            >
-          </li>
-          <li>
-            <strong
-              ><a
-                href="https://khanime.co"
-                target="_blank"
-                rel="noopener noreferrer"
-                style="color: var(--accent-color); text-decoration: underline"
-                >Khanime</a
-              ></strong
-            >
-          </li>
-          <li>
-            <strong
-              ><a
-                href="https://khfullhd.co"
-                target="_blank"
-                rel="noopener noreferrer"
-                style="color: var(--accent-color); text-decoration: underline"
-                >KHFullHD</a
-              ></strong
-            >
-          </li>
-        </ul>
+        <h2>2. How to Translate Manga Pages</h2>
+        <div class="card">
+          <h3>Instant Visual Manga Translation</h3>
+          <p>
+            Read foreign manga pages in clean Khmer. The AI reads the original text bubbles, clears them, and draws Khmer text in their place:
+          </p>
+          <ol>
+            <li>Open a manga chapter on a supported site (e.g., <strong>MangaKatana</strong>).</li>
+            <li>Click the extension icon. You will see a <strong>"Manga Detected!"</strong> card showing the manga title, chapter, and total pages.</li>
+            <li>Select your preferred <strong>Manga Translation Mode</strong> in the settings tab (see below) and click <strong>"Auto Translate Manga"</strong>.</li>
+            <li>The extension will process each page, replacing the original text bubbles with Khmer translations automatically.</li>
+          </ol>
+        </div>
 
-        <h2>3. AI Settings & Configurations Explained</h2>
+        <div class="card">
+          <h3>Manga Translation Modes</h3>
+          <ul>
+            <li><strong>Normal Mode (Precise Overlay):</strong> Removes the original English/Japanese text and redraws Khmer translations exactly inside the speech bubbles. (Requires the Manga Server to be active).</li>
+            <li><strong>Fast Mode (Side-by-Side):</strong> Displays translations instantly without redraws, offering a quick reading flow.</li>
+          </ul>
+        </div>
+
+        <h2>3. Supported Websites</h2>
+        <div class="card">
+          <p>The extension automatically integrates and runs on the following platforms:</p>
+          <ul>
+            <li><strong>Anime & Video Streaming:</strong> 
+              <a href="https://anistream.one" target="_blank" rel="noopener noreferrer">Anistream</a>, 
+              <a href="https://khanime.co" target="_blank" rel="noopener noreferrer">Khanime</a>, 
+              <a href="https://khfullhd.co" target="_blank" rel="noopener noreferrer">KHFullHD</a>
+            </li>
+            <li><strong>Manga & Comics:</strong> 
+              <a href="https://mangakatana.com/" target="_blank" rel="noopener noreferrer">MangaKatana</a>, 
+              <a href="https://comix.to/" target="_blank" rel="noopener noreferrer">Comix.to</a>, 
+              <a href="https://mangaplus.shueisha.co.jp/" target="_blank" rel="noopener noreferrer">MangaPlus</a>
+            </li>
+          </ul>
+        </div>
+
+        <h2>4. Settings & Configurations Explained</h2>
         <div class="card">
           <div class="setting-item">
             <div class="setting-name">
@@ -389,73 +359,43 @@
               <span class="tag-badge tag-required">Required for AI</span>
             </div>
             <p class="setting-desc">
-              Your personal API key from Google AI Studio. Translations run
-              locally and securely directly from your browser to Google Gemini.
+              Your personal connection key from Google AI Studio. It is completely free, does not require a credit card, and ensures your translation requests go directly and securely from your browser to Google Gemini.
             </p>
           </div>
           <div class="setting-item">
             <div class="setting-name">
               Select Model
-              <span class="tag-badge tag-optional">Configurable</span>
+              <span class="tag-badge tag-optional">Optional</span>
             </div>
             <p class="setting-desc">
-              Choose which Gemini model to use. <code>gemini-3.5-flash</code> is
-              recommended for general translation as it is extremely fast and
-              cost-efficient.
+              Choose the AI model brain. We recommend <code>gemini-3.1-flash-lite</code> for subtitles (very fast and uses less quota) and <code>gemini-3.5-flash</code> for manga.
             </p>
           </div>
           <div class="setting-item">
             <div class="setting-name">
-              Context-Aware Translation
-              <span class="tag-badge tag-optional">Toggle</span>
+              Manga Server URL
+              <span class="tag-badge tag-required">Required for Normal Mode</span>
             </div>
             <p class="setting-desc">
-              When enabled, the translator will send surrounding subtitle lines
-              (before and after the current block) as context to the LLM. This
-              yields much more natural dialogue, correct pronouns, and
-              consistent narrative flow.
+              The address of your image-clearing server (e.g. <code>https://khdownloader.xyz</code>). This server removes original text from manga panels so the extension can draw Khmer text in empty bubbles.
             </p>
           </div>
           <div class="setting-item">
             <div class="setting-name">
-              Concurrency <span class="tag-badge tag-optional">Slider</span>
+              Smart Local Cache
+              <span class="tag-badge tag-optional">Optional</span>
             </div>
             <p class="setting-desc">
-              Determines how many lines are sent in parallel. Higher values
-              accelerate translation but increase the risk of hitting Gemini API
-              limits (Error 429).
+              Saves all translated dialogue locally in your browser. Replaying a video or re-reading a manga chapter loads translations instantly from your local disk without consuming any API keys.
             </p>
           </div>
           <div class="setting-item">
             <div class="setting-name">
-              Delay (ms) <span class="tag-badge tag-optional">Slider</span>
+              Mature Content (18+)
+              <span class="tag-badge tag-optional">Optional</span>
             </div>
             <p class="setting-desc">
-              The delay between requests. If your translations are failing due
-              to rate limit errors, increase this delay to space out API
-              requests.
-            </p>
-          </div>
-          <div class="setting-item">
-            <div class="setting-name">
-              18+ / Mature Content
-              <span class="tag-badge tag-optional">Toggle</span>
-            </div>
-            <p class="setting-desc">
-              Allows the LLM to translate slang, swearing, and adult/violent
-              dialogue accurately without censoring or triggering standard
-              safety blocks.
-            </p>
-          </div>
-          <div class="setting-item">
-            <div class="setting-name">
-              Enable Caching <span class="tag-badge tag-optional">Toggle</span>
-            </div>
-            <p class="setting-desc">
-              Saves all translated lines to a local cache (IndexedDB). If you
-              re-translate the same subtitle file or replay a video, the
-              translations load instantly without hitting the Gemini API again,
-              saving you cost and time.
+              Allows the AI to translate slang, swearing, and adult/violent dialogue accurately without censoring or triggering safety blocks.
             </p>
           </div>
         </div>
@@ -463,99 +403,73 @@
 
       <!-- KHMER GUIDE -->
       <div id="guide-km" class="guide-section">
-        <h2>១. របៀបប្រើប្រាស់ Extension</h2>
+        <h2>១. របៀបបកប្រែ Subtitle វីដេអូ (Anime)</h2>
         <div class="card">
-          <h3>បកប្រែ & បញ្ចូលដោយស្វ័យប្រវត្ត (Auto-Translate & Inject)</h3>
+          <h3>បកប្រែ និងបញ្ចូលដោយស្វ័យប្រវត្ត</h3>
           <p>
-            ប្រសិនបើអ្នកកំពុងទស្សនាខ្សែភាពយន្តដែលមាន Subtitle ភាសាអង់គ្លេស
-            Extension អាចបកប្រែនិងបញ្ចូលវាភ្លាមៗ៖
+            នៅពេលទស្សនា Anime ឬវីដេអូដែលមាន Subtitle ភាសាអង់គ្លេស Extension នេះអាចបកប្រែ និងបញ្ចូលវាជាភាសាខ្មែរភ្លាមៗ៖
           </p>
           <ol>
-            <li>បើកគេហទំព័រខ្សែភាពយន្ត (ឧទាហរណ៍ Anistream) រួចចាក់វីដេអូ។</li>
-            <li>
-              បើកផ្ទាំង Extension popup។ ប្រសិនបើរកឃើញ Subtitle ភាសាអង់គ្លេស
-              វានឹងបង្ហាញប្រអប់ពណ៌បៃតង
-              <strong>"បានរកឃើញ Subtitle ភាសាអង់គ្លេស!"</strong>។
-            </li>
-            <li>
-              ចុចប៊ូតុង <strong>"បកប្រែ & បញ្ចូលដោយស្វ័យប្រវត្ត"</strong>។
-              Extension នឹងបកប្រែ Subtitle ហើយបញ្ចូលទៅក្នុង Player វីដេអូភ្លាមៗ។
-            </li>
+            <li>បើកគេហទំព័រវីដេអូ (ឧទាហរណ៍ <strong>Anistream</strong>, <strong>Khanime</strong>, ឬ <strong>KHFullHD</strong>) រួចចាក់វីដេអូ។</li>
+            <li>បើកផ្ទាំង Extension popup។ ប្រសិនបើរកឃើញ Subtitle ភាសាអង់គ្លេស វានឹងបង្ហាញប្រអប់ពណ៌បៃតង <strong>"បានរកឃើញ Subtitle ភាសាអង់គ្លេស!"</strong>។</li>
+            <li>ចុចប៊ូតុង <strong>"បកប្រែ & បញ្ចូលដោយស្វ័យប្រវត្ត"</strong>។ AI នឹងបកប្រែភ្លាមៗ រួចបង្ហាញនៅលើវីដេអូរបស់អ្នក។</li>
           </ol>
         </div>
 
         <div class="card">
-          <h3>បញ្ចូល Subtitle ដោយខ្លួនឯង (Manual Subtitle Injection)</h3>
+          <h3>បកប្រែ និងបញ្ចូល file Subtitle ផ្ទាល់ខ្លួន</h3>
           <p>
-            អ្នកក៏អាចបកប្រែនិងបញ្ចូល file Subtitle ផ្ទាល់ខ្លួនរបស់អ្នកបានដែរ៖
+            អ្នកក៏អាចបកប្រែ និងចាក់ file Subtitle ពីកុំព្យូទ័ររបស់អ្នកបានដែរ៖
           </p>
           <ol>
-            <li>
-              អូសនិងទម្លាក់ file Subtitle (<code>.srt</code>, <code>.vtt</code>,
-              <code>.ass</code>, ឬ <code>.lrc</code>) ចូលក្នុងប្រអប់បង្ហោះ។
-            </li>
-            <li>
-              ជ្រើសរើស <strong>ភាសាដើម</strong> និង
-              <strong>ភាសាបកប្រែ</strong> (ឧទាហរណ៍៖ ខ្មែរ)។
-            </li>
-            <li>
-              ចុច <strong>"បកប្រែ & បញ្ចូល"</strong> ដើម្បីបកប្រែ Subtitle
-              តាមរយៈ Gemini AI រួចបញ្ចូលទៅក្នុង Player។
-            </li>
-            <li>
-              ឬ ចុច <strong>"បញ្ចូលតែប៉ុណ្ណោះ"</strong> ដើម្បីបញ្ចូល Subtitle
-              ទៅក្នុង Player ភ្លាមៗដោយមិនបាច់បកប្រែ។
-            </li>
-            <li>
-              បន្ទាប់ពីបកប្រែរួចរាល់ អ្នកអាចចុច
-              <strong>"ទាញយក Subtitle បកប្រែរួច"</strong> ដើម្បីរក្សាទុក file
-              ចូលក្នុងកុំព្យូទ័រ។
-            </li>
+            <li>អូសនិងទម្លាក់ file Subtitle (<code>.srt</code>, <code>.vtt</code>, <code>.ass</code>, ឬ <code>.lrc</code>) ចូលក្នុងប្រអប់បង្ហោះក្នុង popup។</li>
+            <li>ជ្រើសរើស <strong>ភាសាដើម</strong> និង <strong>ភាសាបកប្រែ</strong> (ខ្មែរ)។</li>
+            <li>ចុច <strong>"បកប្រែ & បញ្ចូល"</strong> ដើម្បីដំណើរការបកប្រែ និងចាក់នៅលើវីដេអូភ្លាមៗ។</li>
+            <li>ឬ ចុច <strong>"បញ្ចូលតែប៉ុណ្ណោះ"</strong> ដើម្បីចាក់ Subtitle របស់អ្នកភ្លាមៗដោយមិនបាច់បកប្រែ។</li>
+            <li>បន្ទាប់ពីបកប្រែរួចរាល់ អ្នកអាចចុច <strong>"ទាញយក Subtitle បកប្រែរួច"</strong> ដើម្បីរក្សាទុក file ក្នុងម៉ាស៊ីន។</li>
           </ol>
         </div>
 
-        <h2>២. គេហទំព័រគាំទ្រការបញ្ចូល Subtitle</h2>
-        <p>
-          Extension នេះអាចស្វែងរក Player
-          វីដេអូដោយស្វ័យប្រវត្តនៅលើគេហទំព័រទាំងនេះ៖
-        </p>
-        <ul style="list-style-type: none; padding-left: 0;">
-          <li>
-            <strong
-              ><a
-                href="https://anistream.one"
-                target="_blank"
-                rel="noopener noreferrer"
-                style="color: var(--accent-color); text-decoration: underline"
-                >Anistream</a
-              ></strong
-            >
-          </li>
-          <li>
-            <strong
-              ><a
-                href="https://khanime.co"
-                target="_blank"
-                rel="noopener noreferrer"
-                style="color: var(--accent-color); text-decoration: underline"
-                >Khanime</a
-              ></strong
-            >
-          </li>
-          <li>
-            <strong
-              ><a
-                href="https://khfullhd.co"
-                target="_blank"
-                rel="noopener noreferrer"
-                style="color: var(--accent-color); text-decoration: underline"
-                >KHFullHD</a
-              ></strong
-            >
-          </li>
-        </ul>
+        <h2>២. របៀបបកប្រែរូបភាព Manga (រឿងគំនូរជីវចល)</h2>
+        <div class="card">
+          <h3>ការបកប្រែរូបភាពភ្លាមៗនៅលើទំព័រ</h3>
+          <p>
+            អានទំព័ររឿងគំនូរជីវចលបរទេសជាភាសាខ្មែរយ៉ាងស្អាត។ AI នឹងអានអក្សរដើម លុបវាចេញ រួចសរសេរអក្សរខ្មែរជំនួសវិញ៖
+          </p>
+          <ol>
+            <li>បើកទំព័ររឿង Manga នៅលើគេហទំព័រគាំទ្រ (ឧទាហរណ៍ <strong>MangaKatana</strong>)។</li>
+            <li>ចុចលើរូបតំណាង Extension។ អ្នកនឹងឃើញកាត <strong>"រកឃើញ Manga!"</strong> ដែលបង្ហាញចំណងជើង វគ្គ និងចំនួនទំព័រ។</li>
+            <li>ជ្រើសរើស <strong>របៀបបកប្រែ Manga</strong> នៅក្នុងការកំណត់ (settings) រួចចុច <strong>"បកប្រែ Manga ដោយស្វ័យប្រវត្ត"</strong>។</li>
+            <li>Extension នឹងដំណើរការទំព័រនីមួយៗ ដោយលុបអក្សរចាស់ចេញ និងសរសេរភាសាខ្មែរចូលក្នុងប្រអប់អក្សរដោយស្វ័យប្រវត្ត។</li>
+          </ol>
+        </div>
 
-        <h2>៣. ការពន្យល់អំពីការកំណត់ AI Settings</h2>
+        <div class="card">
+          <h3>របៀបបកប្រែរឿង Manga</h3>
+          <ul>
+            <li><strong>Normal Mode (បកប្រែជំនួសអក្សរចាស់):</strong> លុបអក្សរអង់គ្លេស/ជប៉ុនចាស់ចេញ រួចសរសេរអក្សរខ្មែរចូលក្នុងប្រអប់ជជែកយ៉ាងស្អាត។ (តម្រូវឱ្យបើកដំណើរការម៉ាស៊ីនបម្រើ Manga Server)។</li>
+            <li><strong>Fast Mode (បកប្រែរហ័ស):</strong> បង្ហាញអត្ថបទបកប្រែភ្លាមៗដោយមិនបាច់រង់ចាំលុបរូបភាព ផ្ដល់នូវការអានយ៉ាងលឿនទាន់ចិត្ត។</li>
+          </ul>
+        </div>
+
+        <h2>៣. គេហទំព័រដែលគាំទ្រ</h2>
+        <div class="card">
+          <p>Extension នេះគាំទ្រ និងដំណើរការដោយស្វ័យប្រវត្តនៅលើគេហទំព័រទាំងនេះ៖</p>
+          <ul>
+            <li><strong>វីដេអូ និង Anime:</strong> 
+              <a href="https://anistream.one" target="_blank" rel="noopener noreferrer">Anistream</a>, 
+              <a href="https://khanime.co" target="_blank" rel="noopener noreferrer">Khanime</a>, 
+              <a href="https://khfullhd.co" target="_blank" rel="noopener noreferrer">KHFullHD</a>
+            </li>
+            <li><strong>Manga និងគំនូរជីវចល:</strong> 
+              <a href="https://mangakatana.com/" target="_blank" rel="noopener noreferrer">MangaKatana</a>, 
+              <a href="https://comix.to/" target="_blank" rel="noopener noreferrer">Comix.to</a>, 
+              <a href="https://mangaplus.shueisha.co.jp/" target="_blank" rel="noopener noreferrer">MangaPlus</a>
+            </li>
+          </ul>
+        </div>
+
+        <h2>៤. ការពន្យល់អំពីការកំណត់ផ្សេងៗ</h2>
         <div class="card">
           <div class="setting-item">
             <div class="setting-name">
@@ -563,72 +477,43 @@
               <span class="tag-badge tag-required">តម្រូវឱ្យមាន</span>
             </div>
             <p class="setting-desc">
-              API Key ផ្ទាល់ខ្លួនរបស់អ្នកដែលបង្កើតពី Google AI Studio។
-              ការបកប្រែធ្វើឡើងនៅលើ browser របស់អ្នកផ្ទាល់ ធានាសុវត្ថិភាពទិន្នន័យ
-              100%។
+              កូដភ្ជាប់ផ្ទាល់ខ្លួនរបស់អ្នកពី Google AI Studio។ វាឥតគិតថ្លៃទាំងស្រុង មិនត្រូវការកាតធនាគារ ហើយធានាថាការបកប្រែដំណើរការដោយផ្ទាល់ និងសុវត្ថិភាពពីកម្មវិធីរុករករបស់អ្នកទៅកាន់ Google Gemini។
             </p>
           </div>
           <div class="setting-item">
             <div class="setting-name">
-              ជ្រើសរើស Model
-              <span class="tag-badge tag-optional">អាចកំណត់បាន</span>
+              ជ្រើសរើសម៉ូដែល AI
+              <span class="tag-badge tag-optional">ជម្រើស</span>
             </div>
             <p class="setting-desc">
-              ជ្រើសរើសម៉ូដែល Gemini សម្រាប់បកប្រែ។ ម៉ូដែល
-              <code>gemini-3.1-flash-lite</code> ត្រូវបានណែនាំ ព្រោះវាលឿនបំផុត
-              និងមានតម្លៃទាបបំផុ ត។
+              ជ្រើសរើសខួរក្បាល AI សម្រាប់បកប្រែ។ 推荐 <code>gemini-3.1-flash-lite</code> សម្រាប់ Subtitle (លឿន និងអស់កូតាតិច) និង <code>gemini-3.5-flash</code> សម្រាប់ Manga។
             </p>
           </div>
           <div class="setting-item">
             <div class="setting-name">
-              បកប្រែតាមបរិបទ (Context-Aware)
-              <span class="tag-badge tag-optional">បើក/បិទ</span>
+              Manga Server URL
+              <span class="tag-badge tag-required">តម្រូវឱ្យមានសម្រាប់ Normal Mode</span>
             </div>
             <p class="setting-desc">
-              នៅពេលបើក Extension ផ្ញើបន្ទាត់ Subtitle ជុំវិញទៅកាន់ AI។
-              វានឹងជួយឱ្យ AI បកប្រែអត្ថន័យស្របគ្នាល្អ យល់ពីសាច់រឿង
-              និងប្រើប្រាស់សព្វនាមត្រឹមត្រូវទៅតាមបរិបទ。
+              អាសយដ្ឋានម៉ាស៊ីនបម្រើលុបអក្សរពីរូបភាព (ឧទាហរណ៍ <code>https://khdownloader.xyz</code>)។ ម៉ាស៊ីនបម្រើនេះជួយលុបអក្សរចាស់ចេញពីទំព័រ Manga ដើម្បីឱ្យ Extension អាចសរសេរអក្សរខ្មែរចូលក្នុងប្រអប់ទំនេរបាន។
             </p>
           </div>
           <div class="setting-item">
             <div class="setting-name">
-              ចំនួនបកប្រែទន្ទឹមគ្នា (Concurrency)
-              <span class="tag-badge tag-optional">កំណត់តម្លៃ</span>
+              ការចងចាំលទ្ធផល (Smart Cache)
+              <span class="tag-badge tag-optional">ជម្រើស</span>
             </div>
             <p class="setting-desc">
-              ចំនួនសំណើដែលផ្ញើបកប្រែស្របគ្នា។ កាន់តែខ្ពស់បកប្រែកាន់តែលឿន
-              ប៉ុន្តែអាចប៉ះពាល់ដល់ដែនកំណត់ល្បឿន API (Error 429)។
+              រក្សាទុកការបកប្រែទាំងអស់នៅក្នុងកុំព្យូទ័ររបស់អ្នក。 ពេលអ្នកទស្សនាវីដេអូ ឬអានទំព័រ Manga ដដែលឡើងវិញ វានឹងទាញយកមកបង្ហាញភ្លាមៗដោយមិនបាច់បកប្រែម្តងទៀត និងមិនចំណាយកូតា API ឡើយ。
             </p>
           </div>
           <div class="setting-item">
             <div class="setting-name">
-              ពន្យារពេល (Delay)
-              <span class="tag-badge tag-optional">កំណត់តម្លៃ</span>
+              មាតិកាសម្រាប់មនុស្សពេញវ័យ (18+)
+              <span class="tag-badge tag-optional">ជម្រើស</span>
             </div>
             <p class="setting-desc">
-              រយៈពេលរង់ចាំរវាងសំណើនីមួយៗ。 ប្រសិនបើជួបបញ្ហាកំហុសបកប្រែ Rate
-              Limit (Error 429) សូមបង្កើនតម្លៃពន្យារពេលនេះ។
-            </p>
-          </div>
-          <div class="setting-item">
-            <div class="setting-name">
-              មាតិកា 18+ / ហិង្សា (Mature Content)
-              <span class="tag-badge tag-optional">បើក/បិទ</span>
-            </div>
-            <p class="setting-desc">
-              អនុញ្ញាតឱ្យ AI បកប្រែពាក្យអសុរស ភាសាតំបន់ ហិង្សា
-              និងការសន្ទនាបែបមនុស្សពេញវ័យចំន័យល្អ ដោយមិនបិទបាំងឬត្រងឡើយ。
-            </p>
-          </div>
-          <div class="setting-item">
-            <div class="setting-name">
-              ប្រើប្រាស់ការចងចាំ (Enable Cache)
-              <span class="tag-badge tag-optional">បើក/បិទ</span>
-            </div>
-            <p class="setting-desc">
-              រក្សាទុកបន្ទាត់បកប្រែក្នុង Cache (IndexedDB)។
-              ប្រសិនបើបកប្រែឯកសារដដែល ឬចាក់វីដេអូឡើងវិញ
-              វានឹងទាញយកទិន្នន័យភ្លាមៗដោយមិនចាំបាច់ផ្ញើសំណើទៅកាន់ API ឡើយ。
+              អនុញ្ញាតឱ្យ AI បកប្រែពាក្យស្លោក ពាក្យជេរ និងការសន្ទនាបែបមនុស្សពេញវ័យ/ហិង្សាបានចំន័យល្អ ដោយមិនមានការត្រង ឬបិទបាំងឡើយ。
             </p>
           </div>
         </div>
@@ -636,156 +521,117 @@
 
       <!-- CHINESE GUIDE -->
       <div id="guide-zh" class="guide-section">
-        <h2>1. 插件使用方法</h2>
+        <h2>1. 如何翻译视频字幕 (动漫)</h2>
         <div class="card">
-          <h3>自动翻译并注入</h3>
+          <h3>自动翻译与注入</h3>
           <p>
-            如果您正在观看含有英文字幕的视频流媒体，插件可以实时翻译并显示：
+            当您在观看带有英文或日文字幕的动漫视频时，本扩展可以立即将其翻译并以高精度的柬埔寨语（高棉语）覆写到播放器中：
           </p>
           <ol>
-            <li>打开播放网页（如 Anistream）并开始播放视频。</li>
-            <li>
-              打开插件弹出窗口。若成功检测到字幕，将显示绿色的
-              <strong>"检测到英文字幕！"</strong> 提示。
-            </li>
-            <li>
-              点击
-              <strong>"自动翻译并注入"</strong
-              >。翻译将启动，且译文字幕将实时注入并同步覆盖到视频播放器上。
-            </li>
+            <li>打开视频播放页面（例如 <strong>Anistream</strong>、<strong>Khanime</strong> 或 <strong>KHFullHD</strong>）并开始播放视频。</li>
+            <li>打开扩展程序弹窗。如果检测到播放器字幕，您将看到绿色的 <strong>"English Subtitles Detected!"（检测到英文旁白字幕）</strong> 提示。</li>
+            <li>点击 <strong>"Auto Translate & Inject"（自动翻译并注入）</strong>。AI 将执行翻译并自动在视频上展示高棉语字幕。</li>
           </ol>
         </div>
 
         <div class="card">
-          <h3>手动字幕注入</h3>
-          <p>您也可以上传并注入本地字幕文件：</p>
+          <h3>翻译并注入本地字幕文件</h3>
+          <p>
+            您也可以翻译并播放您电脑中的本地字幕文件：
+          </p>
           <ol>
-            <li>
-              将字幕文件（支持 <code>.srt</code>, <code>.vtt</code>,
-              <code>.ass</code>, <code>.lrc</code>）拖拽到上传框中。
-            </li>
-            <li>
-              选择 <strong>源语言</strong> 和
-              <strong>目标语言</strong>（如高棉语或中文）。
-            </li>
-            <li>
-              点击 <strong>"翻译并注入"</strong> 使用 Gemini AI
-              进行翻译并插入到播放器中。
-            </li>
-            <li>
-              或者点击
-              <strong>"仅注入"</strong> 直接在当前视频中加载此字幕（无需翻译）。
-            </li>
-            <li>
-              翻译成功后，您可以点击
-              <strong>"下载已翻译字幕"</strong> 以将文件保存到电脑。
-            </li>
+            <li>将字幕文件（<code>.srt</code>、<code>.vtt</code>、<code>.ass</code> 或 <code>.lrc</code>）拖拽到弹窗中的上传区域。</li>
+            <li>选择 <strong>源语言</strong> 与 <strong>目标语言</strong>（柬埔寨高棉语）。</li>
+            <li>点击 <strong>"Translate & Inject"</strong> 运行 AI 翻译并立即展示在播放器上。</li>
+            <li>或者，点击 <strong>"Inject Only"</strong> 仅在播放器上加载字幕而不进行翻译。</li>
+            <li>翻译完成后，您可以点击 <strong>"Save / Download"</strong> 将翻译好的字幕文件保存到您的电脑中。</li>
           </ol>
         </div>
 
-        <h2>2. 支持的流媒体网站</h2>
-        <p>插件内置专用的播放器探测器，支持自动检测并在以下网站注入字幕：</p>
-        <ul style="list-style-type: none; padding-left: 0;">
-          <li>
-            <strong
-              ><a
-                href="https://anistream.one"
-                target="_blank"
-                rel="noopener noreferrer"
-                style="color: var(--accent-color); text-decoration: underline"
-                >Anistream</a
-              ></strong
-            >
-          </li>
-          <li>
-            <strong
-              ><a
-                href="https://khanime.co"
-                target="_blank"
-                rel="noopener noreferrer"
-                style="color: var(--accent-color); text-decoration: underline"
-                >Khanime</a
-              ></strong
-            >
-          </li>
-          <li>
-            <strong
-              ><a
-                href="https://khfullhd.co"
-                target="_blank"
-                rel="noopener noreferrer"
-                style="color: var(--accent-color); text-decoration: underline"
-                >KHFullHD</a
-              ></strong
-            >
-          </li>
-        </ul>
+        <h2>2. 如何翻译漫画图片</h2>
+        <div class="card">
+          <h3>网页漫画即时翻译</h3>
+          <p>
+            直接在网页中阅读高棉语漫画。AI 会智能识别漫画对白、清除原文字符并填入精美的高棉语翻译：
+          </p>
+          <ol>
+            <li>在受支持的漫画网站（例如 <strong>MangaKatana</strong>）打开漫画章节。</li>
+            <li>点击扩展图标，您将看到 <strong>"Manga Detected!"（检测到漫画）</strong> 卡片，展示漫画标题、章节和总页数。</li>
+            <li>在设置选项卡中选择您喜欢的 <strong>漫画翻译模式</strong>，然后点击 <strong>"Auto Translate Manga"（自动翻译漫画）</strong>。</li>
+            <li>扩展将自动处理每一页，擦除原有英文/日文对话框并在原处绘制高棉语翻译。</li>
+          </ol>
+        </div>
 
-        <h2>3. AI 设置说明</h2>
+        <div class="card">
+          <h3>漫画翻译模式</h3>
+          <ul>
+            <li><strong>标准模式 (Normal Mode):</strong> 擦除原英文/日文对话，并在气泡框内精准绘制高棉语翻译文本（需要配置并启用后端 Manga Server）。</li>
+            <li><strong>快速模式 (Fast Mode):</strong> 直接加载并展示翻译，无需等待图像擦除处理，提供极速的阅读体验。</li>
+          </ul>
+        </div>
+
+        <h2>3. 支持的网站平台</h2>
+        <div class="card">
+          <p>本扩展可自动在以下平台中无缝对接和运行：</p>
+          <ul>
+            <li><strong>动漫与视频流媒体:</strong> 
+              <a href="https://anistream.one" target="_blank" rel="noopener noreferrer">Anistream</a>, 
+              <a href="https://khanime.co" target="_blank" rel="noopener noreferrer">Khanime</a>, 
+              <a href="https://khfullhd.co" target="_blank" rel="noopener noreferrer">KHFullHD</a>
+            </li>
+            <li><strong>漫画与连环画:</strong> 
+              <a href="https://mangakatana.com/" target="_blank" rel="noopener noreferrer">MangaKatana</a>, 
+              <a href="https://comix.to/" target="_blank" rel="noopener noreferrer">Comix.to</a>, 
+              <a href="https://mangaplus.shueisha.co.jp/" target="_blank" rel="noopener noreferrer">MangaPlus</a>
+            </li>
+          </ul>
+        </div>
+
+        <h2>4. 核心设置与配置说明</h2>
         <div class="card">
           <div class="setting-item">
             <div class="setting-name">
-              Gemini API Key <span class="tag-badge tag-required">必填项</span>
+              Gemini API Key
+              <span class="tag-badge tag-required">必填 (AI翻译)</span>
             </div>
             <p class="setting-desc">
-              您的个人 Google AI Studio API
-              密钥。翻译工作完全在您本地浏览器发起并直达 Google，安全无风险。
+              您从 Google AI Studio 获取的个人连接密钥。完全免费，无需绑定信用卡，保障您的翻译请求在您的本地浏览器与 Google Gemini 之间直接且安全地传输。
             </p>
           </div>
           <div class="setting-item">
             <div class="setting-name">
-              选择模型 <span class="tag-badge tag-optional">可配置</span>
+              选择模型
+              <span class="tag-badge tag-optional">可选</span>
             </div>
             <p class="setting-desc">
-              选择要调用的 Gemini 模型。推荐使用
-              <code>gemini-3.5-flash</code>，翻译速度极快，性价比极高。
+              选择翻译使用的 AI 脑。推荐在翻译视频字幕时使用 <code>gemini-3.1-flash-lite</code>（速度极快且消耗配额极低），翻译漫画时使用 <code>gemini-3.5-flash</code>。
             </p>
           </div>
           <div class="setting-item">
             <div class="setting-name">
-              上下文关联翻译 <span class="tag-badge tag-optional">开关</span>
+              Manga Server URL
+              <span class="tag-badge tag-required">标准漫画翻译模式必填</span>
             </div>
             <p class="setting-desc">
-              启用后，翻译时会一并发送当前行前后的字幕作为上下文参考，使代词人称更准确，对白更流畅连贯。
+              图像文本擦除服务器 (例如 <code>https://khdownloader.xyz</code>)。该服务器用于擦除漫画图层上的原有英日文字符，以便扩展可以在空白对话框中绘制高棉语。
             </p>
           </div>
           <div class="setting-item">
             <div class="setting-name">
-              并发数 (Concurrency)
-              <span class="tag-badge tag-optional">开关</span>
+              智能本地缓存 (Smart Cache)
+              <span class="tag-badge tag-optional">可选</span>
             </div>
             <p class="setting-desc">
-              设定并行发送的请求数量。并发越高速度越快，但更容易触发 API 429
-              报错限制。
+              将所有已翻译的文本保存在浏览器本地。当您重新观看视频或重读相同漫画章节时，直接从本地极速加载，不消耗任何 API 配额与服务器资源。
             </p>
           </div>
           <div class="setting-item">
             <div class="setting-name">
-              延迟时间 (Delay) <span class="tag-badge tag-optional">开关</span>
+              成人与暴力内容 (18+)
+              <span class="tag-badge tag-optional">可选</span>
             </div>
             <p class="setting-desc">
-              两次 API
-              请求之间的间隔时间（毫秒）。如果您的翻译频繁因频率限制报错，请调大此值以缓和请求频率。
-            </p>
-          </div>
-          <div class="setting-item">
-            <div class="setting-name">
-              18+ / 成人及暴力内容
-              <span class="tag-badge tag-optional">开关</span>
-            </div>
-            <p class="setting-desc">
-              允许 LLM
-              准确地翻译脏话、俚语以及暴力成人对话，不进行任何人工过滤或自我审查。
-            </p>
-          </div>
-          <div class="setting-item">
-            <div class="setting-name">
-              启用本地缓存 <span class="tag-badge tag-optional">开关</span>
-            </div>
-            <p class="setting-desc">
-              开启缓存（使用
-              IndexedDB）后，翻译结果会保存在您本地。如果再次翻译相同文件或重播视频，将秒速加载结果，且完全不再消耗任何
-              API 额度。
+              允许 AI 柬埔寨语翻译准确转换俚语、粗口和成人/暴力对白，不做任何人工屏蔽或安全过滤。
             </p>
           </div>
         </div>
