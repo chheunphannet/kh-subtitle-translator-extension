@@ -230,7 +230,8 @@ const App = () => {
   useEffect(() => {
     // Only save after initial load completes to avoid overwriting stored config with defaults
     if (!configLoaded.current) return;
-    chrome.storage.local.set({ userConfig: config, exportMode, bilingualOrder, formatPref, targetLang, sourceLang, mangaServerUrl });
+    const trimmedUrl = (mangaServerUrl || '').trim();
+    chrome.storage.local.set({ userConfig: config, exportMode, bilingualOrder, formatPref, targetLang, sourceLang, mangaServerUrl: trimmedUrl });
   }, [config, exportMode, bilingualOrder, formatPref, targetLang, sourceLang, mangaServerUrl]);
 
   const checkActivePagePlayer = () => {
@@ -426,7 +427,9 @@ const App = () => {
     setProgress(0);
     setProgressStatus(loc.mangaTranslatingStatus);
 
-    chrome.storage.local.set({ userConfig: config, mangaServerUrl }).then(() => {
+    const trimmedUrl = (mangaServerUrl || '').trim();
+
+    chrome.storage.local.set({ userConfig: config, mangaServerUrl: trimmedUrl }).then(() => {
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         const activeTab = tabs[0];
         if (!activeTab?.id) return;
@@ -434,7 +437,7 @@ const App = () => {
         chrome.tabs.sendMessage(activeTab.id, {
           action: "translateManga",
           config,
-          mangaServerUrl,
+          mangaServerUrl: trimmedUrl,
           targetLanguage: targetLang,
         }, (res) => {
           if (chrome.runtime.lastError || !res?.success) {
@@ -498,13 +501,14 @@ const App = () => {
   };
 
   const handleTestServer = async () => {
-    if (!mangaServerUrl) {
+    const trimmedUrl = (mangaServerUrl || '').trim();
+    if (!trimmedUrl) {
       message.error("Please enter your Server URL first.");
       return;
     }
     setTestingServer(true);
     try {
-      const res = await fetch(`${mangaServerUrl}/health`);
+      const res = await fetch(`${trimmedUrl}/health`);
       if (res.ok) {
         message.success(loc.statusTestSuccess);
       } else {
@@ -803,7 +807,7 @@ const App = () => {
                         <InfoCircleOutlined style={{ color: 'rgba(255,255,255,0.45)', cursor: 'help', fontSize: 12 }} />
                       </Tooltip>
                     </Text>
-                    <Input value={mangaServerUrl} onChange={e => setMangaServerUrl(e.target.value)} style={{ width: '100%' }} />
+                    <Input value={mangaServerUrl} onChange={e => setMangaServerUrl(e.target.value)} onBlur={() => setMangaServerUrl(mangaServerUrl.trim())} style={{ width: '100%' }} />
                   </div>
                   <div style={{ flex: '0 0 110px' }}>
                     <Button onClick={handleTestServer} loading={testingServer} icon={<ApiOutlined />} block>
@@ -927,7 +931,7 @@ const App = () => {
               <Text type="secondary" style={{ fontSize: 9, opacity: 0.3 }}>|</Text>
               <a href="https://khanime.co" target="_blank" rel="noopener noreferrer" style={{ color: '#E54D2E' }}>Khanime</a>
               <Text type="secondary" style={{ fontSize: 9, opacity: 0.3 }}>|</Text>
-              <a href="https://khfullhd.com" target="_blank" rel="noopener noreferrer" style={{ color: '#E54D2E' }}>KHFullHD</a>
+              <a href="https://khfullhd.co" target="_blank" rel="noopener noreferrer" style={{ color: '#E54D2E' }}>KHFullHD</a>
             </Space>
             <Space size="small" style={{ fontSize: 10 }}>
               <a href="https://mangakatana.com/" target="_blank" rel="noopener noreferrer" style={{ color: '#E54D2E' }}>MangaKatana</a>
@@ -942,6 +946,9 @@ const App = () => {
             <span onClick={() => chrome.tabs.create({ url: 'guide.html' })} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
               <QuestionCircleOutlined style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)' }} />
             </span>
+            <a href="https://khdownloader.xyz" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center' }}>
+              <GlobalOutlined style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)' }} />
+            </a>
             <a href="https://github.com/chheunphannet/kh-subtitle-translator" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center' }}>
               <GithubOutlined style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)' }} />
             </a>
