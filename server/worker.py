@@ -16,6 +16,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 WORKER_COUNT = int(os.getenv("WORKER_COUNT", "2"))
+PRODUCTION = os.getenv("PRODUCTION", "false").lower() == "true"
 executor = None
 reader = None
 busy_workers = 0
@@ -130,7 +131,7 @@ def _process_image_sync(job_data):
         
     h, w = img.shape[:2]
     result_img = img.copy()
-    boxes_img = img.copy()
+    boxes_img = None if PRODUCTION else img.copy()
     
     ocr_results = reader.readtext(img, paragraph=False)
     
@@ -155,7 +156,8 @@ def _process_image_sync(job_data):
             continue
             
         g_box = (left, top_px, right, bottom)
-        cv2.rectangle(boxes_img, (left, top_px), (right, bottom), (255, 0, 0), 2)
+        if not PRODUCTION:
+            cv2.rectangle(boxes_img, (left, top_px), (right, bottom), (255, 0, 0), 2)
         
         g_area = box_width * box_height
         
@@ -175,7 +177,8 @@ def _process_image_sync(job_data):
                 if ocr_area > g_area * 4:
                     continue
                 lines_to_erase.append(ocr_box)
-                cv2.rectangle(boxes_img, (int(ocr_box[0]), int(ocr_box[1])), (int(ocr_box[2]), int(ocr_box[3])), (0, 0, 255), 2)
+                if not PRODUCTION:
+                    cv2.rectangle(boxes_img, (int(ocr_box[0]), int(ocr_box[1])), (int(ocr_box[2]), int(ocr_box[3])), (0, 0, 255), 2)
                 
         if lines_to_erase:
             for l_box in lines_to_erase:
@@ -229,18 +232,23 @@ def _process_image_sync(job_data):
 
     final_cv = cv2.cvtColor(np.array(clean_pil.convert("RGB")), cv2.COLOR_RGB2BGR)
 
-    success, encoded_img = cv2.imencode('.jpg', result_img)
-    success2, encoded_boxes_img = cv2.imencode('.jpg', boxes_img)
     success3, encoded_final_img = cv2.imencode('.jpg', final_cv)
-
-    if not success or not success2 or not success3:
+    if not success3:
         raise ValueError("Encode failed")
         
-    return {
-        "erased_image": base64.b64encode(encoded_img.tobytes()).decode('utf-8'),
-        "boxes_image": base64.b64encode(encoded_boxes_img.tobytes()).decode('utf-8'),
+    result = {
         "final_image": base64.b64encode(encoded_final_img.tobytes()).decode('utf-8')
     }
+    
+    if not PRODUCTION:
+        success, encoded_img = cv2.imencode('.jpg', result_img)
+        success2, encoded_boxes_img = cv2.imencode('.jpg', boxes_img)
+        if not success or not success2:
+            raise ValueError("Encode failed")
+        result["erased_image"] = base64.b64encode(encoded_img.tobytes()).decode('utf-8')
+        result["boxes_image"] = base64.b64encode(encoded_boxes_img.tobytes()).decode('utf-8')
+
+    return result
 
 async def process_image_task(job_data, future):
     global busy_workers

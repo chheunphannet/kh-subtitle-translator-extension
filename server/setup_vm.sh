@@ -90,6 +90,7 @@ Restart=always
 Environment=WORKER_COUNT=2
 Environment=REDIS_URL=redis://localhost:6379
 Environment=HOME=$USER_HOME
+Environment=PRODUCTION=true
 
 [Install]
 WantedBy=multi-user.target
