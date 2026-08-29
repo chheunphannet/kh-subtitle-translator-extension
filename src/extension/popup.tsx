@@ -162,7 +162,9 @@ const App = () => {
         }
       }).catch(() => {});
     });
+  }, []); // Run ONLY once on mount to avoid infinite loop when changing formatPref
 
+  useEffect(() => {
     checkActivePagePlayer();
 
     // Poll for the player/manga status while popup is open
@@ -186,12 +188,17 @@ const App = () => {
             setDetectedManga(null);
           } else if (msg.info.hasManga) {
             hasPlayerRef.current = true;
-            setDetectedManga({
-              hasManga: true,
-              mangaTitle: msg.info.mangaTitle,
-              mangaChapter: msg.info.mangaChapter,
-              mangaImagesCount: msg.info.mangaImagesCount,
-              mangaPagesRange: msg.info.mangaPagesRange
+            setDetectedManga((prev: any) => {
+              if (prev && prev.hasManga && prev.mangaTitle === msg.info.mangaTitle && prev.mangaChapter === msg.info.mangaChapter && prev.mangaImagesCount === msg.info.mangaImagesCount && prev.mangaPagesRange === msg.info.mangaPagesRange) {
+                return prev;
+              }
+              return {
+                hasManga: true,
+                mangaTitle: msg.info.mangaTitle,
+                mangaChapter: msg.info.mangaChapter,
+                mangaImagesCount: msg.info.mangaImagesCount,
+                mangaPagesRange: msg.info.mangaPagesRange
+              };
             });
             setDetectedSubUrl(null);
             if (!translating && activeTranslationType !== 'manga') {
@@ -288,12 +295,17 @@ const App = () => {
             setDetectedManga(null);
           } else if (response.hasManga) {
             hasPlayerRef.current = true;
-            setDetectedManga({
-              hasManga: true,
-              mangaTitle: response.mangaTitle,
-              mangaChapter: response.mangaChapter,
-              mangaImagesCount: response.mangaImagesCount,
-              mangaPagesRange: response.mangaPagesRange
+            setDetectedManga((prev: any) => {
+              if (prev && prev.hasManga && prev.mangaTitle === response.mangaTitle && prev.mangaChapter === response.mangaChapter && prev.mangaImagesCount === response.mangaImagesCount && prev.mangaPagesRange === response.mangaPagesRange) {
+                return prev;
+              }
+              return {
+                hasManga: true,
+                mangaTitle: response.mangaTitle,
+                mangaChapter: response.mangaChapter,
+                mangaImagesCount: response.mangaImagesCount,
+                mangaPagesRange: response.mangaPagesRange
+              };
             });
             setDetectedSubUrl(null);
             if (!translating && activeTranslationType !== 'manga') {
