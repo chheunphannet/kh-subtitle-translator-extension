@@ -26,10 +26,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // Sync language with storage on load if available in extension environment
   if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
     chrome.storage.local.get(["uiLanguage"]).then((result) => {
-      const lang = result.uiLanguage || 'km';
+      const lang = result.uiLanguage || 'en';
       switchLang(lang, false);
     }).catch(() => {
-      switchLang('km', false);
+      switchLang('en', false);
     });
 
     // Listen for storage changes to sync language dynamically when changed in popup
@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
   } else {
-    // Normal web page environment fallback
-    switchLang('km', false);
+    // Normal web page environment fallback: default to English
+    switchLang('en', false);
   }
 });
