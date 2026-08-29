@@ -230,11 +230,11 @@ if (matchedSite) {
 
       const visibleIndex = getFirstVisibleImageIndex(imgElements);
 
-      // Collect image URLs starting from the visible image and store DOM mapping
+      // Collect image URLs for ALL images and store DOM mapping to keep indices aligned
       const imageUrls: string[] = [];
       mangaImageElementMap.clear();
       activeMangaUrls = []; // Clear old URLs
-      for (let i = visibleIndex; i < imgElements.length; i++) {
+      for (let i = 0; i < imgElements.length; i++) {
         const imgEl = imgElements[i] as HTMLImageElement;
         // Prioritize lazy-load source URLs over active src (which could be a placeholder)
         let url = imgEl.getAttribute("data-src") || 
@@ -251,14 +251,12 @@ if (matchedSite) {
           }
         }
         
-        if (url) {
-          mangaImageElementMap.set(i, imgEl);
-          imageUrls.push(url);
-          activeMangaUrls[i] = url; // Store by original index
-        }
+        mangaImageElementMap.set(i, imgEl);
+        imageUrls.push(url);
+        activeMangaUrls[i] = url; // Store by original index
       }
 
-      if (imageUrls.length === 0) {
+      if (imageUrls.filter(Boolean).length === 0) {
         sendResponse({ success: false, error: "No valid image URLs found." });
         return true;
       }
