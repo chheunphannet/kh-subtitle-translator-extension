@@ -4,8 +4,10 @@ import asyncio
 import logging
 from contextlib import asynccontextmanager
 
+from pathlib import Path
 from fastapi import FastAPI, UploadFile, File, HTTPException, status, Request, Form
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 import redis.asyncio as redis
 
@@ -77,6 +79,35 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Static assets paths
+BASE_DIR = Path(__file__).resolve().parent
+STATIC_DIR = BASE_DIR / "static"
+EXT_DIR = BASE_DIR.parent / "src" / "extension"
+
+# Mount static fonts & icons if directories exist
+fonts_dir = STATIC_DIR / "fonts" if (STATIC_DIR / "fonts").exists() else (EXT_DIR / "fonts" if (EXT_DIR / "fonts").exists() else None)
+if fonts_dir and fonts_dir.exists():
+    app.mount("/fonts", StaticFiles(directory=str(fonts_dir)), name="fonts")
+
+icons_dir = STATIC_DIR / "icons" if (STATIC_DIR / "icons").exists() else (BASE_DIR.parent / "jw-subtitle-tester" / "icons" if (BASE_DIR.parent / "jw-subtitle-tester" / "icons").exists() else None)
+if icons_dir and icons_dir.exists():
+    app.mount("/icons", StaticFiles(directory=str(icons_dir)), name="icons")
+
+@app.get("/", response_class=HTMLResponse)
+@app.get("/guide.html", response_class=HTMLResponse)
+async def serve_guide():
+    for candidate in [STATIC_DIR / "guide.html", EXT_DIR / "guide.html", BASE_DIR / "guide.html"]:
+        if candidate.exists():
+            return FileResponse(candidate)
+    return HTMLResponse("<h1>khtranslator Guide</h1><p>Guide file not found.</p>", status_code=404)
+
+@app.get("/guide.js")
+async def serve_guide_js():
+    for candidate in [STATIC_DIR / "guide.js", EXT_DIR / "guide.js", BASE_DIR / "guide.js"]:
+        if candidate.exists():
+            return FileResponse(candidate, media_type="application/javascript")
+    raise HTTPException(status_code=404, detail="File not found")
 
 @app.get("/health")
 async def health_check():

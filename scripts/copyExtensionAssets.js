@@ -108,3 +108,27 @@ fs.readdirSync(chromeDestDir).forEach(element => {
   }
 });
 console.log('Firefox build sync completed.');
+
+// 5. Copy guide and static assets to server/static/ for website hosting
+const serverStaticDir = path.join(__dirname, '../server/static');
+if (!fs.existsSync(serverStaticDir)) {
+  fs.mkdirSync(serverStaticDir, { recursive: true });
+}
+
+['guide.html', 'guide.js'].forEach(file => {
+  const src = path.join(srcDir, file);
+  const dst = path.join(serverStaticDir, file);
+  if (fs.existsSync(src)) {
+    fs.copyFileSync(src, dst);
+  }
+});
+
+if (fs.existsSync(fontsSrc)) {
+  copyFolderSync(fontsSrc, path.join(serverStaticDir, 'fonts'));
+}
+
+const iconsSrc = path.join(chromeDestDir, 'icons');
+if (fs.existsSync(iconsSrc)) {
+  copyFolderSync(iconsSrc, path.join(serverStaticDir, 'icons'));
+}
+console.log('Server static assets synced to server/static/.');

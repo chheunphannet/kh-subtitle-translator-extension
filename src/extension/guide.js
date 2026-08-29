@@ -8,8 +8,8 @@ function switchLang(lang, writeToStorage = true) {
   if (clickedBtn && targetSection) {
     clickedBtn.classList.add('active');
     targetSection.classList.add('active');
-    if (writeToStorage) {
-      chrome.storage.local.set({ uiLanguage: lang });
+    if (writeToStorage && typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+      chrome.storage.local.set({ uiLanguage: lang }).catch(() => {});
     }
   }
 }
@@ -23,21 +23,28 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Sync language with storage on load
-  chrome.storage.local.get(["uiLanguage"]).then((result) => {
-    const lang = result.uiLanguage || 'km';
-    switchLang(lang, false);
-  }).catch(() => {
-    switchLang('km', false);
-  });
+  // Sync language with storage on load if available in extension environment
+  if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+    chrome.storage.local.get(["uiLanguage"]).then((result) => {
+      const lang = result.uiLanguage || 'km';
+      switchLang(lang, false);
+    }).catch(() => {
+      switchLang('km', false);
+    });
 
-  // Listen for storage changes to sync language dynamically when changed in popup
-  chrome.storage.onChanged.addListener((changes, namespace) => {
-    if (namespace === 'local' && changes.uiLanguage) {
-      const newLang = changes.uiLanguage.newValue;
-      if (newLang) {
-        switchLang(newLang, false);
-      }
+    // Listen for storage changes to sync language dynamically when changed in popup
+    if (chrome.storage.onChanged) {
+      chrome.storage.onChanged.addListener((changes, namespace) => {
+        if (namespace === 'local' && changes.uiLanguage) {
+          const newLang = changes.uiLanguage.newValue;
+          if (newLang) {
+            switchLang(newLang, false);
+          }
+        }
+      });
     }
-  });
+  } else {
+    // Normal web page environment fallback
+    switchLang('km', false);
+  }
 });
