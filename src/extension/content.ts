@@ -934,9 +934,12 @@ async function runAutoTranslateFlow(
     throw new Error("Failed to parse cues from downloaded subtitle file.");
   }
 
-  // 3. Get configurations from extension local storage
-  const storage = await chrome.storage.local.get(["userConfig"]);
+  // 3. Get configurations and user preferences from extension local storage
+  const storage = await chrome.storage.local.get(["userConfig", "exportMode", "bilingualOrder", "formatPref"]);
   const config = getGeminiConfig(storage.userConfig);
+  const userExportMode = storage.exportMode || 'translatedOnly';
+  const userBilingualOrder = storage.bilingualOrder || 'translationFirst';
+  const userFormatPref = storage.formatPref || exportFormat || 'vtt';
 
   // 4. Translate cues in background (so IndexedDB and API requests work seamlessly)
   const transRes = await chrome.runtime.sendMessage({
@@ -944,7 +947,11 @@ async function runAutoTranslateFlow(
     cues,
     targetLanguage,
     sourceLanguage,
-    config
+    config,
+    fileName: scan.videoTitle,
+    exportMode: userExportMode,
+    bilingualOrder: userBilingualOrder,
+    formatPref: userFormatPref
   });
 
   if (!transRes.success) {

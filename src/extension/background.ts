@@ -256,6 +256,24 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return false;
   }
 
+  if (message.action === "clearTranslationState") {
+    activeTranslationState = {
+      translating: false,
+      percent: 0,
+      status: "",
+      translatedTexts: null,
+      error: null,
+      cues: null,
+      fileName: null,
+      targetLang: null,
+      exportMode: null,
+      bilingualOrder: null,
+      formatPref: null
+    };
+    sendResponse({ success: true });
+    return false;
+  }
+
   if (message.action === "cancelTranslation") {
     if (activeAbortController) {
       activeAbortController.abort();
