@@ -72,16 +72,18 @@ const App = () => {
       };
     });
 
-    // Rebuild export
-    const ext = status.fileName?.split('.').pop()?.toLowerCase() || 'srt';
-    const exportData = generateSubtitleExport(translatedCues, status.formatPref || 'vtt');
+    // Rebuild export using the stored formatPref (or current popup formatPref as fallback)
+    const exportData = generateSubtitleExport(translatedCues, status.formatPref || formatPref || 'vtt');
 
     const baseName = status.fileName ? status.fileName.substring(0, status.fileName.lastIndexOf('.')) : 'subtitles';
     setTranslatedFileName(`${baseName}_${status.targetLang}.${exportData.ext}`);
     setTranslatedContent(exportData.text);
     setProgress(100);
     setProgressStatus(loc.statusInjected);
-  }, [loc.statusInjected]);
+
+    // Clear background state so it won't be restored again on next popup open
+    chrome.runtime.sendMessage({ action: "clearTranslationState" }).catch(() => {});
+  }, [loc.statusInjected, formatPref]);
 
   const handleCancel = () => {
     const action = activeTranslationType === 'manga' ? "cancelMangaTranslation" : "cancelTranslation";
@@ -202,20 +204,23 @@ const App = () => {
         }
       }
       if (msg.action === "translationProgress") {
-        setActiveTranslationType('subtitle');
-        setTranslating(true);
-        setProgress(msg.percent);
-        if (msg.percent === 100) {
-          setProgressStatus(loc.statusInjected);
-          chrome.runtime.sendMessage({ action: "getTranslationStatus" }).then((status: any) => {
-            if (status && status.status === "Completed") {
-              restoreCompletedTranslation(status);
+        // Only update progress if we are currently doing a subtitle translation
+        // (ignore stale 100% broadcasts from a previous completed translation)
+        if (activeTranslationType === 'subtitle' || (!activeTranslationType && msg.percent < 100)) {
+          setActiveTranslationType('subtitle');
+          setTranslating(true);
+          setProgress(msg.percent);
+          if (msg.percent === 100) {
+            setProgressStatus(loc.statusInjected);
+            // The handleAutoTranslate/handleManualInject callbacks handle the final state,
+            // so just mark as done here.
+            setTimeout(() => {
               setTranslating(false);
               setActiveTranslationType(null);
-            }
-          }).catch(() => {});
-        } else {
-          setProgressStatus(loc.statusTranslating);
+            }, 500);
+          } else {
+            setProgressStatus(loc.statusTranslating);
+          }
         }
       }
       if (msg.action === "mangaTranslationProgress") {
@@ -366,10 +371,14 @@ const App = () => {
           // Inject as VTT
           const vttText = buildVtt(translatedCues);
           injectIntoPlayer(vttText, `${baseName}_${targetLang}.vtt`);
+
+          // Clear background state so it won't flash 100% on next popup open
+          chrome.runtime.sendMessage({ action: "clearTranslationState" }).catch(() => {});
         } else {
           showError(res?.error || "Unknown");
         }
         setTranslating(false);
+        setActiveTranslationType(null);
       });
     } catch (err: any) {
       message.error(err.message);
@@ -446,10 +455,13 @@ const App = () => {
             setTranslatedContent(res.text);
             setTranslatedFileName(res.fileName);
             message.success(loc.statusInjected);
+            // Clear background state so it won't flash 100% on next popup open
+            chrome.runtime.sendMessage({ action: "clearTranslationState" }).catch(() => {});
           } else {
             showError(res?.error || "Unknown error");
           }
           setTranslating(false);
+          setActiveTranslationType(null);
         });
       });
     });
