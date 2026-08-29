@@ -1,0 +1,645 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KHTranslator - User Guide</title>
+    <style>
+      @font-face {
+        font-family: "Kantumruy Pro";
+        font-style: normal;
+        font-weight: 100 700;
+        font-display: swap;
+        src: url("fonts/kantumruypro-khmer.woff2") format("woff2");
+        unicode-range: U+1780-17FF, U+19E0-19FF, U+200C-200D, U+25CC;
+      }
+      @font-face {
+        font-family: "Kantumruy Pro";
+        font-style: normal;
+        font-weight: 100 700;
+        font-display: swap;
+        src: url("fonts/kantumruypro-latin.woff2") format("woff2");
+        unicode-range:
+          U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+          U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+          U+2212, U+2215, U+FEFF, U+FFFD;
+      }
+
+      :root {
+        --bg-color: #0e0f12;
+        --card-bg: #16181d;
+        --accent-color: #e54d2e;
+        --accent-hover: #f7684a;
+        --text-main: #f2eee6;
+        --text-muted: rgba(242, 238, 230, 0.65);
+        --border-color: rgba(245, 240, 230, 0.1);
+      }
+
+      body {
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        font-family:
+          "Kantumruy Pro",
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      header {
+        width: 100%;
+        max-width: 800px;
+        padding: 32px 24px 16px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border-color);
+        box-sizing: border-box;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .brand img {
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+      }
+
+      .brand h1 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--text-main);
+      }
+
+      .lang-switcher {
+        display: flex;
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 4px;
+        gap: 4px;
+      }
+
+      .lang-btn {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        padding: 6px 12px;
+        font-size: 13px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-family: inherit;
+        transition: all 0.2s ease;
+      }
+
+      .lang-btn.active {
+        background-color: var(--accent-color);
+        color: #fff;
+        font-weight: 600;
+      }
+
+      .lang-btn:hover:not(.active) {
+        color: var(--text-main);
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+
+      main {
+        width: 100%;
+        max-width: 800px;
+        padding: 24px;
+        box-sizing: border-box;
+        flex: 1;
+      }
+
+      .guide-section {
+        display: none;
+      }
+
+      .guide-section.active {
+        display: block;
+        animation: fadeIn 0.3s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      h2 {
+        color: var(--accent-color);
+        font-size: 20px;
+        margin-top: 32px;
+        margin-bottom: 16px;
+        border-left: 3px solid var(--accent-color);
+        padding-left: 10px;
+      }
+
+      h2:first-of-type {
+        margin-top: 8px;
+      }
+
+      p {
+        line-height: 1.6;
+        color: var(--text-muted);
+        font-size: 15px;
+      }
+
+      .card {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      .card h3 {
+        margin-top: 0;
+        margin-bottom: 12px;
+        font-size: 16px;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .card h3 span {
+        background-color: rgba(229, 77, 46, 0.1);
+        color: var(--accent-color);
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+      }
+
+      ul,
+      ol {
+        padding-left: 20px;
+        color: var(--text-muted);
+        margin: 0 0 16px 0;
+      }
+
+      li {
+        margin-bottom: 8px;
+        line-height: 1.6;
+        font-size: 15px;
+      }
+
+      .setting-item {
+        margin-bottom: 16px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid rgba(245, 240, 230, 0.05);
+      }
+
+      .setting-item:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+      }
+
+      .setting-name {
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .setting-desc {
+        font-size: 14px;
+        color: var(--text-muted);
+        margin: 0;
+      }
+
+      .tag-badge {
+        display: inline-block;
+        padding: 1px 6px;
+        font-size: 11px;
+        border-radius: 4px;
+        font-weight: normal;
+      }
+
+      .tag-required {
+        background-color: rgba(247, 104, 74, 0.15);
+        color: #f7684a;
+        border: 1px solid rgba(247, 104, 74, 0.2);
+      }
+
+      .tag-optional {
+        background-color: rgba(255, 255, 255, 0.08);
+        color: var(--text-muted);
+      }
+
+      footer {
+        width: 100%;
+        max-width: 800px;
+        padding: 24px;
+        text-align: center;
+        border-top: 1px solid var(--border-color);
+        box-sizing: border-box;
+        margin-top: 40px;
+        color: rgba(242, 238, 230, 0.3);
+        font-size: 12px;
+      }
+
+      footer a {
+        color: var(--accent-color);
+        text-decoration: none;
+      }
+
+      footer a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="brand">
+        <img src="icons/icon32.png" alt="Logo" />
+        <h1>khtranslator</h1>
+      </div>
+      <div class="lang-switcher">
+        <button class="lang-btn active" data-lang="en">English</button>
+        <button class="lang-btn" data-lang="km">ភាសាខ្មែរ</button>
+        <button class="lang-btn" data-lang="zh">中文</button>
+      </div>
+    </header>
+
+    <main>
+      <!-- ENGLISH GUIDE -->
+      <div id="guide-en" class="guide-section active">
+        <h2>1. How to Translate Video Subtitles (Anime)</h2>
+        <div class="card">
+          <h3>Auto-Translate & Inject</h3>
+          <p>
+            When watching anime or videos with English subtitles, the extension can translate and overlay them instantly in Khmer:
+          </p>
+          <ol>
+            <li>Open the video streaming page (e.g., <strong>Anistream</strong>, <strong>Khanime</strong>, or <strong>KHFullHD</strong>) and start playing the video.</li>
+            <li>Open the extension popup. If player subtitles are found, you will see a green <strong>"English Subtitles Detected!"</strong> notification.</li>
+            <li>Click <strong>"Auto Translate & Inject"</strong>. The AI will translate the lines and overlay them onto the video player.</li>
+          </ol>
+        </div>
+
+        <div class="card">
+          <h3>Translate & Inject Local Subtitle Files</h3>
+          <p>
+            You can also translate and play local subtitle files from your computer:
+          </p>
+          <ol>
+            <li>Drag & drop a subtitle file (<code>.srt</code>, <code>.vtt</code>, <code>.ass</code>, or <code>.lrc</code>) into the upload area in the popup.</li>
+            <li>Select your <strong>Source Language</strong> and <strong>Target Language</strong> (Khmer).</li>
+            <li>Click <strong>"Translate & Inject"</strong> to run translation and display them on the video player immediately.</li>
+            <li>Or, click <strong>"Inject Only"</strong> to play your subtitles without running any translation.</li>
+            <li>Once completed, you can click <strong>"Save / Download"</strong> to keep the translated subtitle file on your disk.</li>
+          </ol>
+        </div>
+
+        <h2>2. How to Translate Manga Pages</h2>
+        <div class="card">
+          <h3>Instant Visual Manga Translation</h3>
+          <p>
+            Read foreign manga pages in clean Khmer. The AI reads the original text bubbles, clears them, and draws Khmer text in their place:
+          </p>
+          <ol>
+            <li>Open a manga chapter on a supported site (e.g., <strong>MangaKatana</strong>).</li>
+            <li>Click the extension icon. You will see a <strong>"Manga Detected!"</strong> card showing the manga title, chapter, and total pages.</li>
+            <li>Select your preferred <strong>Manga Translation Mode</strong> in the settings tab (see below) and click <strong>"Auto Translate Manga"</strong>.</li>
+            <li>The extension will process each page, replacing the original text bubbles with Khmer translations automatically.</li>
+          </ol>
+        </div>
+
+        <div class="card">
+          <h3>Manga Translation Modes</h3>
+          <ul>
+            <li><strong>Normal Mode (Precise Overlay):</strong> Removes the original English/Japanese text and redraws Khmer translations exactly inside the speech bubbles. (Requires the Manga Server to be active).</li>
+            <li><strong>Fast Mode (Side-by-Side):</strong> Displays translations instantly without redraws, offering a quick reading flow.</li>
+          </ul>
+        </div>
+
+        <h2>3. Supported Websites</h2>
+        <div class="card">
+          <p>The extension automatically integrates and runs on the following platforms:</p>
+          <ul>
+            <li><strong>Anime & Video Streaming:</strong> 
+              <a href="https://anistream.one" target="_blank" rel="noopener noreferrer">Anistream</a>, 
+              <a href="https://khanime.co" target="_blank" rel="noopener noreferrer">Khanime</a>, 
+              <a href="https://khfullhd.co" target="_blank" rel="noopener noreferrer">KHFullHD</a>
+            </li>
+            <li><strong>Manga & Comics:</strong> 
+              <a href="https://mangakatana.com/" target="_blank" rel="noopener noreferrer">MangaKatana</a>, 
+              <a href="https://comix.to/" target="_blank" rel="noopener noreferrer">Comix.to</a>, 
+              <a href="https://mangaplus.shueisha.co.jp/" target="_blank" rel="noopener noreferrer">MangaPlus</a>
+            </li>
+          </ul>
+        </div>
+
+        <h2>4. Settings & Configurations Explained</h2>
+        <div class="card">
+          <div class="setting-item">
+            <div class="setting-name">
+              Gemini API Key
+              <span class="tag-badge tag-required">Required for AI</span>
+            </div>
+            <p class="setting-desc">
+              Your personal connection key from Google AI Studio. It is completely free, does not require a credit card, and ensures your translation requests go directly and securely from your browser to Google Gemini.
+            </p>
+          </div>
+          <div class="setting-item">
+            <div class="setting-name">
+              Select Model
+              <span class="tag-badge tag-optional">Optional</span>
+            </div>
+            <p class="setting-desc">
+              Choose the AI model brain. We recommend <code>gemini-3.1-flash-lite</code> for subtitles (very fast and uses less quota) and <code>gemini-3.5-flash</code> for manga.
+            </p>
+          </div>
+          <div class="setting-item">
+            <div class="setting-name">
+              Manga Server URL
+              <span class="tag-badge tag-required">Required for Normal Mode</span>
+            </div>
+            <p class="setting-desc">
+              The address of your image-clearing server (e.g. <code>https://khdownloader.xyz</code>). This server removes original text from manga panels so the extension can draw Khmer text in empty bubbles.
+            </p>
+          </div>
+          <div class="setting-item">
+            <div class="setting-name">
+              Smart Local Cache
+              <span class="tag-badge tag-optional">Optional</span>
+            </div>
+            <p class="setting-desc">
+              Saves all translated dialogue locally in your browser. Replaying a video or re-reading a manga chapter loads translations instantly from your local disk without consuming any API keys.
+            </p>
+          </div>
+          <div class="setting-item">
+            <div class="setting-name">
+              Mature Content (18+)
+              <span class="tag-badge tag-optional">Optional</span>
+            </div>
+            <p class="setting-desc">
+              Allows the AI to translate slang, swearing, and adult/violent dialogue accurately without censoring or triggering safety blocks.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- KHMER GUIDE -->
+      <div id="guide-km" class="guide-section">
+        <h2>១. របៀបបកប្រែ Subtitle វីដេអូ (Anime)</h2>
+        <div class="card">
+          <h3>បកប្រែ និងបញ្ចូលដោយស្វ័យប្រវត្តិ (Auto-Translate & Inject)</h3>
+          <p>
+            នៅពេលអ្នកទស្សនា Anime ឬវីដេអូដែលមាន Subtitle ជាភាសាអង់គ្លេស កម្មវិធី (Extension) នេះអាចបកប្រែ និងបង្ហាញជាភាសាខ្មែរនៅលើវីដេអូភ្លាមៗ៖
+          </p>
+          <ol>
+            <li>បើកគេហទំព័រវីដេអូ (ដូចជា <strong>Anistream</strong>, <strong>Khanime</strong>, ឬ <strong>KHFullHD</strong>) រួចចាក់វីដេអូ។</li>
+            <li>បើកផ្ទាំង Extension popup។ ប្រសិនបើប្រព័ន្ធស្វែងរកឃើញ Subtitle របស់វីដេអូ វានឹងបង្ហាញសារពណ៌បៃតង <strong>"English Subtitles Detected!"</strong>។</li>
+            <li>ចុចប៊ូតុង <strong>"Auto Translate & Inject"</strong>។ AI នឹងដំណើរការបកប្រែ និងបង្ហាញ Subtitle ភាសាខ្មែរនៅលើវីដេអូដោយស្វ័យប្រវត្តិ។</li>
+          </ol>
+        </div>
+
+        <div class="card">
+          <h3>បកប្រែ និងបញ្ចូលឯកសារ Subtitle ផ្ទាល់ខ្លួន</h3>
+          <p>
+            អ្នកក៏អាចបកប្រែ និងចាក់ឯកសារ Subtitle ពីកុំព្យូទ័ររបស់អ្នកបានដែរ៖
+          </p>
+          <ol>
+            <li>អូស និងទម្លាក់ឯកសារ Subtitle (ប្រភេទ <code>.srt</code>, <code>.vtt</code>, <code>.ass</code>, ឬ <code>.lrc</code>) ទៅក្នុងប្រអប់បង្ហោះនៅក្នុង Extension popup។</li>
+            <li>ជ្រើសរើស <strong>Source Language (ភាសាដើម)</strong> និង <strong>Target Language (ភាសាបកប្រែ)</strong> ជាភាសាខ្មែរ។</li>
+            <li>ចុចប៊ូតុង <strong>"Translate & Inject"</strong> ដើម្បីបកប្រែ និងចាក់នៅលើវីដេអូភ្លាមៗ។</li>
+            <li>ឬចុច <strong>"Inject Only"</strong> ប្រសិនបើអ្នកចង់ចាក់ Subtitle នោះភ្លាមៗដោយមិនបាច់បកប្រែ។</li>
+            <li>បន្ទាប់ពីបកប្រែរួចរាល់ អ្នកអាចចុចប៊ូតុង <strong>"Save / Download"</strong> ដើម្បីរក្សាទុកឯកសារ Subtitle ដែលបកប្រែរួចទៅក្នុងកុំព្យូទ័ររបស់អ្នក។</li>
+          </ol>
+        </div>
+
+        <h2>២. របៀបបកប្រែរឿង Manga</h2>
+        <div class="card">
+          <h3>បកប្រែអត្ថបទលើរូបភាព Manga ភ្លាមៗ</h3>
+          <p>
+            អានទំព័ររឿង Manga បរទេសជាភាសាខ្មែរយ៉ាងងាយស្រួល។ AI នឹងអានអត្ថបទដើម លុបវាចេញ រួចសរសេរភាសាខ្មែរជំនួសវិញនៅក្នុងប្រអប់អក្សរ៖
+          </p>
+          <ol>
+            <li>បើកទំព័ររឿង Manga នៅលើគេហទំព័រដែលគាំទ្រ (ដូចជា <strong>MangaKatana</strong>)។</li>
+            <li>ចុចលើរូបតំណាង Extension។ អ្នកនឹងឃើញកាត <strong>"Manga Detected!"</strong> បង្ហាញចំណងជើង វគ្គ និងចំនួនទំព័រ。</li>
+            <li>ជ្រើសរើស <strong>Manga Translation Mode</strong> នៅក្នុងផ្ទាំងការកំណត់ (Settings) រួចចុចប៊ូតុង <strong>"Auto Translate Manga"</strong>。</li>
+            <li>Extension នឹងដំណើរការទំព័រនីមួយៗ ដោយលុបអត្ថបទចាស់ចេញ និងជំនួសមកវិញនូវអក្សរខ្មែរនៅក្នុងប្រអប់ជជែកដោយស្វ័យប្រវត្តិ។</li>
+          </ol>
+        </div>
+
+        <div class="card">
+          <h3>របៀបបកប្រែរឿង Manga (Translation Modes)</h3>
+          <ul>
+            <li><strong>Normal Mode (បកប្រែជំនួសអក្សរចាស់):</strong> លុបអត្ថបទភាសាអង់គ្លេស/ជប៉ុនចាស់ចេញ រួចសរសេរអក្សរខ្មែរចូលក្នុងប្រអប់ជជែក (Speech Bubbles) យ៉ាងស្អាត។ (តម្រូវឱ្យបើកដំណើរការ Manga Server)។</li>
+            <li><strong>Fast Mode (បកប្រែរហ័ស):</strong> បង្ហាញអត្ថបទបកប្រែភ្លាមៗដោយមិនរង់ចាំការលុបរូបភាព ផ្ដល់នូវការអានយ៉ាងលឿនទាន់ចិត្ត។</li>
+          </ul>
+        </div>
+
+        <h2>៣. គេហទំព័រដែលកម្មវិធីនេះគាំទ្រ</h2>
+        <div class="card">
+          <p>Extension នេះអាចដំណើរការដោយស្វ័យប្រវត្តនៅលើគេហទំព័រទាំងនេះ៖</p>
+          <ul>
+            <li><strong>វីដេអូ និង Anime:</strong> 
+              <a href="https://anistream.one" target="_blank" rel="noopener noreferrer">Anistream</a>, 
+              <a href="https://khanime.co" target="_blank" rel="noopener noreferrer">Khanime</a>, 
+              <a href="https://khfullhd.co" target="_blank" rel="noopener noreferrer">KHFullHD</a>
+            </li>
+            <li><strong>Manga និងរឿងកំប្លែង:</strong> 
+              <a href="https://mangakatana.com/" target="_blank" rel="noopener noreferrer">MangaKatana</a>, 
+              <a href="https://comix.to/" target="_blank" rel="noopener noreferrer">Comix.to</a>, 
+              <a href="https://mangaplus.shueisha.co.jp/" target="_blank" rel="noopener noreferrer">MangaPlus</a>
+            </li>
+          </ul>
+        </div>
+
+        <h2>៤. ការពន្យល់អំពីការកំណត់ (Settings)</h2>
+        <div class="card">
+          <div class="setting-item">
+            <div class="setting-name">
+              Gemini API Key
+              <span class="tag-badge tag-required">តម្រូវឱ្យមាន (Required)</span>
+            </div>
+            <p class="setting-desc">
+              កូដ API Key ផ្ទាល់ខ្លួនរបស់អ្នកដែលទទួលបានពី Google AI Studio។ វាឥតគិតថ្លៃទាំងស្រុង មិនទាមទារកាតធនាគារ ហើយធានាថាទិន្នន័យបកប្រែផ្ញើដោយផ្ទាល់ និងមានសុវត្ថិភាពពីកម្មវិធីរុករករបស់អ្នកទៅកាន់ Google Gemini។
+            </p>
+          </div>
+          <div class="setting-item">
+            <div class="setting-name">
+              Select Model (ជ្រើសរើសម៉ូដែល AI)
+              <span class="tag-badge tag-optional">ជម្រើស (Optional)</span>
+            </div>
+            <p class="setting-desc">
+              ជ្រើសរើសម៉ូដែល AI សម្រាប់បកប្រែ។ យើងណែនាំឱ្យប្រើ <code>gemini-3.1-flash-lite</code> សម្រាប់វីដេអូ Subtitle (ដំណើរការលឿន និងអស់កូតាតិច) និង <code>gemini-3.5-flash</code> សម្រាប់ Manga។
+            </p>
+          </div>
+          <div class="setting-item">
+            <div class="setting-name">
+              Manga Server URL
+              <span class="tag-badge tag-required">តម្រូវឱ្យមានសម្រាប់ Normal Mode</span>
+            </div>
+            <p class="setting-desc">
+              អាសយដ្ឋាន Server សម្រាប់លុបអត្ថបទចេញពីទំព័ររូបភាព (ឧទាហរណ៍ <code>https://khdownloader.xyz</code>)។ ម៉ាស៊ីនបម្រើនេះជួយលុបអក្សរចាស់ចេញពីទំព័រ Manga ដើម្បីឱ្យ Extension អាចគូរអក្សរខ្មែរចូលក្នុងប្រអប់ទំនេរបាន។
+            </p>
+          </div>
+          <div class="setting-item">
+            <div class="setting-name">
+              Smart Cache (ការចងចាំលទ្ធផល)
+              <span class="tag-badge tag-optional">ជម្រើស (Optional)</span>
+            </div>
+            <p class="setting-desc">
+              រក្សាទុកលទ្ធផលបកប្រែទាំងអស់នៅក្នុង Browser របស់អ្នក។ នៅពេលអ្នកមើលវីដេអូ ឬអាន Manga ដដែលឡើងវិញ វានឹងទាញយកមកបង្ហាញភ្លាមៗដោយមិនបាច់បកប្រែម្តងទៀត និងមិនចំណាយកូតា API ឡើយ។
+            </p>
+          </div>
+          <div class="setting-item">
+            <div class="setting-name">
+              មាតិកាសម្រាប់មនុស្សពេញវ័យ (18+)
+              <span class="tag-badge tag-optional">ជម្រើស (Optional)</span>
+            </div>
+            <p class="setting-desc">
+              អនុញ្ញាតឱ្យ AI បកប្រែពាក្យស្លែង (Slang) ពាក្យអសុរស (Swearing) និងការសន្ទនាបែបហិង្សា/មនុស្សពេញវ័យបានន័យចំល្អ ដោយមិនមានការត្រង ឬបិទបាំងឡើយ។
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHINESE GUIDE -->
+      <div id="guide-zh" class="guide-section">
+        <h2>1. 如何翻译视频字幕 (动漫)</h2>
+        <div class="card">
+          <h3>自动翻译与注入</h3>
+          <p>
+            当您在观看带有英文或日文字幕的动漫视频时，本扩展可以立即将其翻译并以高精度的柬埔寨语（高棉语）覆写到播放器中：
+          </p>
+          <ol>
+            <li>打开视频播放页面（例如 <strong>Anistream</strong>、<strong>Khanime</strong> 或 <strong>KHFullHD</strong>）并开始播放视频。</li>
+            <li>打开扩展程序弹窗。如果检测到播放器字幕，您将看到绿色的 <strong>"English Subtitles Detected!"（检测到英文旁白字幕）</strong> 提示。</li>
+            <li>点击 <strong>"Auto Translate & Inject"（自动翻译并注入）</strong>。AI 将执行翻译并自动在视频上展示高棉语字幕。</li>
+          </ol>
+        </div>
+
+        <div class="card">
+          <h3>翻译并注入本地字幕文件</h3>
+          <p>
+            您也可以翻译并播放您电脑中的本地字幕文件：
+          </p>
+          <ol>
+            <li>将字幕文件（<code>.srt</code>、<code>.vtt</code>、<code>.ass</code> 或 <code>.lrc</code>）拖拽到弹窗中的上传区域。</li>
+            <li>选择 <strong>源语言</strong> 与 <strong>目标语言</strong>（柬埔寨高棉语）。</li>
+            <li>点击 <strong>"Translate & Inject"</strong> 运行 AI 翻译并立即展示在播放器上。</li>
+            <li>或者，点击 <strong>"Inject Only"</strong> 仅在播放器上加载字幕而不进行翻译。</li>
+            <li>翻译完成后，您可以点击 <strong>"Save / Download"</strong> 将翻译好的字幕文件保存到您的电脑中。</li>
+          </ol>
+        </div>
+
+        <h2>2. 如何翻译漫画图片</h2>
+        <div class="card">
+          <h3>网页漫画即时翻译</h3>
+          <p>
+            直接在网页中阅读高棉语漫画。AI 会智能识别漫画对白、清除原文字符并填入精美的高棉语翻译：
+          </p>
+          <ol>
+            <li>在受支持的漫画网站（例如 <strong>MangaKatana</strong>）打开漫画章节。</li>
+            <li>点击扩展图标，您将看到 <strong>"Manga Detected!"（检测到漫画）</strong> 卡片，展示漫画标题、章节和总页数。</li>
+            <li>在设置选项卡中选择您喜欢的 <strong>漫画翻译模式</strong>，然后点击 <strong>"Auto Translate Manga"（自动翻译漫画）</strong>。</li>
+            <li>扩展将自动处理每一页，擦除原有英文/日文对话框并在原处绘制高棉语翻译。</li>
+          </ol>
+        </div>
+
+        <div class="card">
+          <h3>漫画翻译模式</h3>
+          <ul>
+            <li><strong>标准模式 (Normal Mode):</strong> 擦除原英文/日文对话，并在气泡框内精准绘制高棉语翻译文本（需要配置并启用后端 Manga Server）。</li>
+            <li><strong>快速模式 (Fast Mode):</strong> 直接加载并展示翻译，无需等待图像擦除处理，提供极速的阅读体验。</li>
+          </ul>
+        </div>
+
+        <h2>3. 支持的网站平台</h2>
+        <div class="card">
+          <p>本扩展可自动在以下平台中无缝对接和运行：</p>
+          <ul>
+            <li><strong>动漫与视频流媒体:</strong> 
+              <a href="https://anistream.one" target="_blank" rel="noopener noreferrer">Anistream</a>, 
+              <a href="https://khanime.co" target="_blank" rel="noopener noreferrer">Khanime</a>, 
+              <a href="https://khfullhd.co" target="_blank" rel="noopener noreferrer">KHFullHD</a>
+            </li>
+            <li><strong>漫画与连环画:</strong> 
+              <a href="https://mangakatana.com/" target="_blank" rel="noopener noreferrer">MangaKatana</a>, 
+              <a href="https://comix.to/" target="_blank" rel="noopener noreferrer">Comix.to</a>, 
+              <a href="https://mangaplus.shueisha.co.jp/" target="_blank" rel="noopener noreferrer">MangaPlus</a>
+            </li>
+          </ul>
+        </div>
+
+        <h2>4. 核心设置与配置说明</h2>
+        <div class="card">
+          <div class="setting-item">
+            <div class="setting-name">
+              Gemini API Key
+              <span class="tag-badge tag-required">必填 (AI翻译)</span>
+            </div>
+            <p class="setting-desc">
+              您从 Google AI Studio 获取的个人连接密钥。完全免费，无需绑定信用卡，保障您的翻译请求在您的本地浏览器与 Google Gemini 之间直接且安全地传输。
+            </p>
+          </div>
+          <div class="setting-item">
+            <div class="setting-name">
+              选择模型
+              <span class="tag-badge tag-optional">可选</span>
+            </div>
+            <p class="setting-desc">
+              选择翻译使用的 AI 脑。推荐在翻译视频字幕时使用 <code>gemini-3.1-flash-lite</code>（速度极快且消耗配额极低），翻译漫画时使用 <code>gemini-3.5-flash</code>。
+            </p>
+          </div>
+          <div class="setting-item">
+            <div class="setting-name">
+              Manga Server URL
+              <span class="tag-badge tag-required">标准漫画翻译模式必填</span>
+            </div>
+            <p class="setting-desc">
+              图像文本擦除服务器 (例如 <code>https://khdownloader.xyz</code>)。该服务器用于擦除漫画图层上的原有英日文字符，以便扩展可以在空白对话框中绘制高棉语。
+            </p>
+          </div>
+          <div class="setting-item">
+            <div class="setting-name">
+              智能本地缓存 (Smart Cache)
+              <span class="tag-badge tag-optional">可选</span>
+            </div>
+            <p class="setting-desc">
+              将所有已翻译的文本保存在浏览器本地。当您重新观看视频或重读相同漫画章节时，直接从本地极速加载，不消耗任何 API 配额与服务器资源。
+            </p>
+          </div>
+          <div class="setting-item">
+            <div class="setting-name">
+              成人与暴力内容 (18+)
+              <span class="tag-badge tag-optional">可选</span>
+            </div>
+            <p class="setting-desc">
+              允许 AI 柬埔寨语翻译准确转换俚语、粗口和成人/暴力对白，不做任何人工屏蔽或安全过滤。
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>khtranslator &copy; 2026.</footer>
+
+    <script src="guide.js"></script>
+  </body>
+</html>
