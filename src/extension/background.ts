@@ -304,6 +304,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       error: "",
       startIndex: message.startIndex || 0
     };
+    activeTranslationState = {
+      translating: false,
+      percent: 0,
+      status: "",
+      translatedTexts: null,
+      cues: null,
+      error: ""
+    };
     mangaAbortController = new AbortController();
     
     const mangaServerUrl = message.mangaServerUrl || "https://example.com";
