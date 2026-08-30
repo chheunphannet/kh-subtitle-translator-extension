@@ -50,7 +50,54 @@ sudo systemctl restart erase-server
 
 ---
 
-## 📜 2. Real-Time Logs & Debugging (`journalctl`)
+## 🌍 2. Check Environment Variables & Runtime Settings
+
+### Check Service Environment Variables (Systemd)
+```bash
+# View all environment variables configured for the erase-server service
+sudo systemctl show erase-server --property=Environment
+
+# View environment variables of the currently running uvicorn process
+cat /proc/$(pgrep -f uvicorn | head -n 1)/environ | tr '\0' '\n'
+
+# View the systemd service file directly
+cat /etc/systemd/system/erase-server.service
+```
+
+### Check Shell Environment Variables
+```bash
+# Print all system/shell environment variables
+printenv
+# or
+env
+
+# Search for specific variables
+printenv REDIS_URL
+printenv PATH
+env | grep -i redis
+```
+
+### Check Python Virtual Environment (`.venv`)
+```bash
+# Activate virtual environment
+source ~/kh-translator/server/.venv/bin/activate
+
+# Check active Python interpreter path
+which python
+which python3
+
+# Check Python version
+python3 --version
+
+# List installed packages
+pip list
+# or
+pip freeze
+```
+
+---
+
+## 📜 3. Real-Time Logs & Debugging (`journalctl`)
 
 ### Follow Live Logs in Real Time
 ```bash
@@ -74,7 +121,7 @@ sudo journalctl -u erase-server -p err..emerg -f
 
 ---
 
-## 🔄 3. Update Code & Dependencies from GitHub
+## 🔄 4. Update Code & Dependencies from GitHub
 
 ### Fast One-Liner Update
 ```bash
@@ -105,7 +152,7 @@ sudo systemctl status erase-server
 
 ---
 
-## 🗄 4. Redis Cache Operations
+## 🗄 5. Redis Cache Operations
 
 ### Check Redis Status
 ```bash
@@ -135,7 +182,7 @@ redis-cli monitor
 
 ---
 
-## 🌐 5. Network, Ports & Health Testing
+## 🌐 6. Network, Ports & Health Testing
 
 ### Test Local Health Endpoint
 ```bash
@@ -164,7 +211,7 @@ sudo netfilter-persistent save
 
 ---
 
-## 📊 6. System Resource Monitoring & Memory Safety
+## 📊 7. System Resource Monitoring & Memory Safety
 
 ### Check RAM and Swap Memory Usage
 ```bash
@@ -191,7 +238,7 @@ sudo systemctl start erase-server
 
 ---
 
-## 🚀 7. Fresh VM Setup / Reinstallation
+## 🚀 8. Fresh VM Setup / Reinstallation
 
 To set up a brand new Ubuntu/Debian VM from scratch:
 
