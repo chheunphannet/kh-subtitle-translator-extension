@@ -266,7 +266,7 @@ const App = () => {
       clearInterval(pollInterval);
       chrome.runtime.onMessage.removeListener(messageListener);
     };
-  }, [restoreCompletedTranslation, translating, loc]);
+  }, [restoreCompletedTranslation, translating, activeTranslationType, loc]);
 
   useEffect(() => {
     // Only save after initial load completes to avoid overwriting stored config with defaults

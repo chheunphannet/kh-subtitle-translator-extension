@@ -274,6 +274,11 @@ async def worker_loop(queue):
             queue.task_done()
             break
         future = job["future"]
+        if future.cancelled():
+            logger.info("Job was cancelled by the client before processing began. Skipping.")
+            queue.task_done()
+            continue
+            
         await process_image_task(job, future)
         queue.task_done()
 

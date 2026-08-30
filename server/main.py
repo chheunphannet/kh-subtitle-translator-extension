@@ -194,6 +194,10 @@ async def erase_image(
         # Client handles their own timeout, but we can set one here too if we want.
         # For now, rely on queue size and worker throughput to bound wait times.
         result_data = await future
+    except asyncio.CancelledError:
+        logger.info(f"Client disconnected while waiting for {img_hash}. Cancelling job.")
+        future.cancel()
+        raise
     except Exception as e:
         logger.error(f"Error processing image in worker: {e}")
         raise HTTPException(status_code=500, detail="Error processing image")

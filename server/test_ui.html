@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erase API Tester</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            padding: 20px; 
+            background: #f5f5f5;
+        }
+        .container { 
+            display: flex; 
+            gap: 20px; 
+            margin-top: 20px; 
+            flex-wrap: wrap;
+        }
+        .box { 
+            flex: 1; 
+            min-width: 300px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 15px; 
+            text-align: center; 
+        }
+        img { 
+            max-width: 100%; 
+            height: auto; 
+            border: 1px solid #eee; 
+            margin-top: 10px; 
+            border-radius: 4px;
+        }
+        .status-text { 
+            margin-top: 15px; 
+            font-weight: bold;
+            color: #0066cc;
+        }
+        button {
+            padding: 10px 20px;
+            background: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover { background: #0052a3; }
+        input[type="file"] {
+            margin-right: 10px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Test the /erase API (Client-Side Gemini)</h2>
+    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <input type="password" id="apiKey" placeholder="Gemini API Key" style="margin-bottom: 10px; padding: 5px; width: 300px;"><br>
+        <input type="file" id="fileInput" accept="image/*" multiple>
+        <button onclick="uploadImages()">Upload and Erase</button>
+        <div id="globalStatus" class="status-text"></div>
+    </div>
+    
+    <div id="resultsContainer"></div>
+
+    <script>
+        window.onload = () => {
+            const savedKey = localStorage.getItem('geminiApiKey');
+            if (savedKey) {
+                document.getElementById('apiKey').value = savedKey;
+            }
+        };
+
+        const DB_NAME = "MangaCacheDB";
+        const STORE_NAME = "ImageResults";
+
+        function openDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, 1);
+                request.onupgradeneeded = event => {
+                    const db = event.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) {
+                        db.createObjectStore(STORE_NAME);
+                    }
+                };
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function getCache(hash) {
+            const db = await openDB();
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(STORE_NAME, "readonly");
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.get(hash);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function setCache(hash, data) {
+            const db = await openDB();
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(STORE_NAME, "readwrite");
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.put(data, hash);
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function hashImage(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const base64String = reader.result.replace("data:", "").replace(/^.+,/, "");
+                    resolve(base64String);
+                };
+                reader.onerror = error => reject(error);
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        function createUIForFile(file, index) {
+            const container = document.createElement('div');
+            container.style.borderTop = "2px solid #ccc";
+            container.style.marginTop = "20px";
+            container.style.paddingTop = "20px";
+            
+            const title = document.createElement('h3');
+            title.innerText = `File: ${file.name}`;
+            container.appendChild(title);
+            
+            const statusDiv = document.createElement('div');
+            statusDiv.className = "status-text";
+            statusDiv.innerText = "Pending...";
+            container.appendChild(statusDiv);
+            
+            const flexContainer = document.createElement('div');
+            flexContainer.className = "container";
+            
+            const createBox = (titleText) => {
+                const box = document.createElement('div');
+                box.className = "box";
+                const h3 = document.createElement('h3');
+                h3.innerText = titleText;
+                const img = document.createElement('img');
+                img.style.display = "none";
+                box.appendChild(h3);
+                box.appendChild(img);
+                flexContainer.appendChild(box);
+                return img;
+            };
+            
+            const originalImg = createBox("Original Image");
+            const boxesImg = createBox("Detected Text (Boxes)");
+            const erasedImg = createBox("Cleaned Image (Erased)");
+            const finalImg = createBox("Final Translated Image");
+            
+            originalImg.src = URL.createObjectURL(file);
+            originalImg.style.display = "block";
+            
+            container.appendChild(flexContainer);
+            document.getElementById('resultsContainer').appendChild(container);
+            
+            return { statusDiv, boxesImg, erasedImg, finalImg };
+        }
+
+        async function uploadImages() {
+            const fileInput = document.getElementById('fileInput');
+            const apiKey = document.getElementById('apiKey').value.trim();
+            const globalStatus = document.getElementById('globalStatus');
+            const resultsContainer = document.getElementById('resultsContainer');
+            
+            if (!apiKey) {
+                alert("Please enter your Gemini API Key first.");
+                return;
+            }
+            
+            localStorage.setItem('geminiApiKey', apiKey);
+
+            if (fileInput.files.length === 0) {
+                alert("Please select at least one file.");
+                return;
+            }
+
+            const files = Array.from(fileInput.files);
+            resultsContainer.innerHTML = ''; 
+            globalStatus.innerText = "Checking local browser cache...";
+
+            // Create UI elements for each file beforehand
+            const uiElements = [];
+            for (let i = 0; i < files.length; i++) {
+                uiElements.push(createUIForFile(files[i], i));
+            }
+
+            const filesToProcess = [];
+            const uiForProcessing = [];
+
+            // 1. Check cache for all files
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const ui = uiElements[i];
+                const fileHash = await hashImage(file);
+                const localCachedData = await getCache(fileHash);
+                
+                if (localCachedData) {
+                    displayResult(localCachedData, ui, true);
+                } else {
+                    filesToProcess.push({ file, hash: fileHash });
+                    uiForProcessing.push(ui);
+                }
+            }
+
+            if (filesToProcess.length === 0) {
+                globalStatus.innerText = "All images loaded from local cache! ⚡";
+                return;
+            }
+
+            globalStatus.innerText = `Step 1: Sending ${filesToProcess.length} un-cached image(s) to Gemini in ONE request...`;
+
+            try {
+                // Prepare single batch payload to Gemini
+                const prompt = "You are an expert manga translator. Analyze these manga pages in order. For each image, provide a separate analysis object in the 'pages' array in the exact same order the images were provided.\nCRITICAL RULES FOR EACH PAGE:\n- ONLY detect actual readable dialogue, narration, or basic sound effects.\n- DO NOT detect chapter titles, page numbers, credits, or margin text.\n- DO NOT hallucinate text! DO NOT draw boxes around empty space, character faces, shadows, or speech bubble borders.\n- The 2D bounding box [ymin, xmin, ymax, xmax] (0-1000) MUST tightly wrap the text and nothing else.\n- Transcribe the original English/Japanese text.\n- Translate to Khmer. CRITICAL: DO NOT translate character names, special attacks, power systems, or unique in-world lore/terminology. You MUST keep these specific keywords completely in English.\n- Judge font size (large/medium/small).\n- Judge if bold or italic.";
+                
+                const parts = [{"text": prompt}];
+                
+                for (let i = 0; i < filesToProcess.length; i++) {
+                    const base64Image = await fileToBase64(filesToProcess[i].file);
+                    parts.push({"inlineData": {"mimeType": filesToProcess[i].file.type || "image/jpeg", "data": base64Image}});
+                }
+
+                const payload = {
+                    "contents": [{"parts": parts}],
+                    "generationConfig": {
+                        "responseMimeType": "application/json",
+                        "responseSchema": {
+                            "type": "OBJECT",
+                            "properties": {
+                                "pages": {
+                                    "type": "ARRAY",
+                                    "description": "An array of results, one for each image provided, in the exact same order.",
+                                    "items": {
+                                        "type": "OBJECT",
+                                        "properties": {
+                                            "is_skip": {"type": "BOOLEAN"},
+                                            "text_blocks": {
+                                                "type": "ARRAY",
+                                                "items": {
+                                                    "type": "OBJECT",
+                                                    "properties": {
+                                                        "box_2d": {"type": "ARRAY", "items": {"type": "INTEGER"}},
+                                                        "original_text": {"type": "STRING"},
+                                                        "translated_text_khmer": {"type": "STRING"},
+                                                        "fontSize": {"type": "STRING"},
+                                                        "isBold": {"type": "BOOLEAN"},
+                                                        "isItalic": {"type": "BOOLEAN"}
+                                                    },
+                                                    "required": ["box_2d", "original_text", "translated_text_khmer", "fontSize", "isBold", "isItalic"]
+                                                }
+                                            }
+                                        },
+                                        "required": ["is_skip", "text_blocks"]
+                                    }
+                                }
+                            },
+                            "required": ["pages"]
+                        }
+                    }
+                };
+
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${apiKey}`;
+                const geminiRes = await fetch(url, {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify(payload)
+                });
+
+                if (!geminiRes.ok) {
+                    throw new Error(`Gemini API Error: ${geminiRes.status} ${await geminiRes.text()}`);
+                }
+
+                const geminiData = await geminiRes.json();
+                const textContent = geminiData.candidates[0].content.parts[0].text;
+                const parsedData = JSON.parse(textContent);
+                const pagesData = parsedData.pages || [];
+                
+                globalStatus.innerText = `Step 2: Received batch response from Gemini! Sending ${filesToProcess.length} requests concurrently to local server...`;
+
+                // Now send to local server concurrently for each UN-CACHED image
+                const promises = [];
+                for (let i = 0; i < filesToProcess.length; i++) {
+                    const fileObj = filesToProcess[i];
+                    const ui = uiForProcessing[i];
+                    
+                    // Match Gemini result to this un-cached file
+                    const pageData = pagesData[i] || { text_blocks: [] };
+                    const textBlocks = pageData.text_blocks || [];
+                    
+                    ui.statusDiv.innerText = `Sending ${textBlocks.length} text blocks to local server...`;
+                    
+                    // Fire off concurrent server requests
+                    const promise = (async () => {
+                        try {
+                            const formData = new FormData();
+                            formData.append("image", fileObj.file);
+                            formData.append("text_blocks", JSON.stringify(textBlocks));
+
+                            const response = await fetch("http://127.0.0.1:8000/erase", {
+                                method: "POST",
+                                body: formData
+                            });
+
+                            if (!response.ok) {
+                                throw new Error(`Server HTTP error! status: ${response.status}`);
+                            }
+
+                            const data = await response.json();
+                            
+                            // Save to local cache
+                            await setCache(fileObj.hash, data);
+                            
+                            displayResult(data, ui, false);
+                        } catch (err) {
+                            console.error(`Server Error on file ${fileObj.file.name}:`, err);
+                            ui.statusDiv.innerText = "❌ Error: " + err.message;
+                            ui.statusDiv.style.color = "red";
+                        }
+                    })();
+                    
+                    promises.push(promise);
+                }
+                
+                await Promise.all(promises);
+                globalStatus.innerText = "All images completely processed!";
+
+            } catch (error) {
+                console.error("Global Error:", error);
+                globalStatus.innerText = "❌ Error: " + error.message;
+                globalStatus.style.color = "red";
+                
+                // Mark all processing UI elements as failed if Gemini failed
+                for (let ui of uiForProcessing) {
+                    if (ui.statusDiv.innerText === "Pending...") {
+                        ui.statusDiv.innerText = "❌ Batch Gemini Request Failed";
+                        ui.statusDiv.style.color = "red";
+                    }
+                }
+            }
+        }
+
+        function displayResult(data, ui, isLocalCache) {
+            if (data.boxes_image) {
+                ui.boxesImg.src = "data:image/jpeg;base64," + data.boxes_image;
+                ui.boxesImg.style.display = "block";
+            }
+            if (data.erased_image) {
+                ui.erasedImg.src = "data:image/jpeg;base64," + data.erased_image;
+                ui.erasedImg.style.display = "block";
+            }
+            if (data.final_image) {
+                ui.finalImg.src = "data:image/jpeg;base64," + data.final_image;
+                ui.finalImg.style.display = "block";
+            }
+            
+            if (isLocalCache) {
+                ui.statusDiv.innerText = "Loaded instantly from your browser's local IndexedDB Cache! ⚡";
+            } else {
+                ui.statusDiv.innerText = "Done! ✅ (Server Cache Hit: " + data.cached + ")";
+            }
+            ui.statusDiv.style.color = "green";
+        }
+    </script>
+</body>
+</html>

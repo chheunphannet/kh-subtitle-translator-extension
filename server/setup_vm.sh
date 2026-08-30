@@ -103,5 +103,6 @@ sudo systemctl enable erase-server
 
 echo "=== Setup Complete! ==="
 echo "The server is running on port 8000 (and forwarded to port 80)."
+
 echo "You can check status using: sudo systemctl status erase-server"
 echo "Or view live logs using: sudo journalctl -u erase-server -f"
